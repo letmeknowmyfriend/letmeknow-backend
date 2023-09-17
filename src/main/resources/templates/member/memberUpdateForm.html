@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+
+    <form role="form" th:action="@{/members/{memberId}/update(memberId = ${memberFindDto.id})}" th:object="${memberUpdateForm}" method="post">
+        <div class="form-group">
+            <label th:for="name">이름</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="이름을 입력하세요." value="이름" th:value="${memberFindDto.name}"
+                   th:class="${#fields.hasErrors('name')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">부적절한 이름입니다.</p>
+        </div>
+
+        <div class="form-group">
+            <label th:for="city">도시</label>
+            <input type="text" id="city" name="city" class="form-control" placeholder="도시를 입력하세요." value="도시" th:value="${memberFindDto.city}"
+                    th:class="${#fields.hasErrors('city')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('city')}" th:errors="*{city}">부적절한 도시입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="street">거리</label>
+            <input type="text" id="street" name="street" class="form-control" placeholder="거리를 입력하세요." value="거리" th:value="${memberFindDto.street}"
+                   th:class="${#fields.hasErrors('street')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('street')}" th:errors="*{street}">부적절한 거리입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="zipcode">우편번호</label>
+            <input type="text" id="zipcode" name="zipcode" class="form-control" placeholder="우편번호를 입력하세요." value="우편번호" th:value="${memberFindDto.zipcode}"
+                   th:class="${#fields.hasErrors('zipcode')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('zipcode')}" th:errors="*{zipcode}">부적절한 우편번호입니다.</p>
+        </div>
+        <button type="submit" class="btn btn-success">완료</button>
+    </form>
+    <br/>
+    <div th:replace="fragments/footer :: footer" />
+</div>
+
+</body>
+</html>

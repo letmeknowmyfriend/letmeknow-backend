@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+
+    <div class="py-5 text-center">
+        <h2>가게 정보 입력</h2>
+    </div>
+
+    <form role="form" th:action="@{/members/{id}/stores/new(id = ${memberId})}" th:object="${storeCreationForm}" method="post">
+        <div class="form-group">
+            <label th:for="name">가게 이름</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요."
+                   th:class="${#fields.hasErrors('name')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">부적절한 가게 이름입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="city">도시</label>
+            <input type="text" th:field="*{city}" class="form-control" placeholder="도시를 입력하세요."
+                   th:class="${#fields.hasErrors('city')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('city')}" th:errors="*{city}">부적절한 도시입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="street">거리</label>
+            <input type="text" th:field="*{street}" class="form-control" placeholder="거리를 입력하세요."
+                   th:class="${#fields.hasErrors('street')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('street')}" th:errors="*{street}">부적절한 거리입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="zipcode">우편번호</label>
+            <input type="text" th:field="*{zipcode}" class="form-control" placeholder="우편번호를 입력하세요."
+                   th:class="${#fields.hasErrors('zipcode')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('zipcode')}" th:errors="*{zipcode}">부적절한 우편번호입니다.</p>
+        </div>
+        <button type="submit" class="btn btn-success">완료</button>
+    </form>
+    <br/>
+    <div th:replace="fragments/footer :: footer" />
+</div>
+
+</body>
+</html>

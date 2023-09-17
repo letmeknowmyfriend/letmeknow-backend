@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+            href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 560px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>상품 상세</h2>
+    </div>
+
+    <!-- 추가 -->
+    <h2 th:if="${param.status}" th:text="'저장 완료'"></h2>
+
+    <div>
+        <label for="name">상품명</label>
+        <input type="text" id="name" name="name" class="form-control" value="상품명" th:value="${itemFindDto.name}" readonly>
+    </div>
+    <div>
+        <label for="price">가격</label>
+        <input type="text" id="price" name="price" class="form-control" value="가격" th:value="${itemFindDto.price}" readonly>
+    </div>
+    <div>
+        <label for="stock">재고</label>
+        <input type="text" id="stock" name="stock" class="form-control" value="재고" th:value="${itemFindDto.stock}" readonly>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col">
+            <button class="w-75 btn btn-danger btn-lg"
+                    onclick="location.href='editForm.html'"
+                    th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/items/{itemId}/delete(memberId = ${memberId}, storeId = ${storeId}, itemId = ${itemFindDto.id})}'|"
+                    type="button">삭제</button>
+        </div>
+        <div class="col">
+            <button class="w-75 btn btn-primary btn-lg"
+                    onclick="location.href='editForm.html'"
+                    th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/items/{itemId}/update(memberId = ${memberId}, storeId = ${storeId}, itemId = ${itemFindDto.id})}'|"
+                    type="button">수정</button>
+        </div>
+        <div class="col">
+            <button class="w-75 btn btn-secondary btn-lg"
+                    onclick="location.href='items.html'"
+                    th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/items(memberId = ${memberId}, storeId = ${storeId})}'|"
+                    type="button">목록</button>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

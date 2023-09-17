@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<style>
+    .login-button {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+
+    <div class="container mt-4">
+        <h2 class="text-center">소셜 로그인</h2>
+        <div class="row">
+            <div class="col-md-6 col-md-3 mt-3 mt-md-0 d-flex justify-content-center">
+                <a href="/auth/signup" class="btn btn-lg btn-primary login-button">회원가입</a>
+            </div>
+
+            <!--OAuth 로그인 버튼을 표시한다.-->
+            <div class="col-md-6 col-md-3 mt-3 mt-md-0 d-flex justify-content-center">
+                <a href="/auth/login/oauth2/authorization/kakao" class="login-button"><img src="/img/auth/oauth/button/kakao_login_medium_narrow.png"/></a>
+            </div>
+            <div class="col-md-6 col-md-3 mt-3 mt-md-0 d-flex justify-content-center">
+                <a href="/auth/login/oauth2/authorization/naver" class="login-button"><img src="/img/auth/oauth/button/naver_login_btnG_official.png"/></a>
+            </div>
+            <div class="col-md-6 col-md-3 mt-3 mt-md-0 d-flex justify-content-center">
+                <a href="/auth/login/oauth2/authorization/google" class="login-button"><img src="/img/auth/oauth/button/google_login_dark_normal_web@2x.png"/></a>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <form role="form" action="/auth/login/member" th:object="${memberLogInForm}" method="POST">
+
+            <div class="form-group">
+                <label th:for="email">이메일</label>
+                <input type="text" th:field="*{email}" class="form-control" placeholder="이메일을 입력하세요."
+                       th:class="${#fields.hasErrors('email')}? 'form-control fieldError' : 'form-control'">
+                <p th:if="${memberLogInError.email}" th:text="${memberLogInError.email}">부적절한 이메일입니다.</p>
+            </div>
+            <div class="form-group">
+                <label th:for="password">비밀번호</label>
+                    <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요."
+                       th:class="${#fields.hasErrors('password')}? 'form-control fieldError' : 'form-control'">
+                <p th:if="${memberLogInError.password}" th:text="${memberLogInError.password}">부적절한 비밀번호입니다.</p>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success btn-lg">완료</button>
+            </div>
+        </form>
+    </div>
+
+    <br/>
+    <div th:replace="fragments/footer :: footer" />
+</div>
+
+
+</body>
+</html>

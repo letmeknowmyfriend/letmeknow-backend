@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div class="py-5 text-center">
+        <h2>가게 정보</h2>
+    </div>
+
+    <div>
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>가게 이름</th>
+                <th>도시</th>
+                <th>주소</th>
+                <th>우편번호</th>
+                <th>현재 상태</th>
+                <th>수정</th>
+            </tr>
+            </thead>
+            <tbody>
+                <td th:text="${storeDto.name}"></td>
+                <td th:text="${storeDto.getCity}"></td>
+                <td th:text="${storeDto.getStreet}"></td>
+                <td th:text="${storeDto.getZipcode}"></td>
+                <td>
+                    <button class="w-75 btn btn-primary btn-sm"
+                            th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/changeStoreStatus(memberId = ${storeDto.memberId}, storeId = ${storeDto.id})}'|"
+                            type="button"
+                            th:text="${storeDto.storeStatus}">테이블 상태
+                    </button>
+                </td>
+                <td>
+                    <button class="w-75 btn btn-primary btn-sm"
+                            th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/update(memberId = ${storeDto.memberId}, storeId = ${storeDto.id})}'|"
+                            type="button">수정
+                    </button>
+                </td>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="jumbotron">
+        <button class="w-75 btn btn-primary btn-lg"
+                th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables(memberId = ${storeDto.memberId}, storeId = ${storeDto.id})}'|"
+                type="button">테이블 목록
+        </button>
+        <button class="w-75 btn btn-primary btn-lg"
+                th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/items(memberId = ${storeDto.memberId}, storeId = ${storeDto.id})}'|"
+                type="button">상품 목록
+        </button>
+    </div>
+    <div th:replace="fragments/footer :: footer" />
+
+</div>
+
+</body>
+</html>

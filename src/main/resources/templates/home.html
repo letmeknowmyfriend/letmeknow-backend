@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+    <title>Hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+
+<div class="container">
+
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div class="jumbotron">
+        <h2>MyLittleStore</h2>
+        <p th:unless="${username}" class="lead">회원 기능</p>
+        <p th:unless="${username}">
+            <a class="btn btn-lg btn-secondary" href="/auth/login">로그인</a>
+        </p>
+        <p th:if="${username}" class="lead" th:text="'안녕하세요 ' + ${username} + '님'"></p>
+        <p th:if="${username}">
+            <a class="btn btn-lg btn-secondary" th:href="@{/members/{memberId}(memberId = ${memberFindDto.id})}">내 정보</a>
+            <a class="btn btn-lg btn-secondary" href="/auth/logout">로그아웃</a>
+        </p>
+        <p class="lead">상품 기능</p>
+        <p>
+            <a class="btn btn-lg btn-dark" href="/items/new">상품 등록</a>
+            <a class="btn btn-lg btn-dark" href="/items">상품 목록</a>
+        </p>
+        <p class="lead">주문 기능</p>
+        <p>
+            <a class="btn btn-lg btn-info" href="/order">상품 주문</a>
+            <a class="btn btn-lg btn-info" href="/orders">주문 내역</a>
+        </p>
+    </div>
+
+    <div th:replace="fragments/footer :: footer" />
+
+</div>
+
+</body>
+</html>

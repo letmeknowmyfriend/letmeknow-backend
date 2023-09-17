@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div class="py-5 text-center">
+        <h2>회원 목록</h2>
+    </div>
+
+    <div>
+        <table th:if="${memberFindDtos.size() > 0}" class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>이름</th>
+                <th>도시</th>
+                <th>주소</th>
+                <th>우편번호</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="memberFindDto : ${memberFindDtos}" th:onclick="|location.href='@{/members/{memberId}(memberId = ${memberFindDto.id})}'|">
+                    <td th:text="${memberFindDto.name}"></td>
+                    <td th:text="${memberFindDto?.city}"></td>
+                    <td th:text="${memberFindDto?.street}"></td>
+                    <td th:text="${memberFindDto?.zipcode}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="fragments/footer :: footer" />
+
+</div>
+
+</body>
+</html>
