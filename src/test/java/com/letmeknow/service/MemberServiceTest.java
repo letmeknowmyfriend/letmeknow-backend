@@ -10,7 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.dto.member.MemberUpdateDto;
 import com.letmeknow.dto.store.StoreCreationDto;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.dto.member.MemberPasswordUpdateDto;

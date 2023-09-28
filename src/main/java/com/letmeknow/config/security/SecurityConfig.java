@@ -91,7 +91,7 @@ public class SecurityConfig {
                 //로그아웃
                 .logout()
                 .logoutUrl("/auth/logout")
-                .logoutSuccessUrl("/auth/login")
+                .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .addLogoutHandler(jwtLogoutHandler);

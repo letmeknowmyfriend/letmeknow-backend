@@ -8,7 +8,7 @@ spring:
     test: classpath*:sql/test.sql
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
 #      hibernate:
 #        show_sql: true
@@ -20,6 +20,7 @@ spring:
 #          descriptor:
 #            sql: trace
     open-in-view: false
+    database: h2
   security:
     oauth2:
       client:

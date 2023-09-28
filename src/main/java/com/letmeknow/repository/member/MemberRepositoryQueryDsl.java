@@ -10,4 +10,5 @@ public interface MemberRepositoryQueryDsl {
     Optional<Member> findNotDeletedByPasswordVerificationCode(String passwordVerificationCode);
     Optional<Long> findIdByEmail(String email);
     Optional<Long> findNotDeletedIdByEmail(String email);
+    Optional<Member> findNotDeletedByEmailAndDeviceTokenAndSubscription(String email);
 }

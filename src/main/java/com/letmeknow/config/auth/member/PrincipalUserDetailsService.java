@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.repository.member.MemberRepository;
 
 @Service

@@ -20,7 +20,7 @@
 //import org.springframework.web.filter.OncePerRequestFilter;
 //import com.letmeknow.config.auth.PrincipalUserDetails;
 //import com.letmeknow.domain.member.Member;
-//import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+//import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 //import com.letmeknow.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 //import com.letmeknow.exception.auth.jwt.AccessTokenException;
 //import com.letmeknow.repository.member.MemberRepository;

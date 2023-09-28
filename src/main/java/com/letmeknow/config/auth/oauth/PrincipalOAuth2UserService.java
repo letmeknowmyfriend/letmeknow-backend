@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.domain.auth.OAuth2;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.oauth2.OAuth2ErrorMessage;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.exception.auth.oauth2.NoSuchOAuth2Exception;

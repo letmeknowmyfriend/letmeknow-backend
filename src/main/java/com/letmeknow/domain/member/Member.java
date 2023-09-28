@@ -1,6 +1,8 @@
 package com.letmeknow.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.letmeknow.domain.notification.Subscription;
+import com.letmeknow.domain.notification.DeviceToken;
 import lombok.*;
 import com.letmeknow.domain.Address;
 import com.letmeknow.domain.Store;
@@ -15,7 +17,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,6 +44,14 @@ public class Member extends BaseEntity {
     @NotNull
     @OneToMany(mappedBy = "member")
     private List<Store> stores = new ArrayList<>();
+
+    @NotNull
+    @OneToMany(mappedBy = "member")
+    private Set<Subscription> subscriptions = new HashSet<>();
+
+    @NotNull
+    @OneToMany(mappedBy = "member")
+    private Set<DeviceToken> deviceTokens = new HashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -150,6 +162,14 @@ public class Member extends BaseEntity {
 
     public void setJwt(Jwt jwt) {
         this.jwt = jwt;
+    }
+
+    public void addDeviceToken(DeviceToken deviceToken) {
+        deviceTokens.add(deviceToken);
+    }
+
+    public void removeDeviceToken(DeviceToken deviceToken) {
+        deviceTokens.remove(deviceToken);
     }
 
 //    public void updateStoreName(String originalName, String newStoreName) throws IllegalStateException {

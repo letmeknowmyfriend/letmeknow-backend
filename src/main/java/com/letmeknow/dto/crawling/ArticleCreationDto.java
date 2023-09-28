@@ -1,7 +1,7 @@
 package com.letmeknow.dto.crawling;
 
 import com.letmeknow.domain.Article;
-import com.letmeknow.domain.BoardNumber;
+import com.letmeknow.domain.Board;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +37,7 @@ public class ArticleCreationDto {
     }
 
     // toEntity
-    public Article toEntity(BoardNumber boardNumber) {
+    public Article toEntity(Board boardNumber) {
         return Article.builder()
                 .boardNumber(boardNumber)
                 .title(title)

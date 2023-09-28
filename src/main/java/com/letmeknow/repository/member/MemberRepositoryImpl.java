@@ -9,6 +9,8 @@ import javax.persistence.EntityManager;
 import java.util.Optional;
 
 import static com.letmeknow.domain.member.QMember.member;
+import static com.letmeknow.domain.notification.QSubscription.subscription;
+import static com.letmeknow.domain.notification.QDeviceToken.deviceToken1;
 
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
@@ -78,5 +80,20 @@ public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
                                 .and(member.status.ne(MemberStatus.DELETED)))
                         .fetchOne()
         );
+    }
+
+    @Override
+    public Optional<Member> findNotDeletedByEmailAndDeviceTokenAndSubscription(String email) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return Optional.ofNullable(
+            queryFactory
+                .selectDistinct(member)
+                .from(member)
+                .where(member.email.eq(email)
+                    .and(member.status.ne(MemberStatus.DELETED)))
+                .leftJoin(member.deviceTokens, deviceToken1).fetchJoin()
+                .leftJoin(member.subscriptions, subscription).fetchJoin()
+            .fetchOne());
     }
 }

@@ -1,5 +1,6 @@
 package com.letmeknow.config.auth.member;
 
+import com.letmeknow.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
+    private final NotificationService notificationService;
 
     /**
      * 로그인 성공 시, JwtEntity를 생성하고 AccessToken과 RefreshToken을 Cookie에 담아 보낸다.
@@ -37,6 +39,11 @@ public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
 
         //token들을 발급한다.
         jwtService.issueTokens(email, response);
+
+        String deviceToken = request.getParameter("deviceToken");
+
+        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+        notificationService.whenMemberLogIn_AddDeviceToken_AddFCMSubscription(email, deviceToken);
 
         //Member 로그인 성공 시, 메인 페이지로 이동
         response.setStatus(HttpServletResponse.SC_OK);

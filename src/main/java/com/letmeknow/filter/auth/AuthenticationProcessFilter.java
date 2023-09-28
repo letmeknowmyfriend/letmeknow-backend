@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 import com.letmeknow.exception.auth.jwt.NoSuchJwtException;
 import com.letmeknow.exception.auth.jwt.NotValidJwtException;
@@ -70,7 +70,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                 try
                 {
                     //access token에서 email 추출
-                    String email = jwtService.extractEmailFromAccessToken(accessToken)
+                    String email = jwtService.extractEmailFromToken(accessToken)
                             .orElseThrow(() -> new NotValidJwtException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
 
                     //해당 email을 사용하는 유저 객체 반환
@@ -89,7 +89,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                 {
                     //access token이 유효하지 않으면, 인증 실패
                     //모든 토큰 삭제
-                    jwtService.deleteAllTokens(response);
+                    jwtService.deleteAllTokensFromClient(response);
 
                     //로그인 페이지로 redirect
                     response.sendRedirect("/auth/login");
@@ -119,7 +119,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                     //refresh token인 유효하지 않거나 DB에 없거나 기한이 지났으면, 인증 실패
                     else {
                         //모든 토큰 삭제
-                        jwtService.deleteAllTokens(response);
+                        jwtService.deleteAllTokensFromClient(response);
 
                         //로그인 페이지로 redirect
                         response.sendRedirect("/auth/login");
@@ -129,7 +129,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
 
                 //refresh token도 없으면, 인증이 없는 것
                 else {
-                    //예외로 메인 페이지는 볼 수 있음
+                    // 예외로 메인 페이지는 볼 수 있음
                     if (request.getRequestURI().equals("/")) {
                         filterChain.doFilter(request, response); //다음 필터 호출
                         return;
@@ -143,7 +143,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
         //해당 사용자가 없을 때
         } catch (NoSuchMemberException | NoSuchJwtException e) {
             //모든 토큰 삭제
-            jwtService.deleteAllTokens(response);
+            jwtService.deleteAllTokensFromClient(response);
 
             //로그인 페이지로 redirect
             response.sendRedirect("/auth/login");
@@ -152,7 +152,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
         //access token이 유효하지 않을 때
         } catch (NotValidJwtException e) {
             //모든 토큰 삭제
-            jwtService.deleteAllTokens(response);
+            jwtService.deleteAllTokensFromClient(response);
 
             //로그인 페이지로 redirect
             response.sendRedirect("/auth/login");

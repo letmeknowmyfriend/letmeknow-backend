@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 import static javax.persistence.FetchType.*;
 
@@ -25,7 +24,7 @@ public class Article extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "BOARD_ID")
-    private BoardNumber boardNumber;
+    private Board boardNumber;
 
     @NotBlank
     private String title;
@@ -40,7 +39,7 @@ public class Article extends BaseEntity {
     private boolean isNotice;
 
     @Builder
-    protected Article(BoardNumber boardNumber, String title, Long link, String createdAt, Boolean isNotice) {
+    protected Article(Board boardNumber, String title, Long link, String createdAt, Boolean isNotice) {
         this.boardNumber = boardNumber;
         this.title = title;
         this.link = link;

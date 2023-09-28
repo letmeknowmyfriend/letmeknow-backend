@@ -79,6 +79,9 @@ dependencies {
 
 	// jsoup
 	implementation 'org.jsoup:jsoup:1.16.1'
+
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {

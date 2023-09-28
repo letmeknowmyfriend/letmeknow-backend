@@ -1,10 +1,12 @@
 package com.letmeknow.quartz.analyser;
 
-import com.letmeknow.domain.BoardNumber;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.letmeknow.domain.Board;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.dto.crawling.ArticleDto;
 import com.letmeknow.service.ArticleService;
-import com.letmeknow.service.BoardNumberService;
+import com.letmeknow.service.BoardService;
 import lombok.NoArgsConstructor;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Response;
@@ -26,9 +28,11 @@ import java.util.Optional;
 @NoArgsConstructor
 public class Analyser extends QuartzJobBean {
     @Autowired
-    private BoardNumberService boardNumberService;
+    private BoardService boardNumberService;
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private FirebaseMessaging fcm;
 
     @Override
     public void executeInternal(JobExecutionContext context) {
@@ -40,11 +44,11 @@ public class Analyser extends QuartzJobBean {
 
         ////////////////////////////////////////////////////////////////////////////
 
-        Optional<BoardNumber> oneByBoardSeq = boardNumberService.findOneByBoardSeq(boardSeq);
+        Optional<Board> oneByBoardSeq = boardNumberService.findOneByBoardSeq(boardSeq);
 
-        BoardNumber boardNumber = null;
+        Board boardNumber = null;
         if (oneByBoardSeq.isEmpty()) {
-            BoardNumber generalNotice = BoardNumber.builder()
+            Board generalNotice = Board.builder()
                     .boardName("일반 공지")
                     .boardSeq(boardSeq)
                     .isThereNotice(true)
@@ -74,6 +78,9 @@ public class Analyser extends QuartzJobBean {
 
             List<ArticleCreationDto> crawledArticles = null;
             List<ArticleCreationDto> whatToSave = new ArrayList();
+
+            // 푸시 알림 리스트
+            List<Message> messages = new ArrayList();
 
             for (int noticeIndex = 0; noticeIndex < elementIds.size(); noticeIndex++) {
                 crawledArticles = new ArrayList();
@@ -118,16 +125,21 @@ public class Analyser extends QuartzJobBean {
 
                 List<ArticleDto> dbArticles = articleService.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardNumber.getId(), 60L, noticeIndex == 1);
 
-                whatToSave = findWhereToStart(dbArticles, crawledArticles, whatToSave);
+                whatToSave = findWhereToStart(dbArticles, crawledArticles, whatToSave, messages, elementIds.get(noticeIndex), boardNumber.getId());
             }
 
             articleService.saveAllArticles(whatToSave);
+
+            // 푸시 알림 보내기
+            for (Message msg : messages) {
+                String id = String.valueOf(fcm.sendAsync(msg));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<ArticleCreationDto> findWhereToStart(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave) {
+    private List<ArticleCreationDto> findWhereToStart(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave, List<Message> messages, String elementId, Long boardId) {
         // 어디서부터 넣어야할지 비교하는 로직
         int crawledArticleIndex = 0;
 
@@ -152,17 +164,24 @@ public class Analyser extends QuartzJobBean {
             }
         }
 
+        int index;
         if (isSuccess) {
             // tempArticles에서 필요한거 넣어주는 로직
-            for (int i = crawledArticleIndex; i >= 0; i--) {
-                whatToSave.add(crawledArticles.get(i));
-            }
+            index = crawledArticleIndex;
         }
-        // 60개동안 겹치는게 하나도 없는거니까 다 넣어주자.
         else {
-            for (int i = crawledArticles.size() - 1; i >= 0 ; i--) {
-                whatToSave.add(crawledArticles.get(i));
-            }
+            // 60개동안 겹치는게 하나도 없는거니까 다 넣어주자.
+            index = crawledArticles.size() - 1;
+        }
+
+        for (int i = index; i >= 0; i--) {
+            whatToSave.add(crawledArticles.get(i));
+
+            // 푸시 알림 리스트에 추가
+            messages.add(Message.builder()
+                    .setTopic(boardId.toString())
+                    .putData("body", crawledArticles.get(i).getTitle())
+                .build());
         }
 
         return whatToSave;

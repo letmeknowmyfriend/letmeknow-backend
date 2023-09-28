@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.domain.auth.Jwt;
 import com.letmeknow.dto.jwt.JwtFindDto;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 import com.letmeknow.exception.auth.jwt.NoSuchJwtException;
 import com.letmeknow.exception.auth.jwt.NotValidJwtException;
@@ -79,6 +79,7 @@ public class JwtService {
                 .withIssuer("myLittleStore")
                 .withSubject("refreshToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .withClaim("email", member.getEmail())
                 .sign(Algorithm.HMAC512(secret));
 
         jwtRepository.findByMemberId(member.getId())
@@ -122,6 +123,7 @@ public class JwtService {
                 .withIssuer("myLittleStore")
                 .withSubject("refreshToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .withClaim("email", member.getEmail())
                 .sign(Algorithm.HMAC512(secret));
 
         jwtRepository.findByMemberId(member.getId())
@@ -184,7 +186,7 @@ public class JwtService {
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
-    public Optional<String> extractEmailFromAccessToken(String accessToken) {
+    public Optional<String> extractEmailFromToken(String accessToken) {
         try {
             // 토큰 유효성 검사하는 데에 사용할 알고리즘이 있는 JWT verifier builder 반환
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secret))
@@ -229,7 +231,7 @@ public class JwtService {
         return true;
     }
 
-    public void deleteAllTokens(HttpServletResponse response) {
+    public void deleteAllTokensFromClient(HttpServletResponse response) {
         deleteToken("accessToken", response);
         deleteToken("refreshToken", response);
     }

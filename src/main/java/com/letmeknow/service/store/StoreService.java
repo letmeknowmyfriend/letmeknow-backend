@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.domain.Store;
 import com.letmeknow.dto.store.*;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.StoreErrorMessage;
 import com.letmeknow.enumstorage.status.StoreStatus;
 import com.letmeknow.exception.member.NoSuchMemberException;

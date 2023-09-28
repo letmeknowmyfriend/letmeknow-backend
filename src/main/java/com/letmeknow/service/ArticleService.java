@@ -1,11 +1,11 @@
 package com.letmeknow.service;
 
 import com.letmeknow.domain.Article;
-import com.letmeknow.domain.BoardNumber;
+import com.letmeknow.domain.Board;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.dto.crawling.ArticleDto;
 import com.letmeknow.repository.ArticleRepository;
-import com.letmeknow.repository.BoardNumberRepository;
+import com.letmeknow.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
-    private final BoardNumberRepository boardNumberRepository;
+    private final BoardRepository boardNumberRepository;
 
     public List<Article> findByBoardNumberOrderByIdDesc(Long boardNumber, Pageable pageable) {
         return articleRepository.findByBoardNumberOrderByIdDesc(boardNumber, pageable);
@@ -39,7 +39,7 @@ public class ArticleService {
         }
 
         // boardNumber를 가져온다.
-        BoardNumber boardNumber = boardNumberRepository.findOneById(articleCreationDtos.get(0).getBoardId())
+        Board boardNumber = boardNumberRepository.findOneById(articleCreationDtos.get(0).getBoardId())
                 .orElseThrow();
 
         List<Article> articles = articleCreationDtos.stream()

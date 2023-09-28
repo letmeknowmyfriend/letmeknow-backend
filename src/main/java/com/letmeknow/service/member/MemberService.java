@@ -10,7 +10,7 @@ import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.dto.member.MemberPasswordUpdateDto;
 import com.letmeknow.dto.member.MemberUpdateDto;
-import com.letmeknow.enumstorage.errormessage.MemberErrorMessage;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
 import com.letmeknow.enumstorage.message.EmailMessage;
 import com.letmeknow.exception.auth.PasswordException;
@@ -51,7 +51,6 @@ public class MemberService {
                 .toMemberFindDto();
     }
 
-    @Transactional
     public Long verifyPasswordVerificationCode(String passwordVerificationCode) throws NoSuchMemberException {
         Member member = memberRepository.findNotDeletedByPasswordVerificationCode(passwordVerificationCode)
                 //해당하는 비밀번호 변경 코드를 가진 회원이 없으면, 예외 발생
