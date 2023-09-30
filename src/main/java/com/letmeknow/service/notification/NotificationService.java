@@ -36,7 +36,9 @@ public class NotificationService {
     private final SubscriptionRepository subscriptionRepository;
 
     @Transactional
-    public void whenMemberLogIn_AddDeviceToken_AddFCMSubscription(String email, String deviceToken) {
+    public void whenMemberLogIn_AddDeviceToken_AddFCMSubscription(String email, String deviceToken) throws NoSuchMemberException {
+
+
         // 회원을 DeviceToken과 Subscription을 fetchJoin하여 찾는다.
         Member member = memberRepository.findNotDeletedByEmailAndDeviceTokenAndSubscription(email)
             .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
@@ -61,7 +63,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void whenMemberLogOut_DeleteDeviceToken_UnsubscribeFCM(String email, String deviceToken) {
+    public void whenMemberLogOut_DeleteDeviceToken_UnsubscribeFCM(String email, String deviceToken) throws NoSuchMemberException {
         // 회원을 DeviceToken과 Subscription을 fetchJoin하여 찾는다.
         Member member = memberRepository.findNotDeletedByEmailAndDeviceTokenAndSubscription(email)
             .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
@@ -92,7 +94,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void subscribe(String email, String deviceToken, Long boardId) {
+    public void subscribe(String email, String deviceToken, Long boardId) throws NoSuchMemberException {
         // 회원을 DeviceToken과 Subscription을 fetchJoin하여 찾는다.
         Member member = memberRepository.findNotDeletedByEmailAndDeviceTokenAndSubscription(email)
             .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
@@ -138,7 +140,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void unsubscribe(String email, String deviceToken, Long boardId) {
+    public void unsubscribe(String email, String deviceToken, Long boardId) throws NoSuchMemberException {
         // 회원을 DeviceToken과 Subscription을 fetchJoin하여 찾는다.
         Member member = memberRepository.findNotDeletedByEmailAndDeviceTokenAndSubscription(email)
             .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));

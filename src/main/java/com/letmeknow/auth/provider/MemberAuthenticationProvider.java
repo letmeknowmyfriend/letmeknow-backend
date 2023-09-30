@@ -1,5 +1,7 @@
-package com.letmeknow.config.auth.member;
+package com.letmeknow.auth.provider;
 
+import com.letmeknow.auth.PrincipalUserDetails;
+import com.letmeknow.service.auth.PrincipalUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,7 +11,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.LogInErrorMessage;

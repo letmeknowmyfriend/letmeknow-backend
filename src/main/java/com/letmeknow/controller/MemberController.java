@@ -1,5 +1,6 @@
 package com.letmeknow.controller;
 
+import com.letmeknow.exception.member.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class MemberController {
 
     @GetMapping("/members/{memberId}")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public String memberInfo(@PathVariable("memberId") Long memberId, Model model) {
+    public String memberInfo(@PathVariable("memberId") Long memberId, Model model) throws NoSuchMemberException {
         MemberFindDto memberFindDto = memberService.findMemberFindDtoById(memberId);
         List<StoreDto> storeDtos = storeService.findAllStoreDtoById(memberId);
         model.addAttribute("memberFindDto", memberFindDto);
@@ -73,7 +74,7 @@ public class MemberController {
 
     @GetMapping("/members/{memberId}/update")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public String memberUpdateForm(@PathVariable("memberId") Long memberId, Model model) {
+    public String memberUpdateForm(@PathVariable("memberId") Long memberId, Model model) throws NoSuchMemberException {
         model.addAttribute("memberFindDto", memberService.findMemberFindDtoById(memberId));
         model.addAttribute("memberUpdateForm", new MemberUpdateForm());
 
@@ -82,21 +83,20 @@ public class MemberController {
 
     @PostMapping("/members/{memberId}/update")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public String updateMember(@PathVariable("memberId") Long memberId, @Valid MemberUpdateForm memberUpdateForm, BindingResult result, Model model) {
-
+    public String updateMember(@PathVariable("memberId") Long memberId, @Valid MemberUpdateForm memberUpdateForm, BindingResult result, Model model) throws NoSuchMemberException {
         if (result.hasErrors()) {
             model.addAttribute("memberFindDto", memberService.findMemberFindDtoById(memberId));
             return "member/memberUpdateForm";
         }
 
         Long savedMemberId = memberService.updateMember(MemberUpdateDto.builder()
-                .id(memberId)   //나중에 memberId 검증할 것
-                .name(memberUpdateForm.getName())
-                .city(memberUpdateForm.getCity())
-                .street(memberUpdateForm.getStreet())
-                .zipcode(memberUpdateForm.getZipcode())
-                .build());
+            .id(memberId)   //나중에 memberId 검증할 것
+            .name(memberUpdateForm.getName())
+            .city(memberUpdateForm.getCity())
+            .street(memberUpdateForm.getStreet())
+            .zipcode(memberUpdateForm.getZipcode())
+            .build());
 
-        return "redirect:/members/"+savedMemberId;
+        return "redirect:/members/" + savedMemberId;
     }
 }

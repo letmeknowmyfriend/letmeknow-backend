@@ -1,12 +1,12 @@
-package com.letmeknow.config.auth.member;
+package com.letmeknow.service.auth;
 
+import com.letmeknow.auth.PrincipalUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.repository.member.MemberRepository;

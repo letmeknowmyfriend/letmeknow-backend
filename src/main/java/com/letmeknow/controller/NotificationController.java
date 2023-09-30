@@ -1,7 +1,8 @@
 package com.letmeknow.controller;
 
-import com.letmeknow.config.auth.PrincipalUserDetails;
+import com.letmeknow.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
+import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.service.auth.jwt.JwtService;
 import com.letmeknow.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class NotificationController {
     private final JwtService jwtService;
 
     @PostMapping("/subscribe/{boardId}/")
-    public String subscribe(@PathVariable("boardId") Long boardId, @RequestParam("deviceToken") String deviceToken) {
+    public String subscribe(@PathVariable("boardId") Long boardId, @RequestParam("deviceToken") String deviceToken) throws NoSuchMemberException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) principal;
 

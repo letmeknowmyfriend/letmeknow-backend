@@ -1,4 +1,4 @@
-package com.letmeknow.config.auth.oauth;
+package com.letmeknow.auth.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;

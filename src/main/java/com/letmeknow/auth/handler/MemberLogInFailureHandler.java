@@ -1,5 +1,6 @@
-package com.letmeknow.config.auth.member;
+package com.letmeknow.auth.handler;
 
+import com.letmeknow.exception.member.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -89,6 +90,10 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
             //메일 전송 실패하면
             } catch (MessagingException e) {
                 response.sendRedirect("/auth/login?error=email&exception=" + URLEncoder.encode(EmailMessage.VERIFICATION_EMAIL_SEND_FAIL.getMessage(), "UTF-8") + "&email=" + email);
+                return;
+            }
+            catch (NoSuchMemberException e) {
+                response.sendRedirect("/");
                 return;
             }
         }

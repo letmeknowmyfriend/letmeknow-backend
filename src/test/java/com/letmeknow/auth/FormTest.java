@@ -341,7 +341,7 @@ public class FormTest {
 
         //서버에 RefreshToken X
         MemberFindDto memberFindDtoByEmail = memberService.findMemberFindDtoByEmail("cha3088@gmail.com");
-        assertThat(memberFindDtoByEmail.getJwtId()).isNull();
+        assertThat(memberFindDtoByEmail.getJwtIds()).isNull();
     }
 
     @Test
@@ -414,7 +414,7 @@ public class FormTest {
         assertThat(memberFindDtoByEmail.getPasswordVerificationCode()).isNotBlank();
 
         //서버에 RefreshToken X
-        assertThat(memberFindDtoByEmail.getJwtId()).isNull();
+        assertThat(memberFindDtoByEmail.getJwtIds()).isNull();
     }
 
     @Test

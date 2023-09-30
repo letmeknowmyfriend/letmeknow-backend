@@ -1,6 +1,7 @@
 package com.letmeknow.filter.auth;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.letmeknow.exception.auth.jwt.NotValidRefreshTokenException;
+import com.letmeknow.exception.auth.jwt.NotValidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,19 +10,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.letmeknow.config.auth.PrincipalUserDetails;
+import com.letmeknow.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
-import com.letmeknow.exception.auth.jwt.NoSuchJwtException;
-import com.letmeknow.exception.auth.jwt.NotValidJwtException;
+import com.letmeknow.exception.auth.jwt.NotValidAccessTokenException;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.service.auth.jwt.JwtService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -45,51 +44,71 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().startsWith(NO_CHECK_URL) || request.getRequestURI().startsWith("/error") || request.getRequestURI().startsWith("/css") || request.getRequestURI().startsWith("/js") || request.getRequestURI().startsWith("/img") || request.getRequestURI().startsWith("/favicon.ico")) {
+        if (request.getRequestURI().equals("/") || request.getRequestURI().startsWith(NO_CHECK_URL) || request.getRequestURI().startsWith("/error") || request.getRequestURI().startsWith("/css") || request.getRequestURI().startsWith("/js") || request.getRequestURI().startsWith("/img") || request.getRequestURI().startsWith("/favicon.ico")) {
             filterChain.doFilter(request, response); // "/auth/login"으로 시작하는 URL 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
 
-        String accessToken = "";
-        String refreshToken = "";
-        Cookie[] requestCookies = request.getCookies();
-        if (requestCookies != null) {
-            for (Cookie cookie : requestCookies) {
-                if (cookie.getName().equals("accessToken")) {
-                    accessToken = cookie.getValue();
-                } else if (cookie.getName().equals("refreshToken")) {
-                    refreshToken = cookie.getValue();
-                }
-            }
-        }
+//        Cookie[] requestCookies = request.getCookies();
+//        if (requestCookies != null) {
+//            for (Cookie cookie : requestCookies) {
+//                if (cookie.getName().equals("accessToken")) {
+//                    accessToken = cookie.getValue();
+//                } else if (cookie.getName().equals("refreshToken")) {
+//                    refreshToken = cookie.getValue();
+//                }
+//            }
+//        }
+
+        // Header에서 accessToken, refreshToken 추출
+        String accessToken = jwtService.extractAccessToken(request);
+        String refreshToken = jwtService.extractRefreshToken(request);
 
         try {
-            //access token이 있을 때
-            if (!accessToken.isBlank()) {
-                //access token이 유효하면
-                try
-                {
-                    //access token에서 email 추출
-                    String email = jwtService.extractEmailFromToken(accessToken)
-                            .orElseThrow(() -> new NotValidJwtException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
+            //access token에서 email 추출
+            String email = jwtService.validateAndExtractEmailFromToken(accessToken)
+                .orElseThrow(() -> new NotValidAccessTokenException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
 
-                    //해당 email을 사용하는 유저 객체 반환
-                    Member member = memberRepository.findNotDeletedByEmail(email)
-                            .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
+            // refreshToken이 유효한지 검증
+            jwtService.validateAndExtractEmailFromToken(refreshToken)
+                .orElseThrow(() -> new NotValidRefreshTokenException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
 
-                    //access token으로 인증 처리
-                    saveAuthentication(member);
+            //해당 email을 사용하는 유저 객체 반환
+            Member member = memberRepository.findNotDeletedByEmail(email)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
+
+            //access token으로 인증 처리
+            saveAuthentication(member);
+
+            // Header에 accessToken, refreshToken 담기
+            jwtService.setAccessTokenOnHeader(response, accessToken);
+            jwtService.setRefreshTokenOnHeader(response, refreshToken);
+
+            filterChain.doFilter(request, response); //다음 필터 호출
+            return; //return으로 이후 현재 필터 진행 막기
+        }
+        // accessToken이 유효하지 않을 때
+        catch (NotValidTokenException e) {
+            // refreshToken이 있으면, refreshToken으로 accessToken 재발급
+            if (e instanceof NotValidAccessTokenException) {
+                try {
+                    // refreshToken이 유효한지 검증
+                    String email = jwtService.validateAndExtractEmailFromToken(refreshToken)
+                        .orElseThrow(() -> new NotValidRefreshTokenException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
+
+                    // 새로운 JWT 재발급
+                    jwtService.reissueTokensAndSetTokensOnHeader(email, refreshToken, response);
 
                     filterChain.doFilter(request, response); //다음 필터 호출
                     return; //return으로 이후 현재 필터 진행 막기
-                }
+                } catch (NotValidRefreshTokenException ex) {
+                    // refreshToken도 유효하지 않으면, 인증 실패
 
-                //access token이 유효하지 않으면
-                catch (JWTVerificationException e)
-                {
-                    //access token이 유효하지 않으면, 인증 실패
-                    //모든 토큰 삭제
-                    jwtService.deleteAllTokensFromClient(response);
+                    //로그인 페이지로 redirect
+                    response.sendRedirect("/auth/login");
+                    return;
+                } catch (NoSuchMemberException ex) {
+                    // 해당 사용자가 없으면, 인증 실패
 
                     //로그인 페이지로 redirect
                     response.sendRedirect("/auth/login");
@@ -97,62 +116,14 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                 }
             }
 
-            //access token이 없을 때
-            else if (accessToken.isBlank()) {
-                //refresh token이 있으면
-                if (!refreshToken.isBlank()) {
-                    //refresh token을 검증
-                    if (jwtService.isTokenValid(refreshToken) && jwtService.isRefreshTokenExists(response, refreshToken)) {
-                        //refresh token이 유효하면
-
-                        //토큰들 재발급
-                        Member member = jwtService.reissueTokens(refreshToken, response);
-
-                        //access token을 재발급 받았으므로, 인증 성공
-                        saveAuthentication(member);
-
-                        filterChain.doFilter(request, response); //다음 필터 호출
-
-                        return; //RefreshToken이 유효한 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않도록 바로 return으로 필터 진행 막기
-                    }
-
-                    //refresh token인 유효하지 않거나 DB에 없거나 기한이 지났으면, 인증 실패
-                    else {
-                        //모든 토큰 삭제
-                        jwtService.deleteAllTokensFromClient(response);
-
-                        //로그인 페이지로 redirect
-                        response.sendRedirect("/auth/login");
-                        return;
-                    }
-                }
-
-                //refresh token도 없으면, 인증이 없는 것
-                else {
-                    // 예외로 메인 페이지는 볼 수 있음
-                    if (request.getRequestURI().equals("/")) {
-                        filterChain.doFilter(request, response); //다음 필터 호출
-                        return;
-                    }
-
-                    response.sendRedirect("/auth/login");
-                    return;
-                }
-            }
-
-        //해당 사용자가 없을 때
-        } catch (NoSuchMemberException | NoSuchJwtException e) {
-            //모든 토큰 삭제
-            jwtService.deleteAllTokensFromClient(response);
+            // refreshToken도 유효하지 않으므로, 인증 실패
 
             //로그인 페이지로 redirect
             response.sendRedirect("/auth/login");
             return;
-
-        //access token이 유효하지 않을 때
-        } catch (NotValidJwtException e) {
-            //모든 토큰 삭제
-            jwtService.deleteAllTokensFromClient(response);
+        }
+        catch (NoSuchMemberException ex) {
+            // 해당 사용자가 없으면, 인증 실패
 
             //로그인 페이지로 redirect
             response.sendRedirect("/auth/login");

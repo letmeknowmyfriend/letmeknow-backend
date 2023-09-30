@@ -12,17 +12,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import com.letmeknow.config.auth.member.MemberAuthenticationProvider;
-import com.letmeknow.config.auth.member.MemberLogInFailureHandler;
-import com.letmeknow.config.auth.member.MemberLogInSuccessHandler;
-import com.letmeknow.config.auth.member.PrincipalUserDetailsService;
-import com.letmeknow.config.auth.oauth.OAuth2LogInFailureHandler;
-import com.letmeknow.config.auth.oauth.OAuth2LogInSuccessHandler;
-import com.letmeknow.config.auth.oauth.JwtLogoutHandler;
-import com.letmeknow.config.auth.oauth.PrincipalOAuth2UserService;
+import com.letmeknow.auth.provider.MemberAuthenticationProvider;
+import com.letmeknow.auth.handler.MemberLogInFailureHandler;
+import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
+import com.letmeknow.service.auth.PrincipalUserDetailsService;
+import com.letmeknow.auth.handler.OAuth2LogInFailureHandler;
+import com.letmeknow.auth.handler.OAuth2LogInSuccessHandler;
+import com.letmeknow.auth.handler.JwtLogoutHandler;
+import com.letmeknow.service.auth.PrincipalOAuth2UserService;
 import com.letmeknow.enumstorage.role.MemberRole;
 import com.letmeknow.filter.auth.AuthenticationProcessFilter;
-import com.letmeknow.filter.auth.jwt.MemberAuthenticationFilter;
+import com.letmeknow.filter.auth.MemberAuthenticationFilter;
 import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
 import com.letmeknow.service.auth.jwt.JwtService;
 
@@ -48,9 +48,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors()
-            .and()
-                .addFilter(corsConfig.corsFilter());
+                .cors().configurationSource(corsConfig.corsConfigurationSource());
+//            .and()
+//                .addFilter(corsConfig.corsFilter());
 
         http
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능

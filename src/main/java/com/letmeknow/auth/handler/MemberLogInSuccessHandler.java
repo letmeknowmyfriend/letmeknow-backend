@@ -1,5 +1,8 @@
-package com.letmeknow.config.auth.member;
+package com.letmeknow.auth.handler;
 
+import com.letmeknow.enumstorage.errormessage.notification.DeviceTokenErrorMessage;
+import com.letmeknow.exception.member.NoSuchMemberException;
+import com.letmeknow.exception.notification.DeviceTokenException;
 import com.letmeknow.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -32,21 +36,26 @@ public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
      */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        String name = authentication.getName();
+        try {
+            String name = authentication.getName();
 
-        String email = Optional.ofNullable(name)
-                .orElseThrow(() -> new EmailException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()));
+            String email = Optional.ofNullable(name)
+                    .orElseThrow(() -> new EmailException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()));
 
-        //token들을 발급한다.
-        jwtService.issueTokens(email, response);
+            String deviceToken = Optional.ofNullable(request.getParameter("DeviceToken"))
+                .orElseThrow(() -> new DeviceTokenException(DeviceTokenErrorMessage.DEVICE_TOKEN_IS_EMPTY.getMessage()));
 
-        String deviceToken = request.getParameter("deviceToken");
+            //token들을 발급한다.
+            jwtService.issueTokensAndSetTokensOnHeader(email, response);
 
-        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-        notificationService.whenMemberLogIn_AddDeviceToken_AddFCMSubscription(email, deviceToken);
+            // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+            if (deviceToken != null) {
+                notificationService.whenMemberLogIn_AddDeviceToken_AddFCMSubscription(email, deviceToken);
+            }
+        } catch (NoSuchMemberException | DeviceTokenException e) {
+            // 회원을 찾을 수 없거나, DeviceToken이 없으면, 로그인 페이지로 이동
 
-        //Member 로그인 성공 시, 메인 페이지로 이동
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.sendRedirect("/");
+            response.sendRedirect("/auth/login");
+        }
     }
 }

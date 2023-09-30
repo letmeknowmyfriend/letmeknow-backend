@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import com.letmeknow.config.auth.PrincipalUserDetails;
+import com.letmeknow.auth.PrincipalUserDetails;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.role.MemberRole;
 import com.letmeknow.exception.member.NoSuchMemberException;

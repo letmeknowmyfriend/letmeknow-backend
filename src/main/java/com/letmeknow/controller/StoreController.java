@@ -1,5 +1,6 @@
 package com.letmeknow.controller;
 
+import com.letmeknow.exception.member.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,7 +42,7 @@ public class StoreController {
     }
 
     @PostMapping("/members/{memberId}/stores/new")
-    public String createStore(@PathVariable("memberId") Long memberId, @Valid StoreCreationForm storeCreationForm, BindingResult result) {
+    public String createStore(@PathVariable("memberId") Long memberId, @Valid StoreCreationForm storeCreationForm, BindingResult result) throws NoSuchMemberException {
 
         if (result.hasErrors()) {
             return "store/storeCreationForm";
@@ -84,7 +85,7 @@ public class StoreController {
 
         return "redirect:/members/"+memberId+"/stores/"+updatedStoreId;
     }
-    
+
     @GetMapping("/members/{memberId}/stores/{storeId}/changeStoreStatus")
     public String changeStoreStatus(@PathVariable("memberId") Long memberId, @PathVariable("storeId") Long storeId) {
         storeService.toggleStoreStatus(StoreToggleStatusDto.builder()

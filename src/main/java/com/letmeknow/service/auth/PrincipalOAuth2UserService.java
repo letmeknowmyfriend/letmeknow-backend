@@ -1,5 +1,6 @@
-package com.letmeknow.config.auth.oauth;
+package com.letmeknow.service.auth;
 
+import com.letmeknow.auth.PrincipalUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -7,7 +8,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.letmeknow.config.auth.PrincipalUserDetails;
 import com.letmeknow.domain.member.Member;
 import com.letmeknow.domain.auth.OAuth2;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
@@ -129,6 +129,9 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                 //PrincipalDetails를 리턴한다.
                 return new PrincipalUserDetails(member);
             }
+        }
+        catch (NoSuchMemberException noSuchMemberException) {
+            throw new OAuth2AuthenticationException(noSuchMemberException.getMessage());
         }
     }
 }

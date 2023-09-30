@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -37,6 +38,7 @@ public class Member extends BaseEntity {
 
     private String password;
 
+    @NotNull
     @Embedded
     private Address address;
 
@@ -65,8 +67,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<OAuth2> oAuth2s = new ArrayList<>();
 
-    @OneToOne(mappedBy = "member")
-    private Jwt jwt;
+    @NotNull
+    @OneToMany(mappedBy = "member")
+    private Set<Jwt> jwts = new HashSet<>();
 
     @NotNull
     private int logInAttempt = 0;
@@ -83,7 +86,7 @@ public class Member extends BaseEntity {
                 .street(street)
                 .zipcode(zipcode)
             .build();
-        this.role = MemberRole.ADMIN;
+        this.role = MemberRole.MEMBER;
         this.status = MemberStatus.ACTIVE;
     }
 
@@ -160,8 +163,12 @@ public class Member extends BaseEntity {
         oAuth2s.add(oAuth2);
     }
 
-    public void setJwt(Jwt jwt) {
-        this.jwt = jwt;
+    public void addJwt(Jwt jwt) {
+        this.jwts.add(jwt);
+    }
+
+    public boolean removeJwt(Jwt jwt) {
+        return this.jwts.remove(jwt);
     }
 
     public void addDeviceToken(DeviceToken deviceToken) {
@@ -190,7 +197,7 @@ public class Member extends BaseEntity {
                 .street(address != null ? address.getStreet() : null)
                 .zipcode(address != null ? address.getZipcode() : null)
                 .status(status.toString())
-                .jwtId(jwt != null ? jwt.getId() : null)
+                .jwtIds(jwts.stream().map(jwt -> jwt.getId()).collect(Collectors.toSet()))
                 .logInAttempt(logInAttempt)
                 .passwordVerificationCode(passwordVerificationCode != null ? passwordVerificationCode : null)
                 .build();

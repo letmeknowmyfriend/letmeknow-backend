@@ -154,7 +154,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void sendChangePasswordEmail(String email) throws UnsupportedEncodingException, MessagingException {
+    public void sendChangePasswordEmail(String email) throws UnsupportedEncodingException, MessagingException, NoSuchMemberException {
         Member member = memberRepository.findNotDeletedByEmail(email)
                 //해당하는 이메일을 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
@@ -181,7 +181,7 @@ public class MemberService {
      * @param memberId
      */
     @Transactional
-    public void switchRole(Long memberId) {
+    public void switchRole(Long memberId) throws NoSuchMemberException {
         Member member = memberRepository.findNotDeletedById(memberId)
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 

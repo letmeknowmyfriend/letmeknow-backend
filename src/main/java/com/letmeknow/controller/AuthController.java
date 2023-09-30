@@ -248,7 +248,7 @@ public class AuthController {
 
         return "message/message";
     }
-    
+
     @GetMapping("/auth/member/notice/change-password")
     public String changePasswordNotice() {
         return "/auth/notice/changePasswordNotice";
@@ -256,7 +256,7 @@ public class AuthController {
 
     //== Test ==//
     @GetMapping("/auth/oauth2/member/{memberId}/switch-role")
-    public String switchRole(@PathVariable Long memberId) {
+    public String switchRole(@PathVariable Long memberId) throws NoSuchMemberException {
         memberService.switchRole(memberId);
 
         return "redirect:/";

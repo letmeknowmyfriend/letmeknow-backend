@@ -1,12 +1,12 @@
-package com.letmeknow.filter.auth.jwt;
+package com.letmeknow.filter.auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.letmeknow.config.auth.member.MemberLogInFailureHandler;
-import com.letmeknow.config.auth.member.MemberLogInSuccessHandler;
+import com.letmeknow.auth.handler.MemberLogInFailureHandler;
+import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
 import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
 import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;

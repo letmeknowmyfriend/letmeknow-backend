@@ -1,4 +1,4 @@
-package com.letmeknow.config.auth;
+package com.letmeknow.auth;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

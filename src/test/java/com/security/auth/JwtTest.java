@@ -1,18 +1,18 @@
 package com.security.auth;
 
+import com.letmeknow.dto.jwt.JwtFindDto;
+import com.letmeknow.dto.member.MemberFindDto;
+import com.letmeknow.enumstorage.message.EmailMessage;
+import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
+import com.letmeknow.service.auth.jwt.JwtService;
+import com.letmeknow.service.member.MemberService;
+import com.letmeknow.service.member.TemporaryMemberService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import com.security.dto.jwt.JwtFindDto;
-import com.security.dto.member.MemberFindDto;
-import com.security.enumstorage.message.EmailMessage;
-import com.security.exception.member.temporarymember.NoSuchTemporaryMemberException;
-import com.security.service.auth.jwt.JwtService;
-import com.security.service.member.MemberService;
-import com.security.service.member.TemporaryMemberService;
 
 import javax.servlet.http.Cookie;
 import java.net.URLEncoder;
@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 @SpringBootTest
 @AutoConfigureMockMvc

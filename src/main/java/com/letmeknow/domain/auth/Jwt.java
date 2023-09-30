@@ -23,12 +23,14 @@ public class Jwt {
     private Long id;
 
     @NotBlank
+    @Column(unique = true)
     private String refreshToken;
 
     @NotNull
     private LocalDateTime expiredAt;
 
-    @OneToOne(fetch = LAZY)
+    @NotNull
+    @ManyToOne(fetch = LAZY)
     private Member member;
 
     @Builder
@@ -36,13 +38,17 @@ public class Jwt {
         this.refreshToken = refreshToken;
         this.expiredAt = LocalDateTime.now().plusDays(7);
         this.member = member;
-        member.setJwt(this);
+        member.addJwt(this);
     }
 
     //== 비즈니스 로직 ==//
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         this.expiredAt = LocalDateTime.now().plusDays(7);
+    }
+
+    public boolean removeRefreshToken() {
+        return this.member.removeJwt(this);
     }
 
     //== Dto ==//
@@ -53,5 +59,9 @@ public class Jwt {
                 .expiredAt(expiredAt)
                 .memberId(member.getId())
                 .build();
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiredAt);
     }
 }
