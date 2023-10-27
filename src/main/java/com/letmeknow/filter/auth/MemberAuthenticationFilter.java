@@ -1,9 +1,13 @@
 package com.letmeknow.filter.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letmeknow.dto.auth.SignInAPIRequest;
+import com.letmeknow.enumstorage.errormessage.notification.DeviceTokenErrorMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.letmeknow.auth.handler.MemberLogInFailureHandler;
 import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
@@ -11,22 +15,29 @@ import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
 import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
 import com.letmeknow.service.auth.jwt.JwtService;
+import org.springframework.util.StreamUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MemberAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final TemporaryMemberRepository temporaryMemberRepository;
-    private final JwtService jwtService;
+public class MemberAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+    private final ObjectMapper objectMapper;
+    private final MemberLogInSuccessHandler memberLogInSuccessHandler;
+    private final MemberLogInFailureHandler memberLogInFailureHandler;
 
-    public MemberAuthenticationFilter(AuthenticationManager authenticationManager, TemporaryMemberRepository temporaryMemberRepository, JwtService jwtService, MemberLogInSuccessHandler memberLogInSuccessHandler, MemberLogInFailureHandler memberLogInFailureHandler) {
-        super(authenticationManager);
-        this.temporaryMemberRepository = temporaryMemberRepository;
-        this.jwtService = jwtService;
-        setFilterProcessesUrl("/auth/login/member");
+    public MemberAuthenticationFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager, MemberLogInSuccessHandler memberLogInSuccessHandler, MemberLogInFailureHandler memberLogInFailureHandler) {
+        super("/api/auth/signin/v1", authenticationManager);
+
+        this.objectMapper = objectMapper;
+        this.memberLogInSuccessHandler = memberLogInSuccessHandler;
+        this.memberLogInFailureHandler = memberLogInFailureHandler;
+
+        setAuthenticationManager(authenticationManager);
         setAuthenticationSuccessHandler(memberLogInSuccessHandler);
         setAuthenticationFailureHandler(memberLogInFailureHandler);
     }
@@ -38,24 +49,43 @@ public class MemberAuthenticationFilter extends UsernamePasswordAuthenticationFi
     //4. PrincipalDetails를 세션에 담고 (권한 관리를 위해서)
     //5. JWT를 만들어서 응답해주면 됨
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        //1. email, password 받아서
-        Enumeration<String> params = request.getParameterNames();
-        ConcurrentHashMap<String, String> concurrentHashMap = new ConcurrentHashMap<>();
-        while (params.hasMoreElements()) {
-            String param = params.nextElement();
-            concurrentHashMap.put(param, request.getParameter(param));
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
+        if (request.getContentType() == null || !request.getMethod().equals("POST") || !request.getContentType().equals("application/json")) {
+            throw new AuthenticationException("Authentication method not supported: " + request.getMethod() + " " + request.getContentType()) {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
         }
 
-        String email = Optional.ofNullable(concurrentHashMap.get("email"))
-                .orElseThrow(() -> new AuthenticationException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()) {});
-        String password = Optional.ofNullable(concurrentHashMap.get("password"))
-                .orElseThrow(() -> new AuthenticationException(PasswordErrorMessage.PASSWORD_IS_EMPTY.getMessage()) {});
+        if (Optional.ofNullable(request.getHeader("DeviceToken")).isEmpty()) {
+            throw new AuthenticationException(DeviceTokenErrorMessage.DEVICE_TOKEN_IS_EMPTY.getMessage()) {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+        }
 
-        //authentication 생성
+        SignInAPIRequest signInAPIRequest = objectMapper.readValue(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8), SignInAPIRequest.class);
+
+        String email = signInAPIRequest.getEmail();
+        String password = signInAPIRequest.getPassword();
+
+        if (email.isBlank() || password.isBlank()) {
+            throw new AuthenticationException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()) {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+        }
+
+        // authentication 생성
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
 
-        //PrincipalUserDetailsService의 loadUserByUsername() 함수가 실행됨
+        // PrincipalUserDetailsService의 loadUserByUsername() 함수가 실행됨
         return super.getAuthenticationManager().authenticate(authentication);
     }
 

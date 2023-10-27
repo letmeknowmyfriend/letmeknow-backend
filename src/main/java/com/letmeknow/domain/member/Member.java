@@ -1,12 +1,12 @@
 package com.letmeknow.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.letmeknow.domain.auth.RefreshToken;
 import com.letmeknow.domain.notification.Subscription;
 import com.letmeknow.domain.notification.DeviceToken;
 import lombok.*;
 import com.letmeknow.domain.Address;
 import com.letmeknow.domain.Store;
-import com.letmeknow.domain.auth.Jwt;
 import com.letmeknow.domain.auth.OAuth2;
 import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.entity.BaseEntity;
@@ -38,8 +38,8 @@ public class Member extends BaseEntity {
 
     private String password;
 
-    @NotNull
     @Embedded
+    @NotNull
     private Address address;
 
     @JsonIgnore
@@ -69,7 +69,7 @@ public class Member extends BaseEntity {
 
     @NotNull
     @OneToMany(mappedBy = "member")
-    private Set<Jwt> jwts = new HashSet<>();
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
 
     @NotNull
     private int logInAttempt = 0;
@@ -98,10 +98,6 @@ public class Member extends BaseEntity {
     }
 
     //== 비즈니스 로직 ==//
-    public void updateMemberName(String name) {
-        this.name = name;
-    }
-
     public void changePassword(String newPassword) {
         this.password = newPassword;
     }
@@ -145,6 +141,10 @@ public class Member extends BaseEntity {
         this.passwordVerificationCode = "";
     }
 
+    public void deleteMember() {
+        this.status = MemberStatus.DELETED;
+    }
+
     //== 테스트 로직 ==//
     public void switchRole() {
         if (this.role == MemberRole.ADMIN) {
@@ -163,20 +163,22 @@ public class Member extends BaseEntity {
         oAuth2s.add(oAuth2);
     }
 
-    public void addJwt(Jwt jwt) {
-        this.jwts.add(jwt);
+    public void addJwt(RefreshToken refreshToken) {
+        this.refreshTokens.add(refreshToken);
     }
 
-    public boolean removeJwt(Jwt jwt) {
-        return this.jwts.remove(jwt);
+    public boolean removeJwt(RefreshToken refreshToken) {
+        return this.refreshTokens.remove(refreshToken);
     }
 
     public void addDeviceToken(DeviceToken deviceToken) {
         deviceTokens.add(deviceToken);
     }
 
-    public void removeDeviceToken(DeviceToken deviceToken) {
-        deviceTokens.remove(deviceToken);
+    public void removeDeviceToken(String deviceToken) {
+        deviceTokens.stream()
+                .filter(deviceToken1 -> deviceToken1.getDeviceToken().equals(deviceToken))
+                    .map(deviceToken1 -> deviceTokens.remove(deviceToken1));
     }
 
 //    public void updateStoreName(String originalName, String newStoreName) throws IllegalStateException {
@@ -197,7 +199,7 @@ public class Member extends BaseEntity {
                 .street(address != null ? address.getStreet() : null)
                 .zipcode(address != null ? address.getZipcode() : null)
                 .status(status.toString())
-                .jwtIds(jwts.stream().map(jwt -> jwt.getId()).collect(Collectors.toSet()))
+                .jwtIds(refreshTokens.stream().map(jwt -> jwt.getId()).collect(Collectors.toSet()))
                 .logInAttempt(logInAttempt)
                 .passwordVerificationCode(passwordVerificationCode != null ? passwordVerificationCode : null)
                 .build();

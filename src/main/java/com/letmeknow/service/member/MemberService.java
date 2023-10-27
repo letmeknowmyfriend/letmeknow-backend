@@ -1,38 +1,48 @@
 package com.letmeknow.service.member;
 
+import com.letmeknow.exception.member.InvalidPasswordException;
+import com.letmeknow.exception.member.NewPasswordNotMatchException;
+import com.letmeknow.exception.member.PasswordIncorrectException;
+import com.letmeknow.form.MemberAddressUpdateForm;
+import com.letmeknow.message.MessageMaker;
+import com.letmeknow.util.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.letmeknow.domain.member.Member;
-import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.dto.member.MemberPasswordUpdateDto;
-import com.letmeknow.dto.member.MemberUpdateDto;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
-import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
-import com.letmeknow.enumstorage.message.EmailMessage;
-import com.letmeknow.exception.auth.PasswordException;
+import com.letmeknow.message.EmailMessage;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
 import com.letmeknow.util.email.Email;
+import org.springframework.validation.annotation.Validated;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.letmeknow.message.Message.*;
+import static com.letmeknow.message.reason.MemberReason.*;
+
 @Service
 @Transactional(readOnly = true)
+@Validated
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final MessageMaker messageMaker;
+    private final CodeGenerator codeGenerator;
+    private final Validator validator;
 
     public MemberFindDto findMemberFindDtoById(Long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
@@ -41,7 +51,6 @@ public class MemberService {
                 //Dto로 변환
                 .toMemberFindDto();
     }
-
 
     public MemberFindDto findMemberFindDtoByEmail(String email) throws NoSuchMemberException {
         return memberRepository.findNotDeletedByEmail(email)
@@ -92,8 +101,8 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public boolean isEmailValid(String email) {
-        return !(memberRepository.findIdByEmail(email).isPresent());
+    public boolean isEmailUsed(String email) {
+        return memberRepository.findIdByEmail(email).isPresent();
     }
 
     public List<MemberFindDto> findAllMemberFindDto() {
@@ -102,70 +111,65 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public Long joinMember(MemberCreationDto memberCreationDto) throws DataIntegrityViolationException {
-        return memberRepository.save(Member.builder()
-                        .name(memberCreationDto.getName())
-                        .email(memberCreationDto.getEmail())
-                        .password(memberCreationDto.getPassword())
-                        .city(memberCreationDto.getCity())
-                        .street(memberCreationDto.getStreet())
-                        .zipcode(memberCreationDto.getZipcode())
-                .build())
-            .getId();
-    }
-
     /**
-     * 회원의 정보를 수정한다.
-     * 이름과 주소 수정 가능
-     * @param memberUpdateDto
-     * @return
+     * 회원 주소 수정
+     * @param memberAddressUpdateForm
+     * @return 회원 id
      * @throws NoSuchMemberException
      */
     @Transactional
-    public Long updateMember(MemberUpdateDto memberUpdateDto) throws NoSuchMemberException {
-        //업데이트하려는 회원이 있는지 검증
-        Member findMemberById = findById(memberUpdateDto.getId());
+    public void updateMemberAddress(@Valid MemberAddressUpdateForm memberAddressUpdateForm, String email) throws NoSuchMemberException {
+        // 업데이트하려는 회원 조회
+        Member member = memberRepository.findNotDeletedByEmail(email)
+            // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
+            .orElseThrow(() -> new NoSuchMemberException(messageMaker.add(SUCH).add(EMAIL).add(MEMBER).add(NOT_EXISTS).toString()));
 
-        //회원의 정보 업데이트
-        findMemberById.updateMemberName(memberUpdateDto.getName());
-        findMemberById.updateMemberAddress(memberUpdateDto.getCity(), memberUpdateDto.getStreet(), memberUpdateDto.getZipcode());
+        // 회원 주소 업데이트
+        member.updateMemberAddress(memberAddressUpdateForm.getCity(), memberAddressUpdateForm.getStreet(), memberAddressUpdateForm.getZipcode());
 
-        //저장
-        Member savedMember = memberRepository.save(findMemberById);
-
-        return savedMember.getId();
+        // 저장
+        memberRepository.save(member);
     }
 
     @Transactional
-    public void updateMemberPassword(MemberPasswordUpdateDto memberPasswordUpdateDto) throws NoSuchMemberException, PasswordException {
-        Member findMemberById = findById(memberPasswordUpdateDto.getId());
-
-        //비밀번호 검증
-        if (!findMemberById.getPassword().equals(memberPasswordUpdateDto.getPassword())) {
-            throw new PasswordException(PasswordErrorMessage.PASSWORD_DOES_NOT_MATCH.getMessage());
+    public void updateMemberPassword(@Valid MemberPasswordUpdateDto memberPasswordUpdateDto, String email) throws NoSuchMemberException, PasswordIncorrectException, InvalidPasswordException, NewPasswordNotMatchException {
+        // 새 비밀번호와 새 비밀번호 확인이 일치하지 않으면, 예외 발생
+        if (!memberPasswordUpdateDto.getNewPassword().equals(memberPasswordUpdateDto.getNewPasswordAgain())) {
+            throw new NewPasswordNotMatchException(messageMaker.add(NEW_PASSWORD).add(NOT_EQUAL).toString());
         }
 
-        //회원의 정보 업데이트
-        findMemberById.changePassword(memberPasswordUpdateDto.getNewPassword());
+        // 새 비밀번호가 규칙에 맞지 않으면, 예외 발생
+        validator.isValidPassword(email, memberPasswordUpdateDto.getNewPassword());
 
-        //회원의 정보 저장
-        memberRepository.save(findMemberById);
+        Member member = memberRepository.findNotDeletedByEmail(email)
+            // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
+            .orElseThrow(() -> new NoSuchMemberException(messageMaker.add(SUCH).add(EMAIL).add(MEMBER).add(NOT_EXISTS).toString()));
+
+        // 회원의 비밀번호가 일치하지 않으면, 예외 발생
+        if (!passwordEncoder.matches(memberPasswordUpdateDto.getPassword(), member.getPassword())) {
+            throw new PasswordIncorrectException(messageMaker.add(INCORRECT).add(PASSWORD).toString());
+        }
+
+        // 회원의 정보 업데이트
+        member.changePassword(memberPasswordUpdateDto.getNewPassword());
+
+        // 회원의 정보 저장
+        memberRepository.save(member);
     }
 
     @Transactional
-    public void sendChangePasswordEmail(String email) throws UnsupportedEncodingException, MessagingException, NoSuchMemberException {
+    public void sendPasswordChangeVerificationEmail(String email) throws UnsupportedEncodingException, MessagingException, NoSuchMemberException {
         Member member = memberRepository.findNotDeletedByEmail(email)
-                //해당하는 이메일을 가진 회원이 없으면, 예외 발생
+                // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
 
-        //verificationCode 생성
-        String verificationCode = CodeGenerator.generateCode(20);
+        // verificationCode 생성
+        String verificationCode = codeGenerator.generateCode(20);
 
-        //PasswordVerificationCode 업데이트
+        // PasswordVerificationCode 업데이트
         member.updatePasswordVerificationCode(verificationCode);
 
-        //비밀번호 재설정 이메일 발송
+        // 비밀번호 재설정 이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailMessage.CHANGE_PASSWORD_EMAIL_SUBJECT.getMessage())
                 .receiver(email)

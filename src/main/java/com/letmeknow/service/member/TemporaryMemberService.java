@@ -9,7 +9,7 @@ import com.letmeknow.domain.member.Member;
 import com.letmeknow.domain.member.TemporaryMember;
 import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.enumstorage.errormessage.member.temporarymember.TemporaryMemberErrorMessage;
-import com.letmeknow.enumstorage.message.EmailMessage;
+import com.letmeknow.message.EmailMessage;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
@@ -29,6 +29,7 @@ public class TemporaryMemberService {
     private final MemberRepository memberRepository;
     private final TemporaryMemberRepository temporaryMemberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CodeGenerator codeGenerator;
 
     public Long findIdByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findIdByEmail(email)
@@ -43,7 +44,7 @@ public class TemporaryMemberService {
     @Transactional
     public Long joinTemporaryMember(MemberCreationDto memberCreationDto) throws DataIntegrityViolationException, UnsupportedEncodingException, MessagingException {
         //verificationCode 생성
-        String verificationCode = CodeGenerator.generateCode(20);
+        String verificationCode = codeGenerator.generateCode(20);
 
         //temporaryMember 생성
         Long temporaryMemberId = temporaryMemberRepository.save(TemporaryMember.builder()
@@ -76,7 +77,7 @@ public class TemporaryMemberService {
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_ID.getMessage()));
 
         //verificationCode 생성
-        String verificationCode = CodeGenerator.generateCode(20);
+        String verificationCode = codeGenerator.generateCode(20);
 
         //temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
@@ -98,7 +99,7 @@ public class TemporaryMemberService {
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_EMAIL.getMessage()));
 
         //verificationCode 생성
-        String verificationCode = CodeGenerator.generateCode(20);
+        String verificationCode = codeGenerator.generateCode(20);
 
         //temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
@@ -115,20 +116,20 @@ public class TemporaryMemberService {
     }
 
     @Transactional
-    public void verifyEmail(String verificationCode) throws NoSuchTemporaryMemberException {
+    public void verifyEmailAndTurnIntoMember(String verificationCode) throws NoSuchTemporaryMemberException {
         TemporaryMember temporaryMember = temporaryMemberRepository.findByVerificationCode(verificationCode)
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_VERIFICATION_CODE.getMessage()));
 
-        //verificationCode가 일치하면
+        // verificationCode가 일치하면
         if (verificationCode.equals(temporaryMember.getVerificationCode())) {
             //member 생성
             memberRepository.save(Member.builder()
                             .name(temporaryMember.getName())
                             .email(temporaryMember.getEmail())
                             .password(temporaryMember.getPassword())
-                            .city(temporaryMember.getAddress().getCity())
-                            .street(temporaryMember.getAddress().getStreet())
-                            .zipcode(temporaryMember.getAddress().getZipcode())
+                            .city(temporaryMember.getAddress() == null ? null : temporaryMember.getAddress().getCity())
+                            .street(temporaryMember.getAddress() == null ? null : temporaryMember.getAddress().getStreet())
+                            .zipcode(temporaryMember.getAddress() == null ? null : temporaryMember.getAddress().getZipcode())
                             .build());
 
             //temporaryMember 삭제
@@ -137,5 +138,4 @@ public class TemporaryMemberService {
             throw new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_VERIFICATION_CODE.getMessage());
         }
     }
-
 }

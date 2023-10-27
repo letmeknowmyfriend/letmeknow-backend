@@ -7,7 +7,7 @@
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 
-    <form role="form" th:action="@{/members/{memberId}/update(memberId = ${memberFindDto.id})}" th:object="${memberUpdateForm}" method="post">
+    <form role="form" th:action="@{/members/{memberId}/update(memberId = ${memberFindDto.id})}" th:object="${memberAddressUpdateForm}" method="post">
         <div class="form-group">
             <label th:for="name">이름</label>
             <input type="text" id="name" name="name" class="form-control" placeholder="이름을 입력하세요." value="이름" th:value="${memberFindDto.name}"

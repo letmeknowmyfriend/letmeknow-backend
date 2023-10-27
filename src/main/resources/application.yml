@@ -86,6 +86,7 @@ jwt:
 
 #HTTPS
 server:
+  port: 8443
   ssl:
     key-store: ChaChaKeyStore.p12
     key-store-type: PKCS12

@@ -14,10 +14,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -28,120 +30,132 @@ import java.util.Optional;
 @NoArgsConstructor
 public class Analyser extends QuartzJobBean {
     @Autowired
-    private BoardService boardNumberService;
+    private BoardService boardService;
     @Autowired
     private ArticleService articleService;
     @Autowired
     private FirebaseMessaging fcm;
 
+    @Transactional
     @Override
     public void executeInternal(JobExecutionContext context) {
         ////////////////////////////////////////////////////////////////////////////
         // 나중에 어떤 게시판을 크롤링 할지 인자로 받고
         // 보드에서 게시판 번호를 받아오는거로 리팩토링
 
-        final Long boardSeq = 700L;
+        List<Board> allBoards = boardService.findAll();
 
-        ////////////////////////////////////////////////////////////////////////////
-
-        Optional<Board> oneByBoardSeq = boardNumberService.findOneByBoardSeq(boardSeq);
-
-        Board boardNumber = null;
-        if (oneByBoardSeq.isEmpty()) {
-            Board generalNotice = Board.builder()
-                    .boardName("일반 공지")
-                    .boardSeq(boardSeq)
-                    .isThereNotice(true)
-                    .build();
-
-            boardNumber = boardNumberService.save(generalNotice);
-        }
-        else {
-            boardNumber = oneByBoardSeq.get();
-        }
-        ////////////////////////////////////////////////////////////////////////////
-        try {
-            Connection connection = Jsoup.connect("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=" + boardSeq + "&menuSeq=5168&curBoardDispType=LIST&curPage=60&pageNum=1");
-            connection.timeout(100000);
-            final Response response = connection.execute();
-            System.out.println("#########################Execute##############################");
-
-            final Document doc = response.parse();
-
-            List<String> elementIds = new ArrayList();
-            elementIds.add("dispList");
-
-            // 공지가 있는 게시판이면
-            if (boardNumber.getIsThereNotice()) {
-                elementIds.add("noticeList");
-            }
-
-            List<ArticleCreationDto> crawledArticles = null;
-            List<ArticleCreationDto> whatToSave = new ArrayList();
-
-            // 푸시 알림 리스트
-            List<Message> messages = new ArrayList();
-
-            for (int noticeIndex = 0; noticeIndex < elementIds.size(); noticeIndex++) {
-                crawledArticles = new ArrayList();
-
-                // tag가 tbody이고 id가 dispList인 태그의 자식 태그들을 모두 가져옴
-                Element list = doc.getElementById(elementIds.get(noticeIndex));
-
-                // 그 태그들 중에서 tag가 tr인 태그들을 모두 가져옴
-                List<Element> trs = list.getElementsByTag("tr");
+        for (Board board : allBoards) {
+            try {
+                Long boardSeq = board.getBoardSeq();
+                Long menuSeq = board.getMenuSeq();
+//                ////////////////////////////////////////////////////////////////////////////
+//                Optional<Board> oneByBoardSeq = boardService.findOneByBoardSeq(boardSeq);
+//
+//                Board board = null;
+//
+//                // 게시판이 DB에 없으면
+//                if (oneByBoardSeq.isEmpty()) {
+//                    Elements pageTit = doc.getElementsByClass("page_tit");
+//                    String boardName = pageTit.get(0).getElementsByTag("span").get(0).text();
+//
+//                    Board newBoard = Board.builder()
+//                        .boardName(boardName)
+//                        .boardSeq(boardSeq)
+//                        .menuSeq()
+//                        .isThereNotice(true)
+//                        .build();
+//
+//                    board = boardService.save(newBoard);
+//                }
+//                // 게시판이 DB에 있으면
+//                else {
+//                    board = oneByBoardSeq.get();
+//                }
+//                ////////////////////////////////////////////////////////////////////////////
+                // 크롤링
+                Connection connection = Jsoup.connect("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU" + "&boardSeq=" + boardSeq + "&menuSeq=" + menuSeq + "&curBoardDispType=LIST&curPage=60&pageNum=1");
+                connection.timeout(100000);
+                final Response response = connection.execute();
+                final Document doc = response.parse();
 
 
-                for (int i = 0; i < trs.size(); i++) {
-                    // 그 태그들 중에서 tag가 td인 태그들을 모두 가져옴
-                    List<Element> tds = trs.get(i).getElementsByTag("td");
 
-                    // 제목
-                    Element td = tds.get(1);
-                    Node a = td.childNode(1);
-                    String title = a.childNode(0).toString().trim();
+                List<String> elementIds = new ArrayList();
+                elementIds.add("dispList");
 
-                    // 링크
-                    Long link = Long.parseLong(a.attr("data-itsp-view-link"));
+                // 공지가 있는 게시판이면
+                if (board.getIsThereNotice()) {
+                    // 공지사항도 크롤링
+                    elementIds.add("noticeList");
+                }
 
-                    // 작성 일자
-                    String date = tds.get(3).text();
+                List<ArticleCreationDto> whatToSave = new ArrayList();
 
-                    // 그리고 그 태그들을 모두 저장
-                    crawledArticles.add(ArticleCreationDto.builder()
-                            .boardId(boardNumber.getId())
+                // 푸시 알림 리스트
+                List<Message> messages = new ArrayList();
+
+                // 크롤링 할 대상에 대해
+                for (int noticeIndex = 0; noticeIndex < elementIds.size(); noticeIndex++) {
+                    List<ArticleCreationDto> crawledArticles = new ArrayList();
+
+                    // tag가 tbody이고 id가 dispList인 태그의 자식 태그들을 모두 가져옴
+                    Element list = doc.getElementById(elementIds.get(noticeIndex));
+
+                    // 그 태그들 중에서 tag가 tr인 태그들을 모두 가져옴
+                    List<Element> trs = list.getElementsByTag("tr");
+
+                    for (int i = 0; i < trs.size(); i++) {
+                        // 그 태그들 중에서 tag가 td인 태그들을 모두 가져옴
+                        List<Element> tds = trs.get(i).getElementsByTag("td");
+
+                        // 제목
+                        Element td = tds.get(1);
+                        Node a = td.childNode(1);
+                        String title = a.childNode(0).toString().trim();
+
+                        // 링크
+                        Long link = Long.parseLong(a.attr("data-itsp-view-link"));
+
+                        // 작성 일자
+                        String date = tds.get(3).text();
+
+                        // 그리고 그 태그들을 모두 저장
+                        crawledArticles.add(ArticleCreationDto.builder()
+                            .boardId(board.getId())
                             .title(title)
                             .link(link)
                             .createdAt(date)
                             .isNotice(noticeIndex == 1)
-                        .build());
+                            .build());
 
-                    // DB에 일반 공지를 모두 저장
+                        // DB에 일반 공지를 모두 저장
 
-                    // 그리고 그 태그들을 모두 저장
+                        // 그리고 그 태그들을 모두 저장
 
-                    // DB에 일반 공지를 모두 저장
+                        // DB에 일반 공지를 모두 저장
+                    }
+
+                    List<ArticleDto> dbArticles = articleService.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(board.getId(), 60L, noticeIndex == 1);
+
+                    findWhereToStartAndSaveIntoWhatToSave(dbArticles, crawledArticles, whatToSave, messages, elementIds.get(noticeIndex), board.getId());
                 }
 
-                List<ArticleDto> dbArticles = articleService.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardNumber.getId(), 60L, noticeIndex == 1);
+                articleService.saveAllArticles(whatToSave);
 
-                whatToSave = findWhereToStart(dbArticles, crawledArticles, whatToSave, messages, elementIds.get(noticeIndex), boardNumber.getId());
+                // 푸시 알림 보내기
+                for (Message msg : messages) {
+                    String id = String.valueOf(fcm.sendAsync(msg));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            articleService.saveAllArticles(whatToSave);
-
-            // 푸시 알림 보내기
-            for (Message msg : messages) {
-                String id = String.valueOf(fcm.sendAsync(msg));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private List<ArticleCreationDto> findWhereToStart(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave, List<Message> messages, String elementId, Long boardId) {
+    private void findWhereToStartAndSaveIntoWhatToSave(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave, List<Message> messages, String elementId, Long boardId) {
         // 어디서부터 넣어야할지 비교하는 로직
-        int crawledArticleIndex = 0;
+        int crawledArticleIndex = -1;
 
         boolean isSuccess = false;
         for (int i = 0; i < dbArticles.size(); i++) {
@@ -183,7 +197,5 @@ public class Analyser extends QuartzJobBean {
                     .putData("body", crawledArticles.get(i).getTitle())
                 .build());
         }
-
-        return whatToSave;
     }
 }

@@ -12,12 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.letmeknow.domain.member.Member;
-import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.LogInErrorMessage;
 import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
 import com.letmeknow.enumstorage.status.MemberStatus;
-import com.letmeknow.exception.auth.EmailException;
-import com.letmeknow.exception.auth.PasswordException;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.util.Validator;
 
@@ -36,28 +33,10 @@ public class MemberAuthenticationProvider implements AuthenticationProvider {
      * @throws AuthenticationException
      */
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException, EmailException, PasswordException, BadCredentialsException {
-        //email 검증
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = (String) authentication.getPrincipal();
-        if (!validator.isValidEmail(email)) {
-            throw new AuthenticationException(EmailErrorMessage.NOT_VALID_EMAIL.getMessage()) {
-                @Override
-                public String getMessage() {
-                    return super.getMessage();
-                }
-            };
-        }
 
-        //password 검증
         String password = (String) authentication.getCredentials();
-        if (password.isBlank()) {
-            throw new AuthenticationException(PasswordErrorMessage.PASSWORD_IS_EMPTY.getMessage()) {
-                @Override
-                public String getMessage() {
-                    return super.getMessage();
-                }
-            };
-        }
 
         //email로 회원정보 조회
         UserDetails user = principalUserDetailsService.loadUserByUsername(email);

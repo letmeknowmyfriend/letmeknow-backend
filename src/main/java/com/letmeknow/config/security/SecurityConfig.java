@@ -1,5 +1,7 @@
 package com.letmeknow.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letmeknow.filter.auth.APIContentTypeFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +43,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final AuthenticationProcessFilter authenticationProcessFilter;
+    private final APIContentTypeFilter apiContentTypeFilter;
     private final MemberAuthenticationProvider memberAuthenticationProvider;
     private final CorsConfig corsConfig;
 
@@ -56,8 +59,11 @@ public class SecurityConfig {
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
                 .authorizeHttpRequests(authorize -> authorize
 //                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
-                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
+                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico").permitAll()
+                        .antMatchers("/api/auth/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
+                        .antMatchers("/api/subscription/**").permitAll()
+//                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -66,25 +72,25 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션을 사용하지 않겠다.
             .and()
-                .httpBasic() //http header에 username, password를 넣어서 전송하는 방법을
-                .disable(); //해제
+                .httpBasic() // http header에 username, password를 넣어서 전송하는 방법을
+                .disable(); // 해제
 
         //Filter
         http
-                .addFilterAfter(authenticationProcessFilter, LogoutFilter.class)
-                .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
+            .addFilterBefore(apiContentTypeFilter, LogoutFilter.class)
+            .addFilterAfter(authenticationProcessFilter, APIContentTypeFilter.class)
+            .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
 
         //로그인
         http
-                .formLogin()
-                .loginPage("/auth/login")
-                .loginProcessingUrl("/auth/login/member")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .successHandler(memberLogInSuccessHandler)
-                .failureHandler(memberLogInFailureHandler)
-                .permitAll()
-            .and()
+                .formLogin().disable()
+//                .loginProcessingUrl("/auth/api/signin/v1")
+//                .usernameParameter("email")
+//                .passwordParameter("password")
+//                .successHandler(memberLogInSuccessHandler)
+//                .failureHandler(memberLogInFailureHandler)
+//                .permitAll()
+//            .and()
                 .userDetailsService(principalUserDetailsService)
                 .authenticationProvider(memberAuthenticationProvider)
 
@@ -97,20 +103,20 @@ public class SecurityConfig {
                 .addLogoutHandler(jwtLogoutHandler);
 
         //OAuth2 로그인
-        http
-                .oauth2Login()
-                .loginPage("/auth/login")
-                .authorizationEndpoint()
-                .baseUri("/auth/login/oauth2/authorization")
-            .and()
-                .redirectionEndpoint()
-                .baseUri("/auth/login/oauth2/code/*")
-            .and()
-                .userInfoEndpoint()
-                .userService(principalOAuth2UserService)
-            .and()
-                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정(
-                .failureHandler(oAuth2LoginFailureHandler); // 소셜 로그인 실패 시 핸들러 설정
+//        http
+//                .oauth2Login()
+//                .loginPage("/auth/login")
+//                .authorizationEndpoint()
+//                .baseUri("/auth/login/oauth2/authorization")
+//            .and()
+//                .redirectionEndpoint()
+//                .baseUri("/auth/login/oauth2/code/*")
+//            .and()
+//                .userInfoEndpoint()
+//                .userService(principalOAuth2UserService)
+//            .and()
+//                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정(
+//                .failureHandler(oAuth2LoginFailureHandler); // 소셜 로그인 실패 시 핸들러 설정
 
         return http.build();
     }
@@ -122,7 +128,12 @@ public class SecurityConfig {
 
     @Bean
     public MemberAuthenticationFilter memberAuthenticationFilter() {
-        return new MemberAuthenticationFilter(authenticationManager(), temporaryMemberRepository, jwtService, memberLogInSuccessHandler, memberLogInFailureHandler);
+        return new MemberAuthenticationFilter(objectMapper(), authenticationManager(), memberLogInSuccessHandler, memberLogInFailureHandler);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean

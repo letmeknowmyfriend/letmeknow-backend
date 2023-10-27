@@ -9,10 +9,11 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address {
+    @NotBlank
     private String city;
-
+    @NotBlank
     private String street;
-
+    @NotBlank
     private String zipcode;
 
     @Builder

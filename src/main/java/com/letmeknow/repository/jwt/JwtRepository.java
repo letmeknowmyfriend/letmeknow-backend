@@ -1,13 +1,14 @@
 package com.letmeknow.repository.jwt;
 
+import com.letmeknow.domain.auth.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.letmeknow.domain.auth.Jwt;
 
 import java.util.Optional;
 
-public interface JwtRepository extends JpaRepository<Jwt, Long>, JwtRepositoryQueryDsl {
-    Optional<Jwt> findByRefreshToken(String refreshToken);
-    Optional<Jwt> findByRefreshTokenWithMember(String refreshToken);
-    Optional<Jwt> findByMemberId(Long memberId);
+public interface JwtRepository extends JpaRepository<RefreshToken, Long>, JwtRepositoryQueryDsl {
+    Optional<RefreshToken> findByRefreshToken(String refreshToken);
+    Optional<RefreshToken> findByRefreshTokenWithMember(String refreshToken);
+    Optional<RefreshToken> findByRefreshTokenWithDeviceToken(String refreshToken);
+    Optional<RefreshToken> findByMemberId(Long memberId);
     void deleteByRefreshToken(String refreshToken);
 }

@@ -14,12 +14,12 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); //Whether user credentials are supported.
+        config.setAllowCredentials(true); // Whether user credentials are supported.
 
         config.setAllowedHeaders(List.of("Authorization", "Authorization-refresh, DeviceToken"));
         config.setExposedHeaders(List.of("Authorization", "Authorization-refresh, DeviceToken"));
 
-        config.setAllowedOrigins(List.of("https://localhost:8080"));
+        config.setAllowedOrigins(List.of("https://localhost:8443"));
         config.setAllowedMethods(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

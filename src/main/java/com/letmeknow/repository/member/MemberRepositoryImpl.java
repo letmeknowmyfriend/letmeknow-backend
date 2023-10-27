@@ -8,7 +8,7 @@ import com.letmeknow.enumstorage.status.MemberStatus;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
-import static com.letmeknow.domain.auth.QJwt.jwt;
+import static com.letmeknow.domain.auth.QRefreshToken.refreshToken1;
 import static com.letmeknow.domain.member.QMember.member;
 import static com.letmeknow.domain.notification.QSubscription.subscription;
 import static com.letmeknow.domain.notification.QDeviceToken.deviceToken1;
@@ -44,7 +44,7 @@ public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
     }
 
     @Override
-    public Optional<Member> findNotDeletedByEmailWithJwt(String email) {
+    public Optional<Member> findNotDeletedByEmailWithJwtAndDeviceToken(String email, String deviceToken) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return Optional.ofNullable(
@@ -53,7 +53,8 @@ public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
                         .from(member)
                         .where(member.email.eq(email)
                                 .and(member.status.ne(MemberStatus.DELETED)))
-                        .leftJoin(member.jwts, jwt).fetchJoin()
+                        .leftJoin(member.refreshTokens, refreshToken1).fetchJoin()
+                        .leftJoin(member.deviceTokens, deviceToken1).fetchJoin()
                         .fetchOne()
         );
     }

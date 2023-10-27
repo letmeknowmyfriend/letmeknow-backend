@@ -40,4 +40,10 @@ public class Subscription extends BaseEntity {
         member.getSubscriptions().add(this);
         board.getSubscriptions().add(this);
     }
+
+    // 연관관계 편의 메소드
+    public void removeSubscription() {
+        this.member.getSubscriptions().remove(this);
+        this.board.getSubscriptions().remove(this);
+    }
 }

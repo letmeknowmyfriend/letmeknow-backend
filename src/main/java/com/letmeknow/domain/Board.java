@@ -28,6 +28,9 @@ public class Board extends BaseEntity {
     private Long boardSeq;
 
     @NotNull
+    private Long menuSeq;
+
+    @NotNull
     private Boolean isThereNotice;
 
     @NotNull
@@ -39,9 +42,10 @@ public class Board extends BaseEntity {
     private List<Article> articles = new ArrayList();
 
     @Builder
-    protected Board(String boardName, Long boardSeq, Boolean isThereNotice) {
+    protected Board(String boardName, Long boardSeq, Long menuSeq, Boolean isThereNotice) {
         this.boardName = boardName;
         this.boardSeq = boardSeq;
+        this.menuSeq = menuSeq;
         this.isThereNotice = isThereNotice;
     }
 
