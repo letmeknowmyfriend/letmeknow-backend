@@ -1,25 +1,25 @@
 package com.letmeknow.dto.auth;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Response {
-    @NotBlank
-    private String status;
-    @NotBlank
-    private String command;
-    @NotBlank
-    private String reason;
+    private final String status;
+    private final String data;
+    private final String command;
+    private final String cause;
+    private final String message;
 
     @Builder
-    protected Response(String status, String command, String reason) {
+    protected Response(String status, String data, String command, String cause, String message) {
         this.status = status;
+        this.data = data;
         this.command = command;
-        this.reason = reason;
+        this.cause = cause;
+        this.message = message;
     }
 }

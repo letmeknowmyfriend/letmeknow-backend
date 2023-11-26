@@ -38,7 +38,7 @@
 //
 //    @GetMapping("/members/{memberId}")
 //    @PreAuthorize("hasRole('ROLE_MEMBER')")
-//    public String memberInfo(@PathVariable("memberId") Long memberId, Model model) throws NoSuchMemberException {
+//    public String memberInfo(@PathVariable("memberId") long memberId, Model model) throws NoSuchMemberException {
 //        MemberFindDto memberFindDto = memberService.findMemberFindDtoById(memberId);
 //        List<StoreDto> storeDtos = storeService.findAllStoreDtoById(memberId);
 //        model.addAttribute("memberFindDto", memberFindDto);
@@ -60,7 +60,7 @@
 ////            return "member/memberCreationForm";
 ////        }
 ////
-////        Long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
+////        long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
 ////                .name(memberSignUpForm.getName())
 ////                .email(memberSignUpForm.getEmail())
 ////                .password(memberSignUpForm.getPassword())
@@ -74,7 +74,7 @@
 //
 //    @GetMapping("/members/{memberId}/update")
 //    @PreAuthorize("hasRole('ROLE_MEMBER')")
-//    public String memberUpdateForm(@PathVariable("memberId") Long memberId, Model model) throws NoSuchMemberException {
+//    public String memberUpdateForm(@PathVariable("memberId") long memberId, Model model) throws NoSuchMemberException {
 //        model.addAttribute("memberFindDto", memberService.findMemberFindDtoById(memberId));
 //        model.addAttribute("memberUpdateForm", new MemberAddressUpdateForm());
 //
@@ -88,7 +88,7 @@
 //            return "member/memberUpdateForm";
 //        }
 //
-//        Long savedMemberId = memberService.updateMemberAddress(MemberUpdateDto.builder()
+//        long savedMemberId = memberService.updateMemberAddress(MemberUpdateDto.builder()
 //            .id(memberId)   //나중에 memberId 검증할 것
 //            .name(memberUpdateForm.getName())
 //            .city(memberUpdateForm.getCity())

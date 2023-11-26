@@ -26,7 +26,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping("/members/{memberId}/stores/{storeId}")
-    public String storeInfo(@PathVariable("memberId") Long memberId, @PathVariable("storeId") Long storeId, Model model) {
+    public String storeInfo(@PathVariable("memberId") long memberId, @PathVariable("storeId") long storeId, Model model) {
         model.addAttribute("memberId", memberId);
         model.addAttribute("storeId", storeId);
 
@@ -34,7 +34,7 @@ public class StoreController {
     }
 
     @GetMapping("/members/{memberId}/stores/new")
-    public String createStoreForm(@PathVariable("memberId") Long memberId, Model model) {
+    public String createStoreForm(@PathVariable("memberId") long memberId, Model model) {
         model.addAttribute("memberId", memberId);
         model.addAttribute("storeCreationForm", new StoreCreationForm());
 
@@ -42,13 +42,13 @@ public class StoreController {
     }
 
     @PostMapping("/members/{memberId}/stores/new")
-    public String createStore(@PathVariable("memberId") Long memberId, @Valid StoreCreationForm storeCreationForm, BindingResult result) throws NoSuchMemberException {
+    public String createStore(@PathVariable("memberId") long memberId, @Valid StoreCreationForm storeCreationForm, BindingResult result) throws NoSuchMemberException {
 
         if (result.hasErrors()) {
             return "store/storeCreationForm";
         }
 
-        Long createdStoreId = storeService.createStore(StoreCreationDto.builder()
+        long createdStoreId = storeService.createStore(StoreCreationDto.builder()
                 .memberId(memberId)
                 .name(storeCreationForm.getName())
                 .city(storeCreationForm.getCity())
@@ -60,21 +60,21 @@ public class StoreController {
     }
 
     @GetMapping("/members/{memberId}/stores/{storeId}/update")
-    public String updateStoreForm(@PathVariable("storeId") Long storeId, Model model) {
+    public String updateStoreForm(@PathVariable("storeId") long storeId, Model model) {
         model.addAttribute("storeUpdateForm", new StoreUpdateForm());
 
         return "store/storeUpdateForm";
     }
 
     @PostMapping("/members/{memberId}/stores/{storeId}/update")
-    public String updateStore(@PathVariable("memberId") Long memberId, @PathVariable("storeId") Long storeId, @Valid StoreUpdateForm storeUpdateForm, BindingResult result, Model model) {
+    public String updateStore(@PathVariable("memberId") long memberId, @PathVariable("storeId") long storeId, @Valid StoreUpdateForm storeUpdateForm, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             model.addAttribute("storeUpdateForm", new StoreUpdateForm());
             return "store/storeUpdateForm";
         }
 
-        Long updatedStoreId = storeService.updateStore(StoreUpdateDto.builder()
+        long updatedStoreId = storeService.updateStore(StoreUpdateDto.builder()
                 .memberId(memberId) //나중에 memberId 검증할 것
                 .id(storeId) //나중에 storeId 검증할 것
                 .name(storeUpdateForm.getName())
@@ -87,7 +87,7 @@ public class StoreController {
     }
 
     @GetMapping("/members/{memberId}/stores/{storeId}/changeStoreStatus")
-    public String changeStoreStatus(@PathVariable("memberId") Long memberId, @PathVariable("storeId") Long storeId) {
+    public String changeStoreStatus(@PathVariable("memberId") long memberId, @PathVariable("storeId") long storeId) {
         storeService.toggleStoreStatus(StoreToggleStatusDto.builder()
                 .id(storeId)
                 .memberId(memberId)

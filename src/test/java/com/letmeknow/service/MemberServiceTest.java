@@ -1,16 +1,16 @@
 package com.letmeknow.service;
 
-import com.letmeknow.domain.member.Member;
+import com.letmeknow.entity.member.Member;
 import com.letmeknow.dto.member.MemberPasswordUpdateDto;
-import com.letmeknow.exception.member.NewPasswordNotMatchException;
-import com.letmeknow.exception.member.NoSuchMemberException;
-import com.letmeknow.exception.member.InvalidPasswordException;
-import com.letmeknow.exception.member.PasswordIncorrectException;
+import com.letmeknow.exception.member.*;
 import com.letmeknow.form.MemberAddressUpdateForm;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.service.member.MemberService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +116,7 @@ class MemberServiceTest {
     @Test
     @Order(160)
     @DisplayName("회원 비밀번호 수정 - 성공")
-    void updateMemberPassword() throws InvalidPasswordException, NewPasswordNotMatchException, NoSuchMemberException, PasswordIncorrectException {
+    void updateMemberPassword() throws InvalidPasswordException, NewPasswordNotMatchException, NoSuchMemberException, PasswordIncorrectException, MemberSignUpValidationException {
         // given
         memberService.updateMemberPassword(MemberPasswordUpdateDto.builder()
             .password("password")

@@ -6,7 +6,7 @@
 //import org.springframework.security.core.context.SecurityContextHolder;
 //import org.springframework.stereotype.Component;
 //import org.springframework.web.servlet.HandlerInterceptor;
-//import com.letmeknow.auth.PrincipalUserDetails;
+//import com.letmeknow.auth.userdetail.PrincipalUserDetails;
 //import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 //import com.letmeknow.enumstorage.role.MemberRole;
 //import com.letmeknow.exception.member.NoSuchMemberException;
@@ -41,7 +41,7 @@
 //        PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
 //        String email = principal.getUsername();
 //
-//        Long memberId = memberRepository.findNotDeletedIdByEmail(email)
+//        long memberId = memberRepository.findNotDeletedIdByEmail(email)
 //                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 //
 //        String requestMemberId = request.getRequestURI().split("/")[2];

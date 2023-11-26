@@ -1,14 +1,15 @@
 package com.letmeknow.auth.handler;
 
+import com.letmeknow.auth.service.AuthService;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.member.NoSuchMemberException;
-import com.letmeknow.service.notification.NotificationService;
+import com.letmeknow.service.DeviceTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import com.letmeknow.auth.PrincipalUserDetails;
-import com.letmeknow.service.auth.jwt.JwtService;
+import com.letmeknow.auth.userdetail.PrincipalUserDetails;
+import com.letmeknow.auth.service.JwtService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletException;
@@ -16,14 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.letmeknow.service.auth.jwt.JwtService.*;
-import static com.letmeknow.service.auth.jwt.JwtService.BEARER;
+import static com.letmeknow.auth.service.JwtService.*;
+import static com.letmeknow.auth.service.JwtService.BEARER;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2LogInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
-    private final NotificationService notificationService;
+    private final AuthService authService;
 
     /**
      * 로그인 성공 시, JwtEntity를 생성하고 AccessToken과 RefreshToken을 Cookie에 담아 보낸다.
@@ -42,17 +43,14 @@ public class OAuth2LogInSuccessHandler implements AuthenticationSuccessHandler {
 
             String email = principalUserDetails.getUsername();
 
-            String deviceToken = request.getHeader("DeviceToken");
+            String deviceToken = (String) request.getAttribute(DeviceTokenService.DEVICE_TOKEN);
 
             // token들을 발급한다.
-            String[] accessTokenAndRefreshToken = jwtService.issueTokens(email, deviceToken);
+            String[] accessTokenAndRefreshToken = authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email, deviceToken);
 
             // access token, refresh token을 헤더에 실어서 보낸다.
             response.setHeader(ACCESS_TOKEN_HEADER, BEARER + accessTokenAndRefreshToken[0]);
             response.setHeader(REFRESH_TOKEN_HEADER, BEARER + accessTokenAndRefreshToken[1]);
-
-            // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-            notificationService.whenMemberLogIn_AddFCMSubscription(email, deviceToken);
         } catch (NoSuchMemberException | NoSuchDeviceTokenException e) {
             // 회원을 찾을 수 없거나, DeviceToken이 없으면, 로그인 페이지로 이동
             response.sendRedirect("/auth/login");

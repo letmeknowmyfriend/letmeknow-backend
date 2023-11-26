@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreStatusUpdateDto {
     @NotNull
-    private Long id;
+    private long id;
     @NotNull
-    private Long memberId;
+    private long memberId;
     @Builder
-    protected StoreStatusUpdateDto(Long id, Long memberId) {
+    protected StoreStatusUpdateDto(long id, long memberId) {
         this.id = id;
         this.memberId = memberId;
     }

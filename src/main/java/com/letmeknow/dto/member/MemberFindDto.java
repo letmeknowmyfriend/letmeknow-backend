@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 public class MemberFindDto {
     @NotNull
-    private Long id;
+    private long id;
 
     @NotBlank
     private String name;
@@ -42,7 +42,7 @@ public class MemberFindDto {
     private String passwordVerificationCode;
 
     @Builder
-    protected MemberFindDto(Long id, String name, String email, String city, String street, String zipcode, String status, Set<Long> jwtIds, int logInAttempt, String passwordVerificationCode) {
+    protected MemberFindDto(long id, String name, String email, String city, String street, String zipcode, String status, Set<Long> jwtIds, int logInAttempt, String passwordVerificationCode) {
         this.id = id;
         this.name = name;
         this.email = email;

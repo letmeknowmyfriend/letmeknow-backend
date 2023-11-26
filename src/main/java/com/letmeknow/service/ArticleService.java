@@ -1,7 +1,7 @@
 package com.letmeknow.service;
 
-import com.letmeknow.domain.Article;
-import com.letmeknow.domain.Board;
+import com.letmeknow.entity.Article;
+import com.letmeknow.entity.Board;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.dto.crawling.ArticleDto;
 import com.letmeknow.repository.ArticleRepository;
@@ -22,11 +22,11 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final BoardRepository boardNumberRepository;
 
-    public List<Article> findByBoardNumberOrderByIdDesc(Long boardNumber, Pageable pageable) {
+    public List<Article> findByBoardNumberOrderByIdDesc(long boardNumber, Pageable pageable) {
         return articleRepository.findByBoardNumberOrderByIdDesc(boardNumber, pageable);
     }
 
-    public List<ArticleDto> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(Long boardId, Long limit, Boolean isNotice) {
+    public List<ArticleDto> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
         return articleRepository.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardId, limit, isNotice).stream()
                 .map(Article::toDto)
                 .collect(Collectors.toList());

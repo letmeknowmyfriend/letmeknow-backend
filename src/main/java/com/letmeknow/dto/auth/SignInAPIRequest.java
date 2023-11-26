@@ -1,14 +1,13 @@
 package com.letmeknow.dto.auth;
 
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@NoArgsConstructor(force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class SignInAPIRequest {
     @NotBlank
     private final String email;

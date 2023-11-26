@@ -1,7 +1,7 @@
 package com.letmeknow.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letmeknow.filter.auth.APIContentTypeFilter;
+import com.letmeknow.filter.APIContentTypeFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,16 +17,11 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import com.letmeknow.auth.provider.MemberAuthenticationProvider;
 import com.letmeknow.auth.handler.MemberLogInFailureHandler;
 import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
-import com.letmeknow.service.auth.PrincipalUserDetailsService;
-import com.letmeknow.auth.handler.OAuth2LogInFailureHandler;
-import com.letmeknow.auth.handler.OAuth2LogInSuccessHandler;
+import com.letmeknow.auth.service.PrincipalUserDetailsService;
 import com.letmeknow.auth.handler.JwtLogoutHandler;
-import com.letmeknow.service.auth.PrincipalOAuth2UserService;
 import com.letmeknow.enumstorage.role.MemberRole;
-import com.letmeknow.filter.auth.AuthenticationProcessFilter;
-import com.letmeknow.filter.auth.MemberAuthenticationFilter;
-import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
-import com.letmeknow.service.auth.jwt.JwtService;
+import com.letmeknow.auth.filter.auth.AuthenticationProcessFilter;
+import com.letmeknow.auth.filter.auth.MemberAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
@@ -34,13 +29,8 @@ import com.letmeknow.service.auth.jwt.JwtService;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final PrincipalUserDetailsService principalUserDetailsService;
-    private final PrincipalOAuth2UserService principalOAuth2UserService;
-    private final TemporaryMemberRepository temporaryMemberRepository;
     private final MemberLogInSuccessHandler memberLogInSuccessHandler;
     private final MemberLogInFailureHandler memberLogInFailureHandler;
-    private final OAuth2LogInSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LogInFailureHandler oAuth2LoginFailureHandler;
-    private final JwtService jwtService;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final AuthenticationProcessFilter authenticationProcessFilter;
     private final APIContentTypeFilter apiContentTypeFilter;
@@ -61,8 +51,8 @@ public class SecurityConfig {
 //                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
                         .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico").permitAll()
                         .antMatchers("/api/auth/**").permitAll()
-                        .antMatchers("/auth/**").permitAll()
                         .antMatchers("/api/subscription/**").permitAll()
+                        .antMatchers("/auth/**").permitAll()
 //                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()
                 );
@@ -96,7 +86,7 @@ public class SecurityConfig {
 
                 //로그아웃
                 .logout()
-                .logoutUrl("/auth/logout")
+                .logoutUrl("/api/auth/signout/v1")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")

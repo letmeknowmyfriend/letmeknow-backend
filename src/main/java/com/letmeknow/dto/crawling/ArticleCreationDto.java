@@ -1,7 +1,7 @@
 package com.letmeknow.dto.crawling;
 
-import com.letmeknow.domain.Article;
-import com.letmeknow.domain.Board;
+import com.letmeknow.entity.Article;
+import com.letmeknow.entity.Board;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +13,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ArticleCreationDto {
     @NotNull
-    private Long boardId;
+    private long boardId;
 
     @NotBlank
     private String title;
 
     @NotNull
-    private Long link;
+    private long link;
 
     @NotBlank
     private String createdAt;
@@ -28,7 +28,7 @@ public class ArticleCreationDto {
     private Boolean isNotice;
 
     @Builder
-    protected ArticleCreationDto(Long boardId, String title, Long link, String createdAt, Boolean isNotice) {
+    protected ArticleCreationDto(long boardId, String title, long link, String createdAt, Boolean isNotice) {
         this.boardId = boardId;
         this.title = title;
         this.link = link;

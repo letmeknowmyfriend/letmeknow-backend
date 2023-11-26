@@ -1,13 +1,13 @@
 spring:
   datasource:
 #    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    url: jdbc:h2:tcp://localhost/~/letmeknowtest
+    url: jdbc:h2:tcp://localhost/~/letmeknow
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
 #      hibernate:
 #        show_sql: true
@@ -85,7 +85,7 @@ jwt:
 
 #HTTPS
 server:
-  port: 8443
+  port: 8080
   ssl:
     key-store: ChaChaKeyStore.p12
     key-store-type: PKCS12

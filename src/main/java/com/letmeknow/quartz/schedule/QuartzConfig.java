@@ -1,8 +1,7 @@
 package com.letmeknow.quartz.schedule;
 
 import com.letmeknow.quartz.AutoWiringSpringBeanJobFactory;
-import com.letmeknow.quartz.analyser.Analyser;
-import lombok.RequiredArgsConstructor;
+import com.letmeknow.analyser.Analyser;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;

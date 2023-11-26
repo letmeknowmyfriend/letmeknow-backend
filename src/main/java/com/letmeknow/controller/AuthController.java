@@ -1,17 +1,17 @@
 package com.letmeknow.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.letmeknow.message.EmailMessage;
+import com.letmeknow.message.messages.EmailMessage;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
 import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.member.TemporaryMemberService;
 
-@Slf4j
+
 @Controller
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final MemberService memberService;
@@ -127,7 +127,7 @@ public class AuthController {
 //        return "auth/signUpForm";
 //    }
 
-    @GetMapping("/auth/member/verification-email")
+    @GetMapping("/member/verification-email")
     public String verifyEmail(@RequestParam String verificationCode, Model model) {
         try {
             temporaryMemberService.verifyEmailAndTurnIntoMember(verificationCode);
@@ -136,7 +136,8 @@ public class AuthController {
 
             return "message/message";
 
-        } catch (NoSuchTemporaryMemberException e) {
+        }
+        catch (NoSuchTemporaryMemberException e) {
             model.addAttribute("message", e.getMessage())
                     .addAttribute("href", "/auth/login");
 
@@ -145,7 +146,7 @@ public class AuthController {
     }
 
 //    @GetMapping("/auth/member/notice/verification-email")
-//    public String verificationEmailNotice(@PathVariable Long temporaryMemberId, Model model) {
+//    public String verificationEmailNotice(@PathVariable long temporaryMemberId, Model model) {
 //        model.addAttribute("temporaryMemberId", temporaryMemberId);
 //        return "/auth/notice/verificationEmailNotice";
 //    }
@@ -236,7 +237,7 @@ public class AuthController {
 //
 //    //== Test ==//
 //    @GetMapping("/auth/oauth2/member/{memberId}/switch-role")
-//    public String switchRole(@PathVariable Long memberId) throws NoSuchMemberException {
+//    public String switchRole(@PathVariable long memberId) throws NoSuchMemberException {
 //        memberService.switchRole(memberId);
 //
 //        return "redirect:/";

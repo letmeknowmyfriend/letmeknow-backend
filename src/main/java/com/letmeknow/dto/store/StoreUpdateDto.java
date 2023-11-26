@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreUpdateDto {
     @NotNull
-    private Long id;
+    private long id;
     @NotNull
-    private Long memberId;
+    private long memberId;
     @NotBlank
     private String name;
     @NotBlank
@@ -27,7 +27,7 @@ public class StoreUpdateDto {
     private String storeStatus;
 
     @Builder
-    protected StoreUpdateDto(Long id, Long memberId, String name, String city, String street, String zipcode, String storeStatus) {
+    protected StoreUpdateDto(long id, long memberId, String name, String city, String street, String zipcode, String storeStatus) {
         this.id = id;
         this.memberId = memberId;
         this.name = name;

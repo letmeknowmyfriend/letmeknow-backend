@@ -1,33 +1,31 @@
 package com.letmeknow.dto.notification;
 
-import com.letmeknow.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 public class DeviceTokenDto {
     @NotNull
-    private Long id;
+    private long id;
 
     @NotNull
-    private Long memberId;
+    private long memberId;
 
     @NotBlank
     private String deviceToken;
 
     @NotNull
-    private Set<Long> jwtIds;
+    private Long refreshTokenId;
 
     @Builder
-    protected DeviceTokenDto(Long id, Long memberId, String deviceToken, Set<Long> jwtIds) {
+    protected DeviceTokenDto(long id, long memberId, String deviceToken, long refreshTokenId) {
         this.id = id;
         this.memberId = memberId;
         this.deviceToken = deviceToken;
-        this.jwtIds = jwtIds;
+        this.refreshTokenId = refreshTokenId;
     }
 }

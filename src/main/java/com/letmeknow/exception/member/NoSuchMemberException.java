@@ -1,6 +1,6 @@
 package com.letmeknow.exception.member;
 
-public class NoSuchMemberException extends Exception {
+public class NoSuchMemberException extends RuntimeException {
     private String email;
 
     public NoSuchMemberException(String message) {

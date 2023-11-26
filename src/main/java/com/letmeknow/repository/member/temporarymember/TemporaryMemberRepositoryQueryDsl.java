@@ -1,6 +1,6 @@
 package com.letmeknow.repository.member.temporarymember;
 
-import com.letmeknow.domain.member.TemporaryMember;
+import com.letmeknow.entity.member.TemporaryMember;
 
 import java.util.Optional;
 

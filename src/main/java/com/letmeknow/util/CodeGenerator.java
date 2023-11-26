@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CodeGenerator {
-    private static final StringBuilder sb = new StringBuilder();
+    private static final StringBuffer sb = new StringBuffer();
     private static final String[] CODES = {
             "0123456789",
             "abcdefghijklmnopqrstuvwxyz",

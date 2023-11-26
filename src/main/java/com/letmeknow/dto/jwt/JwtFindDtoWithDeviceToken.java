@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class JwtFindDtoWithDeviceToken {
     @NotNull
-    private Long id;
+    private long id;
 
     @NotBlank
     private String refreshToken;
@@ -20,12 +20,12 @@ public class JwtFindDtoWithDeviceToken {
     private LocalDateTime expiredAt;
 
     @NotNull
-    private Long memberId;
+    private long memberId;
 
     private DeviceTokenDto deviceTokenDto;
 
     @Builder
-    protected JwtFindDtoWithDeviceToken(Long id, String refreshToken, LocalDateTime expiredAt, Long memberId, DeviceTokenDto deviceTokenDto) {
+    protected JwtFindDtoWithDeviceToken(long id, String refreshToken, LocalDateTime expiredAt, long memberId, DeviceTokenDto deviceTokenDto) {
         this.id = id;
         this.refreshToken = refreshToken;
         this.expiredAt = expiredAt;

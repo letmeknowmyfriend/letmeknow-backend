@@ -10,10 +10,10 @@
 //import com.letmeknow.dto.member.MemberFindDto;
 //import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
 //import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
-//import com.letmeknow.message.EmailMessage;
+//import com.letmeknow.message.messages.EmailMessage;
 //import com.letmeknow.enumstorage.status.MemberStatus;
 //import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
-//import com.letmeknow.service.auth.jwt.JwtService;
+//import com.letmeknow.auth.service.JwtService;
 //import com.letmeknow.service.member.MemberService;
 //import com.letmeknow.service.member.TemporaryMemberService;
 //

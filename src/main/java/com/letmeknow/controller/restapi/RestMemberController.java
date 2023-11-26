@@ -29,7 +29,7 @@ public class RestMemberController {
     }
 
     @PostMapping("/update/password")
-    public ResponseEntity<String> updateMemberPassword(MemberPasswordUpdateDto memberPasswordUpdateDto, HttpServletRequest request) throws NoSuchMemberException, PasswordIncorrectException, InvalidPasswordException, NewPasswordNotMatchException {
+    public ResponseEntity<String> updateMemberPassword(MemberPasswordUpdateDto memberPasswordUpdateDto, HttpServletRequest request) throws NoSuchMemberException, PasswordIncorrectException, MemberSignUpValidationException, NewPasswordNotMatchException {
         String email = request.getAttribute("email").toString();
 
         memberService.updateMemberPassword(memberPasswordUpdateDto, email);
@@ -37,7 +37,7 @@ public class RestMemberController {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({NoSuchMemberException.class, NewPasswordNotMatchException.class, InvalidPasswordException.class, PasswordIncorrectException.class})
+    @ExceptionHandler({NoSuchMemberException.class, NewPasswordNotMatchException.class, MemberSignUpValidationException.class, PasswordIncorrectException.class})
     public ResponseEntity<String> handleNoSuchMemberException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }

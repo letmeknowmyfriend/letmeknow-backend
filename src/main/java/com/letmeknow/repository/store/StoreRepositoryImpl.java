@@ -22,7 +22,7 @@
 //    private final EntityManager em;
 //
 //    @Override
-//    public Optional<StoreDto> findStoreDtoById(Long id) {
+//    public Optional<StoreDto> findStoreDtoById(long id) {
 //        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 //
 //        //write code 1:N relation Dto using QueryDsl Projections
