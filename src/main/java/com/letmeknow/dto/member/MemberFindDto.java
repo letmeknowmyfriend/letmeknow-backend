@@ -7,26 +7,42 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MemberFindDto {
     @NotNull
-    private Long id;
+    private long id;
+
     @NotBlank
     private String name;
+
     @NotBlank
     private String email;
+
+    @NotBlank
     private String city;
+
+    @NotBlank
     private String street;
+
+    @NotBlank
     private String zipcode;
+
+    @NotBlank
     private String status;
-    private Long jwtId;
+
+    @NotNull
+    private Set<Long> jwtIds;
+
+    @NotNull
     private int logInAttempt;
+
     private String passwordVerificationCode;
 
     @Builder
-    protected MemberFindDto(Long id, String name, String email, String city, String street, String zipcode, String status, Long jwtId, int logInAttempt, String passwordVerificationCode) {
+    protected MemberFindDto(long id, String name, String email, String city, String street, String zipcode, String status, Set<Long> jwtIds, int logInAttempt, String passwordVerificationCode) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -34,7 +50,7 @@ public class MemberFindDto {
         this.street = street;
         this.zipcode = zipcode;
         this.status = status;
-        this.jwtId = jwtId;
+        this.jwtIds = jwtIds;
         this.logInAttempt = logInAttempt;
         this.passwordVerificationCode = passwordVerificationCode;
     }

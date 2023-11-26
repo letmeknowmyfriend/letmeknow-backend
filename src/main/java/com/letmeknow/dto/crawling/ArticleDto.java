@@ -11,16 +11,16 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ArticleDto {
     @NotNull
-    private Long id;
+    private long id;
 
     @NotNull
-    private Long boardId;
+    private long boardId;
 
     @NotBlank
     private String title;
 
     @NotNull
-    private Long link;
+    private long link;
 
     @NotBlank
     private String createdAt;
@@ -29,7 +29,7 @@ public class ArticleDto {
     private Boolean isNotice;
 
     @Builder
-    protected ArticleDto(Long id, Long boardId, String title, Long link, String createdAt, Boolean isNotice) {
+    protected ArticleDto(long id, long boardId, String title, long link, String createdAt, Boolean isNotice) {
         this.id = id;
         this.boardId = boardId;
         this.title = title;

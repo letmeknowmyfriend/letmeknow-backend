@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class MemberUpdateDto {
     @NotNull
-    private Long id;
+    private long id;
     @NotBlank
     private String name;
     @NotBlank
@@ -25,7 +25,7 @@ public class MemberUpdateDto {
 
     @Builder
     @QueryProjection
-    public MemberUpdateDto(Long id, String name, String city, String street, String zipcode) {
+    public MemberUpdateDto(long id, String name, String city, String street, String zipcode) {
         this.id = id;
         this.name = name;
         this.city = city;

@@ -2,13 +2,13 @@ package com.letmeknow.repository.member.temporarymember;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import com.letmeknow.domain.member.TemporaryMember;
+import com.letmeknow.entity.member.TemporaryMember;
 
 import javax.persistence.EntityManager;
 
 import java.util.Optional;
 
-import static com.letmeknow.domain.member.QTemporaryMember.temporaryMember;
+import static com.letmeknow.entity.member.QTemporaryMember.temporaryMember;
 
 @RequiredArgsConstructor
 public class TemporaryMemberRepositoryImpl implements TemporaryMemberRepositoryQueryDsl {

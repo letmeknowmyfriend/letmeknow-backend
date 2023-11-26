@@ -1,9 +1,9 @@
 package com.letmeknow.repository;
 
-import com.letmeknow.domain.Article;
+import com.letmeknow.entity.Article;
 
 import java.util.List;
 
 public interface ArticleRepositoryQueryDsl {
-    List<Article> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(Long boardId, Long limit, Boolean isNotice);
+    List<Article> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice);
 }

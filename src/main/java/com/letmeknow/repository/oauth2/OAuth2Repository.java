@@ -1,7 +1,7 @@
 package com.letmeknow.repository.oauth2;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.letmeknow.domain.auth.OAuth2;
+import com.letmeknow.auth.entity.OAuth2;
 
 import java.util.Optional;
 

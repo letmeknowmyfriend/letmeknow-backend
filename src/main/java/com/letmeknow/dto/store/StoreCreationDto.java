@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class StoreCreationDto {
     @NotNull
-    private Long memberId;
+    private long memberId;
     @NotBlank
     private String name;
     @NotBlank
@@ -20,7 +20,7 @@ public class StoreCreationDto {
     private String zipcode;
 
     @Builder
-    protected StoreCreationDto(Long memberId, String name, String city, String street, String zipcode) {
+    protected StoreCreationDto(long memberId, String name, String city, String street, String zipcode) {
         this.memberId = memberId;
         this.name = name;
         this.city = city;

@@ -1,5 +1,7 @@
 package com.letmeknow.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letmeknow.filter.APIContentTypeFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,19 +14,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import com.letmeknow.config.auth.member.MemberAuthenticationProvider;
-import com.letmeknow.config.auth.member.MemberLogInFailureHandler;
-import com.letmeknow.config.auth.member.MemberLogInSuccessHandler;
-import com.letmeknow.config.auth.member.PrincipalUserDetailsService;
-import com.letmeknow.config.auth.oauth.OAuth2LogInFailureHandler;
-import com.letmeknow.config.auth.oauth.OAuth2LogInSuccessHandler;
-import com.letmeknow.config.auth.oauth.JwtLogoutHandler;
-import com.letmeknow.config.auth.oauth.PrincipalOAuth2UserService;
+import com.letmeknow.auth.provider.MemberAuthenticationProvider;
+import com.letmeknow.auth.handler.MemberLogInFailureHandler;
+import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
+import com.letmeknow.auth.service.PrincipalUserDetailsService;
+import com.letmeknow.auth.handler.JwtLogoutHandler;
 import com.letmeknow.enumstorage.role.MemberRole;
-import com.letmeknow.filter.auth.AuthenticationProcessFilter;
-import com.letmeknow.filter.auth.jwt.MemberAuthenticationFilter;
-import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
-import com.letmeknow.service.auth.jwt.JwtService;
+import com.letmeknow.auth.filter.auth.AuthenticationProcessFilter;
+import com.letmeknow.auth.filter.auth.MemberAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
@@ -32,15 +29,11 @@ import com.letmeknow.service.auth.jwt.JwtService;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final PrincipalUserDetailsService principalUserDetailsService;
-    private final PrincipalOAuth2UserService principalOAuth2UserService;
-    private final TemporaryMemberRepository temporaryMemberRepository;
     private final MemberLogInSuccessHandler memberLogInSuccessHandler;
     private final MemberLogInFailureHandler memberLogInFailureHandler;
-    private final OAuth2LogInSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LogInFailureHandler oAuth2LoginFailureHandler;
-    private final JwtService jwtService;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final AuthenticationProcessFilter authenticationProcessFilter;
+    private final APIContentTypeFilter apiContentTypeFilter;
     private final MemberAuthenticationProvider memberAuthenticationProvider;
     private final CorsConfig corsConfig;
 
@@ -48,16 +41,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors()
-            .and()
-                .addFilter(corsConfig.corsFilter());
+                .cors().configurationSource(corsConfig.corsConfigurationSource());
+//            .and()
+//                .addFilter(corsConfig.corsFilter());
 
         http
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
                 .authorizeHttpRequests(authorize -> authorize
 //                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
-                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
+                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico").permitAll()
+                        .antMatchers("/api/auth/**").permitAll()
+                        .antMatchers("/api/subscription/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
+//                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -66,51 +62,51 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션을 사용하지 않겠다.
             .and()
-                .httpBasic() //http header에 username, password를 넣어서 전송하는 방법을
-                .disable(); //해제
+                .httpBasic() // http header에 username, password를 넣어서 전송하는 방법을
+                .disable(); // 해제
 
         //Filter
         http
-                .addFilterAfter(authenticationProcessFilter, LogoutFilter.class)
-                .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
+            .addFilterBefore(apiContentTypeFilter, LogoutFilter.class)
+            .addFilterAfter(authenticationProcessFilter, APIContentTypeFilter.class)
+            .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
 
         //로그인
         http
-                .formLogin()
-                .loginPage("/auth/login")
-                .loginProcessingUrl("/auth/login/member")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .successHandler(memberLogInSuccessHandler)
-                .failureHandler(memberLogInFailureHandler)
-                .permitAll()
-            .and()
+                .formLogin().disable()
+//                .loginProcessingUrl("/auth/api/signin/v1")
+//                .usernameParameter("email")
+//                .passwordParameter("password")
+//                .successHandler(memberLogInSuccessHandler)
+//                .failureHandler(memberLogInFailureHandler)
+//                .permitAll()
+//            .and()
                 .userDetailsService(principalUserDetailsService)
                 .authenticationProvider(memberAuthenticationProvider)
 
                 //로그아웃
                 .logout()
-                .logoutUrl("/auth/logout")
+                .logoutUrl("/api/auth/signout/v1")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .addLogoutHandler(jwtLogoutHandler);
 
         //OAuth2 로그인
-        http
-                .oauth2Login()
-                .loginPage("/auth/login")
-                .authorizationEndpoint()
-                .baseUri("/auth/login/oauth2/authorization")
-            .and()
-                .redirectionEndpoint()
-                .baseUri("/auth/login/oauth2/code/*")
-            .and()
-                .userInfoEndpoint()
-                .userService(principalOAuth2UserService)
-            .and()
-                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정(
-                .failureHandler(oAuth2LoginFailureHandler); // 소셜 로그인 실패 시 핸들러 설정
+//        http
+//                .oauth2Login()
+//                .loginPage("/auth/login")
+//                .authorizationEndpoint()
+//                .baseUri("/auth/login/oauth2/authorization")
+//            .and()
+//                .redirectionEndpoint()
+//                .baseUri("/auth/login/oauth2/code/*")
+//            .and()
+//                .userInfoEndpoint()
+//                .userService(principalOAuth2UserService)
+//            .and()
+//                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정(
+//                .failureHandler(oAuth2LoginFailureHandler); // 소셜 로그인 실패 시 핸들러 설정
 
         return http.build();
     }
@@ -122,7 +118,12 @@ public class SecurityConfig {
 
     @Bean
     public MemberAuthenticationFilter memberAuthenticationFilter() {
-        return new MemberAuthenticationFilter(authenticationManager(), temporaryMemberRepository, jwtService, memberLogInSuccessHandler, memberLogInFailureHandler);
+        return new MemberAuthenticationFilter(objectMapper(), authenticationManager(), memberLogInSuccessHandler, memberLogInFailureHandler);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean

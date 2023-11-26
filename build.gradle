@@ -11,9 +11,10 @@ buildscript {
 
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.8'
+	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	//queryDsl
+
+	// queryDsl
 	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
@@ -34,18 +35,13 @@ repositories {
 dependencies {
 	//Lombok
 	implementation "org.projectlombok:lombok"
-	annotationProcessor "org.projectlombok:lombok"
-	//Lombok
-
-//	//Regex
-//	implementation 'com.google.re2j:re2j:1.7'
-//	//Regex
+    annotationProcessor "org.projectlombok:lombok"
 
 	//Spring
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.8'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
 	//Spring
 
@@ -62,7 +58,9 @@ dependencies {
 
 	//JWT
 	implementation 'com.auth0:java-jwt:4.4.0'
-	//JWT
+
+    // MySql
+    implementation 'mysql:mysql-connector-java:8.0.33'
 
 	// QueryDSL
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -71,24 +69,23 @@ dependencies {
 			"javax.persistence:javax.persistence-api",
 			"javax.annotation:javax.annotation-api",
 			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
-	// QueryDSL
-
-	runtimeOnly 'com.h2database:h2'
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// jsoup
 	implementation 'org.jsoup:jsoup:1.16.1'
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+    // TEST
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
 
-//querydsl 추가 시작
+// querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
 	jpa = true
@@ -103,5 +100,3 @@ configurations {
 compileQuerydsl {
 	options.annotationProcessorPath = configurations.querydsl
 }
-//querydsl 추가 끝
-

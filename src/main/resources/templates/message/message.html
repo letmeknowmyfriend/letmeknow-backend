@@ -2,15 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <th:block th:if="${message != null}">
-            <script>
-                top.alert("[[${message}]]");
-            </script>
-        </th:block>
-        <th:block th:if="${href != null}">
-            <script>
-                top.location.href = '[[${href}]]';
-            </script>
-        </th:block>
+        <title>Message</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
+    <body>
+        <p th:text="${message}" />
+    </body>
+
 </html>

@@ -17,16 +17,22 @@ import javax.mail.internet.MimeMessage;
 public class EmailService {
     private final JavaMailSender javaMailSender;
 
-    @Transactional
     @Async
     public String sendMail(Email email) throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-        mimeMessageHelper.setTo(email.getReceiver());
-        mimeMessageHelper.setSubject(email.getSubject());
-        mimeMessageHelper.setText(email.getMessage(), true);
-        javaMailSender.send(mimeMessage);
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(email.getReceiver());
+            mimeMessageHelper.setSubject(email.getSubject());
+            mimeMessageHelper.setText(email.getMessage(), true);
+            javaMailSender.send(mimeMessage);
 
-        return "success";
+            return "success";
+        }
+        catch (Exception e) {
+            sendMail(email);
+        }
+
+        throw new MessagingException("메일 전송에 실패했습니다.");
     }
 }

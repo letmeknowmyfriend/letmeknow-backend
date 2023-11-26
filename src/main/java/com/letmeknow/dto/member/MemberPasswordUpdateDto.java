@@ -1,23 +1,23 @@
 package com.letmeknow.dto.member;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+import javax.validation.constraints.NotBlank;
+
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberPasswordUpdateDto {
-
-    private Long id;
-
+    @NotBlank
     private String password;
-
+    @NotBlank
     private String newPassword;
+    @NotBlank
+    private String newPasswordAgain;
 
     @Builder
-    @QueryProjection
-    public MemberPasswordUpdateDto(Long id, String password, String newPassword) {
-        this.id = id;
+    public MemberPasswordUpdateDto(String password, String newPassword, String newPasswordAgain) {
         this.password = password;
         this.newPassword = newPassword;
+        this.newPasswordAgain = newPasswordAgain;
     }
 }

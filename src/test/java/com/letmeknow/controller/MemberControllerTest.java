@@ -68,7 +68,7 @@ class MemberControllerTest {
     @Test
     void memberInfo() throws Exception {
         //given
-        Long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
+        long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
                 .name("memberTest")
                 .email("memberTest@email.com")
                 .password("password")
@@ -77,7 +77,7 @@ class MemberControllerTest {
                 .zipcode("zipcode")
                 .build());
 
-        Long savedStoreId = storeService.createStore(StoreCreationDto.builder()
+        long savedStoreId = storeService.createStore(StoreCreationDto.builder()
                 .memberId(savedMemberId)
                 .name("storeTest")
                 .city("city")

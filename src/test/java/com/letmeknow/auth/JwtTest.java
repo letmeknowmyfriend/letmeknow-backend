@@ -8,9 +8,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import com.letmeknow.dto.jwt.JwtFindDto;
 import com.letmeknow.dto.member.MemberFindDto;
-import com.letmeknow.enumstorage.message.EmailMessage;
+import com.letmeknow.message.messages.EmailMessage;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
-import com.letmeknow.service.auth.jwt.JwtService;
+import com.letmeknow.auth.service.JwtService;
 import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.member.TemporaryMemberService;
 
@@ -85,7 +85,7 @@ public class JwtTest {
         //then
         //임시회원정보가 지워졌는지
         //회원정보가 생성되었는지
-        assertThatThrownBy(() -> temporaryMemberService.findIdByEmail("cha3088@gmail.com")).isInstanceOf(NoSuchTemporaryMemberException.class);
+        assertThatThrownBy(() -> temporaryMemberService.findTemporaryMemberByEmail("cha3088@gmail.com")).isInstanceOf(NoSuchTemporaryMemberException.class);
 
         MemberFindDto memberFindDtoByEmail = memberService.findMemberFindDtoByEmail("cha3088@gmail.com");
         assertThat(memberFindDtoByEmail).isNotNull();

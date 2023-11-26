@@ -1,6 +1,6 @@
 package com.letmeknow.service;
 
-import com.letmeknow.domain.Board;
+import com.letmeknow.entity.Board;
 import com.letmeknow.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    public Optional<Board> findOneByBoardSeq(Long boardSeq) {
+    public Optional<Board> findOneByBoardSeq(long boardSeq) {
         return boardRepository.findOneByBoardSeq(boardSeq);
     }
 

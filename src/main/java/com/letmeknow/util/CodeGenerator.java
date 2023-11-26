@@ -4,20 +4,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CodeGenerator {
+    private static final StringBuffer sb = new StringBuffer();
     private static final String[] CODES = {
             "0123456789",
             "abcdefghijklmnopqrstuvwxyz",
     };
 
-    public static String generateCode(int length) {
-        StringBuilder code = new StringBuilder();
-
+    public String generateCode(int length) {
         for (int i = 0; i < length; ++i) {
             int randomIndex = (int) (Math.random() * CODES.length);
             String randomCode = CODES[randomIndex];
             int randomCodeIndex = (int) (Math.random() * randomCode.length());
-            code.append(randomCode.charAt(randomCodeIndex));
+            sb.append(randomCode.charAt(randomCodeIndex));
         }
-        return code.toString();
+
+        String result = sb.toString();
+
+        sb.setLength(0);
+
+        return result;
     }
 }

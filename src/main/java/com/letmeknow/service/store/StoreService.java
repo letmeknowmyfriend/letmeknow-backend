@@ -3,8 +3,8 @@ package com.letmeknow.service.store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.letmeknow.domain.member.Member;
-import com.letmeknow.domain.Store;
+import com.letmeknow.entity.member.Member;
+import com.letmeknow.entity.Store;
 import com.letmeknow.dto.store.*;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.enumstorage.errormessage.StoreErrorMessage;
@@ -24,7 +24,7 @@ public class StoreService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
 
-    public StoreDto findStoreDtoById(Long id) throws NoSuchStoreException {
+    public StoreDto findStoreDtoById(long id) throws NoSuchStoreException {
         return storeRepository.findById(id)
                 //가게가 없으면 예외 발생
                 .orElseThrow(() -> new NoSuchStoreException(StoreErrorMessage.NO_SUCH_STORE.getMessage()))
@@ -32,7 +32,7 @@ public class StoreService {
                 .toStoreDto();
     }
 
-    public List<StoreDto> findAllStoreDtoById(Long memberId) {
+    public List<StoreDto> findAllStoreDtoById(long memberId) {
         //회원 id를 가지고 있는 가게를 찾아야지.
         return storeRepository.findAllStoreByMemberId(memberId).stream()
                 //Dto로 변환
@@ -41,7 +41,7 @@ public class StoreService {
     }
 
     @Transactional
-    public Long createStore(StoreCreationDto storeCreationDto) throws NoSuchMemberException {
+    public long createStore(StoreCreationDto storeCreationDto) throws NoSuchMemberException {
         //가게 생성
         Member member = findMemberById(storeCreationDto.getMemberId());
 
@@ -69,7 +69,7 @@ public class StoreService {
      * @return
      */
     @Transactional
-    public Long updateStore(StoreUpdateDto storeUpdateDto) {
+    public long updateStore(StoreUpdateDto storeUpdateDto) {
         //업데이트 하려는 가게가 회원의 가게인지 검증
         Store findStore = validateStoreIsMembersStore(storeUpdateDto.getId(), storeUpdateDto.getMemberId());
 
@@ -87,7 +87,7 @@ public class StoreService {
      * 가게 열기 / 닫기 토글
      */
     @Transactional
-    public Long toggleStoreStatus(StoreToggleStatusDto storeToggleStatusDto) {
+    public long toggleStoreStatus(StoreToggleStatusDto storeToggleStatusDto) {
         //업데이트 하려는 가게가 회원의 가게인지 검증
         Store findStore = validateStoreIsMembersStore(storeToggleStatusDto.getId(), storeToggleStatusDto.getMemberId());
 
@@ -102,14 +102,14 @@ public class StoreService {
         return storeRepository.save(findStore).getId();
     }
 
-    private Member findMemberById(Long memberId) throws NoSuchMemberException {
+    private Member findMemberById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
                 //해당하는 Id를 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
     }
 
     //업데이트 하려는 가게가 회원의 가게인지 검증
-    private Store validateStoreIsMembersStore(Long storeId, Long memberId) {
+    private Store validateStoreIsMembersStore(long storeId, long memberId) {
         return storeRepository.findStoreByIdAndMemberId(storeId, memberId)
                 //storeId와 memberId에 맞는 가게가 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchStoreException(StoreErrorMessage.IS_NOT_MEMBERS_STORE.getMessage()));

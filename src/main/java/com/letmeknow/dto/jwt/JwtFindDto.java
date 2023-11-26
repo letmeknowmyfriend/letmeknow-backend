@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class JwtFindDto {
     @NotNull
-    private Long id;
+    private long id;
 
     @NotBlank
     private String refreshToken;
@@ -19,10 +19,10 @@ public class JwtFindDto {
     private LocalDateTime expiredAt;
 
     @NotNull
-    private Long memberId;
+    private long memberId;
 
     @Builder
-    protected JwtFindDto(Long id, String refreshToken, LocalDateTime expiredAt, Long memberId) {
+    protected JwtFindDto(long id, String refreshToken, LocalDateTime expiredAt, long memberId) {
         this.id = id;
         this.refreshToken = refreshToken;
         this.expiredAt = expiredAt;
