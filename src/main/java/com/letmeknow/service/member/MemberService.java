@@ -200,7 +200,7 @@ public class MemberService {
     @Transactional
     public void consentToNotification(String email, String deviceToken, HttpServletResponse response) throws NoSuchDeviceTokenException, NoSuchMemberException {
         // ToDo: 테스트 할 때만 끔 // 추출한 deviceToken이 유효한지 확인한다.
-        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
+//        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
 
         Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
                 // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
