@@ -67,13 +67,13 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
 
         // ToDo: 테스트 할 때만 끔
         // DeviceToken 유효성 검사
-        try {
-            FirebaseMessaging.getInstance().send(Message.builder()
-                        .setToken(deviceToken)
-                .build());
-        } catch (FirebaseMessagingException e) {
-            throw new InvalidRequestException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
-        }
+//        try {
+//            FirebaseMessaging.getInstance().send(Message.builder()
+//                        .setToken(deviceToken)
+//                .build());
+//        } catch (FirebaseMessagingException e) {
+//            throw new InvalidRequestException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
+//        }
 
         // DeviceToken을 request의 attribute에 담는다.
         request.setAttribute("DeviceToken", deviceToken);
