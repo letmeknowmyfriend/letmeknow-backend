@@ -2,7 +2,6 @@ package com.letmeknow.auth.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.letmeknow.auth.service.AuthService;
-import com.letmeknow.auth.service.JwtService;
 import com.letmeknow.dto.auth.Response;
 import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.enumstorage.response.Status;
@@ -13,8 +12,6 @@ import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.form.auth.MemberSignUpForm;
 import com.letmeknow.message.cause.JwtCause;
 import com.letmeknow.message.cause.MemberCause;
-import com.letmeknow.message.cause.TemporaryMemberCause;
-import com.letmeknow.service.DeviceTokenService;
 import com.letmeknow.service.member.TemporaryMemberService;
 import com.letmeknow.util.Validator;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +38,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class RestAuthController {
+public class AuthRestController {
     private final TemporaryMemberService temporaryMemberService;
     private final AuthService authService;
 
@@ -69,7 +66,7 @@ public class RestAuthController {
     }
 
     @PostMapping(value = "/reissue/v1", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity reissueJwtsV1(@RequestParam @NotBlank String redirectUrl, HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, NoSuchDeviceTokenException, JWTVerificationException, IOException {
+    public ResponseEntity reissueJwtsV1(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, NoSuchDeviceTokenException, JWTVerificationException, IOException {
         String[] jwts = authService.reissueJwts(request);
 
         // access token, refresh token을 헤더에 실어서 보낸다.
@@ -78,7 +75,6 @@ public class RestAuthController {
 
         // redirect URL로 보내야함
         return ResponseEntity.noContent()
-                .header("Location", redirectUrl)
             .build();
     }
 
