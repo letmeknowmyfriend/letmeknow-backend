@@ -86,7 +86,7 @@ jwt:
             header: Authorization
         refresh:
             expiration: 604800000 # 7일 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> d) * 7L(d -> w))
-            header: Authorization-refresh
+            header: AuthorizationRefresh
 
 server:
     port: 9090

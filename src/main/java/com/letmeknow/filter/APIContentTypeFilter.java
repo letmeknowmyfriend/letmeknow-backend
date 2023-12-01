@@ -1,5 +1,6 @@
 package com.letmeknow.filter;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,7 +24,7 @@ public class APIContentTypeFilter extends OncePerRequestFilter {
         }
 
         // Content-Type이 application/json이 아니면
-        if (!request.getContentType().equals("application/json")) {
+        if (!request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
             // 400 Bad Request
             response.setStatus(SC_BAD_REQUEST);
 

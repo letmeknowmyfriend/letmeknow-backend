@@ -36,6 +36,7 @@ public class SecurityConfig {
     private final APIContentTypeFilter apiContentTypeFilter;
     private final MemberAuthenticationProvider memberAuthenticationProvider;
     private final CorsConfig corsConfig;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -118,12 +119,7 @@ public class SecurityConfig {
 
     @Bean
     public MemberAuthenticationFilter memberAuthenticationFilter() {
-        return new MemberAuthenticationFilter(objectMapper(), authenticationManager(), memberLogInSuccessHandler, memberLogInFailureHandler);
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new MemberAuthenticationFilter(objectMapper, authenticationManager(), memberLogInSuccessHandler, memberLogInFailureHandler);
     }
 
     @Bean

@@ -1,5 +1,7 @@
 package com.letmeknow.auth.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letmeknow.dto.auth.Response;
 import com.letmeknow.dto.temporarymember.TemporaryMemberDto;
 import com.letmeknow.exception.auth.InvalidRequestException;
 import com.letmeknow.exception.member.MemberStateException;
@@ -26,14 +28,24 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Optional;
 
+import static com.letmeknow.enumstorage.response.Status.FAIL;
+
 @Component
 @RequiredArgsConstructor
 public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
     private final TemporaryMemberService temporaryMemberService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         String email = (String) request.getAttribute("email");
+
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+            .status(FAIL)
+            .message(exception.getMessage())
+            .build()
+        ));
 
         // 해당 회원이 없는 경우
         if (exception instanceof UsernameNotFoundException) {
@@ -75,7 +87,13 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
 
             // UTF-8로 인코딩, body에 메시지 담아서 보내기
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(exception.getMessage());
+
+            response.getWriter().write(objectMapper.writeValueAsString(
+                Response.builder()
+                .status(FAIL)
+                .message(exception.getMessage())
+                .build()
+            ));
             return;
         }
     }

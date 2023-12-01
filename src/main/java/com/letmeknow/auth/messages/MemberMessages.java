@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum MemberMessages {
     MEMBER("회원 "),
     SIGN_UP("가입 "),
+    SIGN_IN("로그인 "),
     TEMPORARY_MEMBER("임시 회원 "),
     NAME("이름 "),
     EMAIL("이메일 "),
