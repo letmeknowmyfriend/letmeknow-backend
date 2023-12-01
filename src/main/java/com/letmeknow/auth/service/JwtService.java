@@ -61,7 +61,7 @@ public class JwtService {
 
     public static final String ACCESS_TOKEN_HEADER = "Authorization";
 
-    public static final String REFRESH_TOKEN_HEADER = "Authorization-refresh";
+    public static final String REFRESH_TOKEN_HEADER = "AuthorizationRefresh";
 
     public static final String BEARER = "Bearer ";
 

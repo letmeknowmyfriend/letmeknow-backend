@@ -16,8 +16,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // Whether user credentials are supported.
 
-        config.setAllowedHeaders(List.of("Authorization", "Authorization-refresh, DeviceToken"));
-        config.setExposedHeaders(List.of("Authorization", "Authorization-refresh, DeviceToken"));
+        config.setAllowedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
+        config.setExposedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
 
         config.setAllowedOrigins(List.of("https://localhost:9090"));
         config.setAllowedMethods(List.of("*"));

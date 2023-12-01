@@ -1,8 +1,11 @@
 package com.letmeknow.auth.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.letmeknow.auth.service.AuthService;
+import com.letmeknow.dto.auth.Response;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.exception.subscription.SubscriptionException;
+import com.letmeknow.message.messages.Messages;
 import com.letmeknow.service.DeviceTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,12 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.letmeknow.auth.messages.MemberMessages.SIGN_IN;
 import static com.letmeknow.auth.service.JwtService.*;
+import static com.letmeknow.enumstorage.response.Status.SUCCESS;
 
 @Component
 @RequiredArgsConstructor
 public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
     private final AuthService authService;
+    private final ObjectMapper objectMapper;
 
     /**
      * 로그인 성공 시, JwtEntity를 생성하고 AccessToken과 RefreshToken을 Header에 담아 보낸다.
@@ -43,6 +49,11 @@ public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
             // access token, refresh token을 헤더에 실어서 보낸다.
             response.setHeader(ACCESS_TOKEN_HEADER, BEARER + accessTokenAndRefreshToken[0]);
             response.setHeader(REFRESH_TOKEN_HEADER, BEARER + accessTokenAndRefreshToken[1]);
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                .status(SUCCESS)
+                .message(new StringBuffer().append(SIGN_IN.getMessage()).append(Messages.SUCCESS.getMessage()).toString())
+                .build()));
         }
         catch (NoSuchMemberException | SubscriptionException e) {
             // 회원을 찾을 수 없거나, 구독에 오류가 발생하면, 로그인 페이지로 이동

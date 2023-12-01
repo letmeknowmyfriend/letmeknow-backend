@@ -13,6 +13,7 @@ import com.letmeknow.dto.auth.SignInAPIRequest;
 import com.letmeknow.exception.auth.InvalidRequestException;
 import com.letmeknow.service.DeviceTokenService;
 import org.apache.http.entity.ContentType;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,7 +58,7 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         // request의 method가 POST가 아니거나, Content-Type이 application/json이 아니면 예외 발생
-        if (request.getContentType() == null || !request.getMethod().equals("POST") || !request.getContentType().equals(ContentType.APPLICATION_JSON.getMimeType())) {
+        if (request.getContentType() == null || !request.getMethod().equals("POST") || !request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
             throw new InvalidRequestException(new StringBuffer().append(REQUEST.getMessage()).append(INVALID.getMessage()).toString());
         }
 

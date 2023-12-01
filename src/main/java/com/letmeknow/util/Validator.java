@@ -21,6 +21,13 @@ public class Validator {
             "(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))"
     );
 
+    // 비밀번호에 반복된 문자가 3개 이상 포함되어 있으면 안된다.
+    private static final Pattern passwordRepeatPattern = Pattern.compile("(\\w)\\1{2,}");
+
+    // 영문, 숫자, 특수문자 포함 8자 이상, 30자 이하
+    private static final Pattern passwordFormatPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,30}$");
+
+
     public void validateMemberSignUpForm(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
         // 이름 검사
         isValidName(memberSignUpForm);
@@ -79,15 +86,13 @@ public class Validator {
         }
 
         // 비밀번호 포맷 확인(영문, 특수문자, 숫자 포함 8자 이상, 30자 이하)
-        Pattern passwordFormatPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,30}$");
         Matcher passwordFormatMatcher = passwordFormatPattern.matcher(password);
 
         if (!passwordFormatMatcher.find()) {
             throw new MemberSignUpValidationException(MemberCause.PASSWORD, PasswordErrorMessage.PASSWORD_FORMAT_IS_NOT_VALID.getMessage());
         }
 
-        //반복된 문자 확인
-        Pattern passwordRepeatPattern = Pattern.compile("(\\w)\\1{2,}");
+        // 반복된 문자 확인
         Matcher passwordRepeatMatcher = passwordRepeatPattern.matcher(password);
 
         if (passwordRepeatMatcher.find()) {
