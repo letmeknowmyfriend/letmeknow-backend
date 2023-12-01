@@ -37,9 +37,9 @@ public class ArticleCreationDto {
     }
 
     // toEntity
-    public Article toEntity(Board boardNumber) {
+    public Article toEntity(Board board) {
         return Article.builder()
-                .boardNumber(boardNumber)
+                .board(board)
                 .title(title)
                 .link(link)
                 .createdAt(createdAt)

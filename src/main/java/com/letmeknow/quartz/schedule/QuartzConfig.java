@@ -84,10 +84,11 @@ public class QuartzConfig {
 //                .build();
         return newTrigger()
                 .withIdentity("trigger1", "group1")
-                .startNow()
+//                .startNow()
+                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
                 .withSchedule(simpleSchedule()
-                        .withIntervalInSeconds(1)
-                        .withRepeatCount(0))
+//                        .withIntervalInSeconds(5)
+                        .withRepeatCount(0)) // 1번만 실행
                 .forJob(jobDetail())
                 .build();
     }

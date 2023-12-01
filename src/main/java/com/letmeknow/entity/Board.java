@@ -1,5 +1,6 @@
 package com.letmeknow.entity;
 
+import com.letmeknow.entity.notification.Notification;
 import com.letmeknow.entity.notification.Subscription;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,27 +20,37 @@ public class Board extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BOARD_ID")
     private Long id;
+
     @NotBlank
     private String boardName;
-    @NotNull
-    private long boardSeq;
-    @NotNull
-    private long menuSeq;
+
+    @NotBlank
+    private String boardUrl;
+
     @NotNull
     private Boolean isThereNotice;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "COLLEGE_ID")
+    private College college;
+
     @NotNull
     @OneToMany(mappedBy = "board")
     private List<Subscription> subscriptions = new ArrayList<>();
+
     @NotNull
-    @OneToMany(mappedBy = "boardNumber")
+    @OneToMany(mappedBy = "board")
     private List<Article> articles = new ArrayList();
 
     @Builder
-    protected Board(String boardName, long boardSeq, long menuSeq, Boolean isThereNotice) {
+    protected Board(String boardName, String boardUrl, Boolean isThereNotice, College college) {
         this.boardName = boardName;
-        this.boardSeq = boardSeq;
-        this.menuSeq = menuSeq;
+        this.boardUrl = boardUrl;
         this.isThereNotice = isThereNotice;
+        this.college = college;
+
+        college.addBoard(this);
     }
 
     // 연관 관계 편의 메소드

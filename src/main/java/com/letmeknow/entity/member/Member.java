@@ -8,6 +8,7 @@ import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.entity.Address;
 import com.letmeknow.entity.BaseEntity;
 import com.letmeknow.entity.Store;
+import com.letmeknow.entity.notification.Notification;
 import com.letmeknow.entity.notification.Subscription;
 import com.letmeknow.enumstorage.role.MemberRole;
 import com.letmeknow.enumstorage.status.MemberStatus;
@@ -61,6 +62,10 @@ public class Member extends BaseEntity {
     @NotNull
     @OneToMany(mappedBy = "member")
     private Set<RefreshToken> refreshTokens = new HashSet<>();
+
+    @NotNull
+    @OneToMany(mappedBy = "member")
+    private Set<Notification> notifications = new HashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)

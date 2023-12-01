@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryQueryDsl {
-    List<Article> findByBoardNumberOrderByIdDesc(long boardNumber, Pageable pageable);
     List<Article> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice);
 }
