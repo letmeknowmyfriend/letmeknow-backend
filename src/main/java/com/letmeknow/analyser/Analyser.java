@@ -1,14 +1,14 @@
 package com.letmeknow.analyser;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.letmeknow.entity.Article;
 import com.letmeknow.entity.Board;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.dto.crawling.ArticleDto;
 import com.letmeknow.service.ArticleService;
 import com.letmeknow.service.BoardService;
+import com.letmeknow.service.notification.NotificationService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
@@ -28,13 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@NoArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class Analyser extends QuartzJobBean {
     @Autowired
     private BoardService boardService;
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     @Override
@@ -45,10 +47,10 @@ public class Analyser extends QuartzJobBean {
 
         List<Board> allBoards = boardService.findAll();
 
+        System.out.println("@@@@@ 크롤링 시작 @@@@@");
+
         for (Board board : allBoards) {
             try {
-                long boardSeq = board.getBoardSeq();
-                long menuSeq = board.getMenuSeq();
 //                ////////////////////////////////////////////////////////////////////////////
 //                Optional<Board> oneByBoardSeq = boardService.findOneByBoardSeq(boardSeq);
 //
@@ -74,8 +76,8 @@ public class Analyser extends QuartzJobBean {
 //                }
 //                ////////////////////////////////////////////////////////////////////////////
                 // 크롤링
-                Connection connection = Jsoup.connect("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU" + "&boardSeq=" + boardSeq + "&menuSeq=" + menuSeq + "&curBoardDispType=LIST&curPage=60&pageNum=1");
-                connection.timeout(100000);
+                Connection connection = Jsoup.connect(board.getBoardUrl());
+                connection.timeout(100_000); // 100초
                 final Response response = connection.execute();
                 final Document doc = response.parse();
 
@@ -90,14 +92,14 @@ public class Analyser extends QuartzJobBean {
                     elementIds.add("noticeList");
                 }
 
-                List<ArticleCreationDto> whatToSave = new ArrayList();
+                List<Article> whatToSave = new ArrayList();
 
                 // 푸시 알림 리스트
                 List<Message> messages = new ArrayList();
 
                 // 크롤링 할 대상에 대해
                 for (int noticeIndex = 0; noticeIndex < elementIds.size(); noticeIndex++) {
-                    List<ArticleCreationDto> crawledArticles = new ArrayList();
+                    List<Article> crawledArticles = new ArrayList();
 
                     // tag가 tbody이고 id가 dispList인 태그의 자식 태그들을 모두 가져옴
                     Element list = doc.getElementById(elementIds.get(noticeIndex));
@@ -121,8 +123,8 @@ public class Analyser extends QuartzJobBean {
                         String date = tds.get(3).text();
 
                         // 그리고 그 태그들을 모두 저장
-                        crawledArticles.add(ArticleCreationDto.builder()
-                            .boardId(board.getId())
+                        crawledArticles.add(Article.builder()
+                            .board(board)
                             .title(title)
                             .link(link)
                             .createdAt(date)
@@ -138,33 +140,24 @@ public class Analyser extends QuartzJobBean {
 
                     List<ArticleDto> dbArticles = articleService.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(board.getId(), 60L, noticeIndex == 1);
 
-                    findWhereToStartAndSaveIntoWhatToSave(dbArticles, crawledArticles, whatToSave, messages, elementIds.get(noticeIndex), board.getId());
+                    findWhereToStartAndSaveIntoWhatToSave(dbArticles, crawledArticles, whatToSave, messages, board.getId());
                 }
 
                 articleService.saveAllArticles(whatToSave);
 
                 // 새로 들어온게 있으면
                 if (!whatToSave.isEmpty()) {
-                    // 푸시 알림 보내기
-                    FirebaseMessaging.getInstance().send(Message.builder()
-                        .setNotification(Notification.builder()
-                            .setTitle(board.getBoardName() + "에 " + whatToSave.size() + "개의 새로운 글이 올라왔습니다!")
-                            .setBody("확인해보세요!")
-                            .build())
-                        .setTopic(String.valueOf(board.getId()))
-                        .build());
+                    // notification을 보내고, 푸시 알림을 보낸다.
+                    notificationService.saveAndSendNotifications(board, whatToSave);
                 }
             } catch (IOException e) {
-                log.warn(e.getMessage());
-                throw new RuntimeException(e);
-            } catch (FirebaseMessagingException e) {
                 log.warn(e.getMessage());
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private void findWhereToStartAndSaveIntoWhatToSave(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave, List<Message> messages, String elementId, long boardId) {
+    private void findWhereToStartAndSaveIntoWhatToSave(List<ArticleDto> dbArticles, List<Article> crawledArticles, List<Article> whatToSave, List<Message> messages, long boardId) {
         // 어디서부터 넣어야할지 비교하는 로직
         int crawledArticleIndex = -1;
 

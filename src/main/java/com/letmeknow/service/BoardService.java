@@ -20,12 +20,8 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    public Optional<Board> findOneByBoardSeq(long boardSeq) {
-        return boardRepository.findOneByBoardSeq(boardSeq);
-    }
-
     @Transactional
-    public Board save(Board boardNumber) {
-        return boardRepository.save(boardNumber);
+    public Board save(Board board) {
+        return boardRepository.save(board);
     }
 }

@@ -7,7 +7,6 @@ import com.letmeknow.dto.crawling.ArticleDto;
 import com.letmeknow.repository.ArticleRepository;
 import com.letmeknow.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
-    private final BoardRepository boardNumberRepository;
-
-    public List<Article> findByBoardNumberOrderByIdDesc(long boardNumber, Pageable pageable) {
-        return articleRepository.findByBoardNumberOrderByIdDesc(boardNumber, pageable);
-    }
+    private final BoardRepository boardRepository;
 
     public List<ArticleDto> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
         return articleRepository.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardId, limit, isNotice).stream()
@@ -33,24 +28,10 @@ public class ArticleService {
     }
 
     @Transactional
-    public void saveAllArticles(List<ArticleCreationDto> articleCreationDtos) {
-        if (articleCreationDtos.isEmpty()) {
+    public void saveAllArticles(List<Article> articles) {
+        if (articles.isEmpty()) {
             return;
         }
-
-        // boardNumber를 가져온다.
-        Board boardNumber = boardNumberRepository.findOneById(articleCreationDtos.get(0).getBoardId())
-                .orElseThrow();
-
-        List<Article> articles = articleCreationDtos.stream()
-                .map(articleCreationDto -> Article.builder()
-                        .boardNumber(boardNumber)
-                        .title(articleCreationDto.getTitle())
-                        .link(articleCreationDto.getLink())
-                        .createdAt(articleCreationDto.getCreatedAt())
-                        .isNotice(articleCreationDto.getIsNotice())
-                        .build())
-                .collect(Collectors.toList());
 
         articleRepository.saveAll(articles);
     }

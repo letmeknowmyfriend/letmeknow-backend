@@ -52,10 +52,8 @@ import static com.letmeknow.message.messages.NotificationMessages.DEVICE_TOKEN;
 @RequiredArgsConstructor
 public class MemberService {
     private final SubscriptionService subscriptionService;
-    private final DeviceTokenService deviceTokenService;
 
     private final MemberRepository memberRepository;
-    private final DeviceTokenRepository deviceTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final SubscriptionRepository subscriptionRepository;
 
