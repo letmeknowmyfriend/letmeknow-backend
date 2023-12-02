@@ -2,9 +2,8 @@ package com.letmeknow.auth.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.letmeknow.auth.service.AuthService;
-import com.letmeknow.dto.auth.Response;
+import com.letmeknow.dto.Response;
 import com.letmeknow.dto.member.MemberCreationDto;
-import com.letmeknow.enumstorage.response.Status;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.auth.jwt.NoSuchRefreshTokenInDBException;
 import com.letmeknow.exception.member.MemberSignUpValidationException;
@@ -12,6 +11,7 @@ import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.form.auth.MemberSignUpForm;
 import com.letmeknow.message.cause.JwtCause;
 import com.letmeknow.message.cause.MemberCause;
+import com.letmeknow.message.messages.Messages;
 import com.letmeknow.service.member.TemporaryMemberService;
 import com.letmeknow.util.Validator;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +25,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import static com.letmeknow.auth.messages.MemberMessages.*;
 import static com.letmeknow.auth.service.JwtService.*;
-import static com.letmeknow.message.messages.Messages.*;
+import static com.letmeknow.enumstorage.response.Status.FAIL;
+import static com.letmeknow.enumstorage.response.Status.SUCCESS;
+import static com.letmeknow.message.cause.MemberCause.FORM;
+import static com.letmeknow.message.messages.Messages.NOT_FOUND;
+import static com.letmeknow.message.messages.Messages.REDIRECT_URL;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AuthRestController {
     private final TemporaryMemberService temporaryMemberService;
@@ -60,12 +63,12 @@ public class AuthRestController {
             .build());
 
         return ResponseEntity.ok(Response.builder()
-            .status(Status.SUCCESS)
-            .message(new StringBuffer().append(TEMPORARY_MEMBER.getMessage()).append(SIGN_UP.getMessage()).append(SUCCESS.getMessage()).toString())
+            .status(SUCCESS.getStatus())
+            .message(new StringBuffer().append(TEMPORARY_MEMBER.getMessage()).append(SIGN_UP.getMessage()).append(Messages.SUCCESS.getMessage()).toString())
             .build());
     }
 
-    @PostMapping(value = "/reissue/v1", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/reissue/v1")
     public ResponseEntity reissueJwtsV1(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, NoSuchDeviceTokenException, JWTVerificationException, IOException {
         String[] jwts = authService.reissueJwts(request);
 
@@ -82,8 +85,8 @@ public class AuthRestController {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Response> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body(Response.builder()
-                .status(Status.FAIL)
-                .cause(MemberCause.FORM)
+                .status(FAIL.getStatus())
+                .cause(FORM)
                 .message(e.getMessage())
             .build());
     }
@@ -93,7 +96,7 @@ public class AuthRestController {
     public ResponseEntity<Response> handleMemberSignUpValidationException(MemberSignUpValidationException e) {
         return ResponseEntity.badRequest()
             .body(Response.builder()
-                .status(Status.FAIL)
+                .status(FAIL.getStatus())
                 .cause(e.getReason())
                 .message(e.getMessage())
             .build());
@@ -103,9 +106,9 @@ public class AuthRestController {
     @ExceptionHandler({MessagingException.class, UnsupportedEncodingException.class})
     public ResponseEntity<Response> handleEmailException() {
         return ResponseEntity.internalServerError().body(Response.builder()
-            .status(Status.FAIL)
+            .status(FAIL.getStatus())
             .cause(MemberCause.VERIFICATION)
-            .message(new StringBuffer().append(VERIFICATION.getMessage()).append(EMAIL.getMessage()).append(SEND.getMessage()).append(FAIL.getMessage()).toString())
+            .message(new StringBuffer().append(VERIFICATION.getMessage()).append(EMAIL.getMessage()).append(SEND.getMessage()).append(Messages.FAIL.getMessage()).toString())
             .build());
     }
 
@@ -117,7 +120,7 @@ public class AuthRestController {
 
         return ResponseEntity.badRequest()
             .body(Response.builder()
-                .status(Status.FAIL)
+                .status(FAIL.getStatus())
                 .cause(e.getCause().toString())
                 .message(e.getMessage())
                 .build());
@@ -134,7 +137,7 @@ public class AuthRestController {
 
         return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
             .body(Response.builder()
-                .status(Status.FAIL)
+                .status(FAIL.getStatus())
                 .cause(JwtCause.JWT)
                 .message(e.getMessage())
                 .build());

@@ -1,32 +1,21 @@
 package com.letmeknow.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letmeknow.dto.auth.Response;
-import com.letmeknow.dto.temporarymember.TemporaryMemberDto;
+import com.letmeknow.dto.Response;
 import com.letmeknow.exception.auth.InvalidRequestException;
 import com.letmeknow.exception.member.MemberStateException;
-import com.letmeknow.exception.member.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import com.letmeknow.enumstorage.errormessage.auth.EmailErrorMessage;
-import com.letmeknow.enumstorage.errormessage.auth.LogInErrorMessage;
-import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
-import com.letmeknow.message.messages.EmailMessage;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
-import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.member.TemporaryMemberService;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Optional;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
 
@@ -42,7 +31,7 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
 
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
-            .status(FAIL)
+            .status(FAIL.getStatus())
             .message(exception.getMessage())
             .build()
         ));
@@ -90,7 +79,7 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
 
             response.getWriter().write(objectMapper.writeValueAsString(
                 Response.builder()
-                .status(FAIL)
+                .status(FAIL.getStatus())
                 .message(exception.getMessage())
                 .build()
             ));

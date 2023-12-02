@@ -35,16 +35,4 @@ public class ArticleCreationDto {
         this.createdAt = createdAt;
         this.isNotice = isNotice;
     }
-
-    // toEntity
-    public Article toEntity(Board board) {
-        return Article.builder()
-                .board(board)
-                .title(title)
-                .link(link)
-                .createdAt(createdAt)
-                .isNotice(isNotice)
-            .build();
-    }
-
 }

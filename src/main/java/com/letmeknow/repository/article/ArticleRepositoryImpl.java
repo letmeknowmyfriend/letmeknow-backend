@@ -1,13 +1,16 @@
-package com.letmeknow.repository;
+package com.letmeknow.repository.article;
 
 import com.letmeknow.entity.Article;
-import com.letmeknow.entity.QArticle;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static com.letmeknow.entity.QArticle.*;
+
+@Repository
 @RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
     private final EntityManager em;
@@ -17,10 +20,15 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return queryFactory
-                .selectFrom(QArticle.article)
-                .where(QArticle.article.boardNumber.id.eq(boardId).and(QArticle.article.isNotice.eq(isNotice)))
-                .orderBy(QArticle.article.id.desc())
+                .selectFrom(article)
+                .where(article.board.id.eq(boardId).and(article.isNotice.eq(isNotice)))
+                .orderBy(article.id.desc())
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public void saveAllArticles(List<Article> articles) {
+        em.persist(articles);
     }
 }

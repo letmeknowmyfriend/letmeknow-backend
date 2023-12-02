@@ -1,7 +1,14 @@
 package com.letmeknow.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letmeknow.filter.APIContentTypeFilter;
+import com.letmeknow.auth.filter.auth.AuthenticationProcessFilter;
+import com.letmeknow.auth.filter.auth.MemberAuthenticationFilter;
+import com.letmeknow.auth.handler.JwtLogoutHandler;
+import com.letmeknow.auth.handler.MemberLogInFailureHandler;
+import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
+import com.letmeknow.auth.provider.MemberAuthenticationProvider;
+import com.letmeknow.auth.service.PrincipalUserDetailsService;
+import com.letmeknow.enumstorage.role.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +21,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import com.letmeknow.auth.provider.MemberAuthenticationProvider;
-import com.letmeknow.auth.handler.MemberLogInFailureHandler;
-import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
-import com.letmeknow.auth.service.PrincipalUserDetailsService;
-import com.letmeknow.auth.handler.JwtLogoutHandler;
-import com.letmeknow.enumstorage.role.MemberRole;
-import com.letmeknow.auth.filter.auth.AuthenticationProcessFilter;
-import com.letmeknow.auth.filter.auth.MemberAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
@@ -33,7 +32,6 @@ public class SecurityConfig {
     private final MemberLogInFailureHandler memberLogInFailureHandler;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final AuthenticationProcessFilter authenticationProcessFilter;
-    private final APIContentTypeFilter apiContentTypeFilter;
     private final MemberAuthenticationProvider memberAuthenticationProvider;
     private final CorsConfig corsConfig;
     private final ObjectMapper objectMapper;
@@ -53,6 +51,10 @@ public class SecurityConfig {
                         .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico").permitAll()
                         .antMatchers("/api/auth/**").permitAll()
                         .antMatchers("/api/subscription/**").permitAll()
+                        .antMatchers("/api/notification/**").permitAll()
+                        .antMatchers("/api/school/**").permitAll()
+                        .antMatchers("/api/college/**").permitAll()
+                        .antMatchers("/api/board/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
 //                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()
@@ -68,8 +70,7 @@ public class SecurityConfig {
 
         //Filter
         http
-            .addFilterBefore(apiContentTypeFilter, LogoutFilter.class)
-            .addFilterAfter(authenticationProcessFilter, APIContentTypeFilter.class)
+            .addFilterBefore(authenticationProcessFilter, LogoutFilter.class)
             .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
 
         //로그인

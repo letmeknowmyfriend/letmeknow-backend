@@ -1,4 +1,4 @@
-package com.letmeknow.dto.auth;
+package com.letmeknow.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

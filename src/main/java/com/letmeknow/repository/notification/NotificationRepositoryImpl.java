@@ -15,15 +15,16 @@ public class NotificationRepositoryImpl implements NotificationRepositoryQueryDs
     private final EntityManager em;
 
     @Override
-    public List<Notification> findWithNoOffset(Long lastId, Long pageSize, Long memberId) {
+    public List<Notification> findByNoOffsetWithArticle(Long lastId, Long pageSize, Long memberId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return queryFactory
             .selectFrom(notification)
             .where(
-                ltId(lastId)
-                .and(notification.member.id.eq(memberId))
+                ltId(lastId),
+                notification.memberId.eq(memberId)
             )
+            .leftJoin(notification.article).fetchJoin()
             .orderBy(notification.id.desc())
             .limit(getPageSize(pageSize))
             .fetch();
@@ -38,7 +39,7 @@ public class NotificationRepositoryImpl implements NotificationRepositoryQueryDs
             .set(notification.isRead, true)
             .where(
                 notification.id.eq(notificationId)
-                .and(notification.member.id.eq(memberId))
+                    .and(notification.member.id.eq(memberId))
             )
             .execute();
     }

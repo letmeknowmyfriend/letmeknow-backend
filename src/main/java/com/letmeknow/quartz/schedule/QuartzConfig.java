@@ -1,9 +1,13 @@
 package com.letmeknow.quartz.schedule;
 
-import com.letmeknow.quartz.AutoWiringSpringBeanJobFactory;
 import com.letmeknow.analyser.Analyser;
-import org.quartz.*;
+import com.letmeknow.quartz.AutoWiringSpringBeanJobFactory;
+import org.quartz.DateBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +20,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Properties;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Configuration
@@ -68,7 +72,6 @@ public class QuartzConfig {
         jobDetailFactoryBean.setDurability(true);
 
 
-
         jobDetailFactoryBean.afterPropertiesSet();
 
         return jobDetailFactoryBean.getObject();
@@ -79,16 +82,17 @@ public class QuartzConfig {
         // Trigger the job to run now, and then repeat every 40 seconds
 //        return newTrigger()
 //                .withIdentity("trigger1", "group1")
-//                .withSchedule(cronSchedule("30 10-17 * * *")) // 매일 10시 30분부터 17시 30분까지 1시간마다 실행
 //                .forJob("job1", "group1")
 //                .build();
         return newTrigger()
                 .withIdentity("trigger1", "group1")
 //                .startNow()
-                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
-                .withSchedule(simpleSchedule()
-//                        .withIntervalInSeconds(5)
-                        .withRepeatCount(0)) // 1번만 실행
+//                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
+                // 매일 10시 30분부터 17시 30분까지 1시간마다 실행
+                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"))
+//                .withSchedule(simpleSchedule()
+////                        .withIntervalInSeconds(5)
+//                        .withRepeatCount(0)) // 1번만 실행
                 .forJob(jobDetail())
                 .build();
     }
