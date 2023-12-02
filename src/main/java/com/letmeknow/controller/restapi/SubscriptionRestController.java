@@ -1,6 +1,6 @@
 package com.letmeknow.controller.restapi;
 
-import com.letmeknow.dto.auth.Response;
+import com.letmeknow.dto.Response;
 import com.letmeknow.exception.NoSuchBoardException;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.member.NoSuchMemberException;
@@ -19,13 +19,13 @@ import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
 
 @RestController
-@RequestMapping("/api/subscription")
+@RequestMapping(value = "/api/subscription", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class SubscriptionRestController {
     private final SubscriptionService subscriptionService;
 
     // 게시판 구독
-    @PostMapping(value = "/subscribe/v1/{boardId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/subscribe/v1/{boardId}")
     public ResponseEntity subscribe_v1(@PathVariable long boardId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
@@ -39,7 +39,7 @@ public class SubscriptionRestController {
     }
 
     // 게시판 구독 취소
-    @DeleteMapping(value = "/unsubscribe/v1/{boardId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/unsubscribe/v1/{boardId}")
     public ResponseEntity unsubscribe_v1(@PathVariable Long boardId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 

@@ -11,7 +11,7 @@ import com.letmeknow.entity.notification.Subscription;
 import com.letmeknow.exception.NoSuchBoardException;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.exception.subscription.SubscriptionException;
-import com.letmeknow.repository.BoardRepository;
+import com.letmeknow.repository.board.BoardRepository;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.repository.notification.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,6 @@ import static com.letmeknow.message.messages.MemberMessage.CONSENT_TO_PUSH_NOTIF
 import static com.letmeknow.message.messages.Messages.*;
 import static com.letmeknow.message.messages.NotificationMessages.FCM;
 import static com.letmeknow.message.messages.SubscriptionMessages.SUBSCRIPTION;
-import static com.letmeknow.message.messages.SubscriptionMessages.UNSUBSCRIPTION;
 
 @Service
 @Transactional(readOnly = true)
@@ -107,10 +106,15 @@ public class SubscriptionService {
             throw new IllegalArgumentException(new StringBuffer().append(MEMBER.getMessage()).append(CONSENT_TO_PUSH_NOTIFICATION.getMessage()).append(DID_NOT.getMessage()).toString());
         }
 
-        // 회원이 이미 구독한 토픽이면
-        if (member.getSubscriptions().stream().anyMatch(subscription -> subscription.getBoard().getId().equals(boardId))) {
-            // 예외 발생
-            throw new IllegalArgumentException(new StringBuffer().append(SUBSCRIPTION.getMessage()).append(ALREADY.getMessage()).append(EXISTS.getMessage()).toString());
+        // 회원이 이미 구독한 토픽이 아니면
+        if (!member.getSubscriptions().stream().anyMatch(subscription -> subscription.getBoard().getId().equals(Long.valueOf(boardId)))) {
+            // 회원의 구독에 추가
+            Subscription subscription = Subscription.builder()
+                .member(member)
+                .board(board)
+                .build();
+
+            subscriptionRepository.save(subscription);
         }
 
         // 회원이 갖고있는 deviceToken들에게 구독을 추가한다.
@@ -131,14 +135,6 @@ public class SubscriptionService {
                 throw new SubscriptionException(new StringBuffer().append(FCM.getMessage()).append(SUBSCRIPTION.getMessage()).append(FAIL.getMessage()).toString());
             }
         });
-
-        // 회원의 구독에 추가
-        Subscription subscription = Subscription.builder()
-            .member(member)
-            .board(board)
-            .build();
-
-        subscriptionRepository.save(subscription);
     }
 
     @Transactional
@@ -146,12 +142,6 @@ public class SubscriptionService {
         // memberWithSubscriptionAndDeviceToken
         Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
-
-        // 회원이 구독했던 토픽이 아니면
-        if (member.getSubscriptions().stream().noneMatch(subscription -> subscription.getBoard().getId().equals(boardId))) {
-            // 예외 발생
-            throw new IllegalArgumentException(new StringBuffer().append(SUBSCRIPTION.getMessage()).append(NOT_EXISTS.getMessage()).toString());
-        }
 
         // 회원이 갖고있는 deviceToken들에게 구독을 삭제한다.
         List<String> deviceTokens = member.getDeviceTokens().stream()

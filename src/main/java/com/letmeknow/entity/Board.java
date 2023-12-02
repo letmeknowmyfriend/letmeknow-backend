@@ -1,6 +1,6 @@
 package com.letmeknow.entity;
 
-import com.letmeknow.entity.notification.Notification;
+import com.letmeknow.dto.BoardDtoWithSubscription;
 import com.letmeknow.entity.notification.Subscription;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -56,5 +56,14 @@ public class Board extends BaseEntity {
     // 연관 관계 편의 메소드
     public void addArticle(Article article) {
         this.articles.add(article);
+    }
+
+    //== DTO ==//
+    public BoardDtoWithSubscription toDtoWithSubscription() {
+        return BoardDtoWithSubscription.builder()
+                .id(this.id)
+                .boardName(this.boardName)
+                .isThereSubscription(subscriptions.size() > 0)
+                .build();
     }
 }

@@ -70,144 +70,127 @@
 //        // 회원5 정보
 //        String email5 = "member5@gmail.com";
 //
-////        // 게시판 생성
-////        Board newBoard1 = Board.builder()
-////                        .boardName("일반공지")
-////                        .boardSeq(700l)
-////                        .menuSeq(5168l)
-////                        .isThereNotice(true)
-////                        .build();
-////        boardService.save(newBoard1);
-////
-////        Board newBoard2 = Board.builder()
-////            .boardName("취업/장학")
-////            .boardSeq(701l)
-////            .menuSeq(5170l)
-////            .isThereNotice(false)
-////            .build();
-////        boardService.save(newBoard2);
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 회원1 생성
-////        memberRepository.save(Member.builder()
-////                .name("member1")
-////                .email(email1)
-////                .password(passwordEncoder.encode("password"))
-////                .city("city")
-////                .street("street")
-////                .zipcode("zipcode")
-////            .build());
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 임시 회원1 생성
-////        temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
-////                .name("temporaryMember1")
-////                .email("temporaryMember1@gmail.com")
-////                .password("password")
-////                .city("city")
-////                .street("street")
-////                .zipcode("zipcode")
-////            .build());
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 회원2 생성
-////        memberRepository.save(Member.builder()
-////                .name("member2")
-////                .email(email2)
-////                .password(passwordEncoder.encode("password"))
-////                .city("city")
-////                .street("street")
-////                .zipcode("zipcode")
-////            .build());
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 회원3 생성
-////        memberRepository.save(Member.builder()
-////            .name("member3")
-////            .email(email3)
-////            .password(passwordEncoder.encode("password"))
-////            .city("city")
-////            .street("street")
-////            .zipcode("zipcode")
-////            .build());
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 회원4 생성
-////        memberRepository.save(Member.builder()
-////            .name("member4")
-////            .email(email4)
-////            .password(passwordEncoder.encode("password"))
-////            .city("city")
-////            .street("street")
-////            .zipcode("zipcode")
-////            .build());
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 회원1 생성
+//        memberRepository.save(Member.builder()
+//                .name("member1")
+//                .email(email1)
+//                .password(passwordEncoder.encode("password"))
+//                .city("city")
+//                .street("street")
+//                .zipcode("zipcode")
+//            .build());
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 회원5 생성
-////        memberRepository.save(Member.builder()
-////            .name("member5")
-////            .email(email5)
-////            .password(passwordEncoder.encode("password"))
-////            .city("city")
-////            .street("street")
-////            .zipcode("zipcode")
-////            .build());
-////
-////        Member member5 = memberRepository.findNotDeletedByEmail(email5)
-////            .orElseThrow(() -> new NoSuchMemberException("회원이 없습니다."));
-////
-////        member5.deleteMember();
-////
-////        memberRepository.save(member5);
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email1, deviceToken1);
-////
-////        // 게시판 구독
-////        subscriptionService.subscribeToTopic(email1, "2");
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_1);
-////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_2);
-////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_3);
-////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_4);
-////
-////        // 게시판 구독
-////        subscriptionService.subscribeToTopic(email2, "1");
-////        subscriptionService.subscribeToTopic(email2, "2");
-////        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////        // 로그인
-////        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_1);
-////
-////        // 로그인
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_2);
-////
-////        // 로그인
-////        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_3);
-////
-////        // 게시판 구독
-////        subscriptionService.subscribeToTopic(email3, "1");
-////        subscriptionService.subscribeToTopic(email3, "2");
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 임시 회원1 생성
+//        temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+//                .name("temporaryMember1")
+//                .email("temporaryMember1@gmail.com")
+//                .password("password")
+//                .city("city")
+//                .street("street")
+//                .zipcode("zipcode")
+//            .build());
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 회원2 생성
+//        memberRepository.save(Member.builder()
+//                .name("member2")
+//                .email(email2)
+//                .password(passwordEncoder.encode("password"))
+//                .city("city")
+//                .street("street")
+//                .zipcode("zipcode")
+//            .build());
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 회원3 생성
+//        memberRepository.save(Member.builder()
+//            .name("member3")
+//            .email(email3)
+//            .password(passwordEncoder.encode("password"))
+//            .city("city")
+//            .street("street")
+//            .zipcode("zipcode")
+//            .build());
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 회원4 생성
+//        memberRepository.save(Member.builder()
+//            .name("member4")
+//            .email(email4)
+//            .password(passwordEncoder.encode("password"))
+//            .city("city")
+//            .street("street")
+//            .zipcode("zipcode")
+//            .build());
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 회원5 생성
+//        memberRepository.save(Member.builder()
+//            .name("member5")
+//            .email(email5)
+//            .password(passwordEncoder.encode("password"))
+//            .city("city")
+//            .street("street")
+//            .zipcode("zipcode")
+//            .build());
+//
+//        Member member5 = memberRepository.findNotDeletedByEmail(email5)
+//            .orElseThrow(() -> new NoSuchMemberException("회원이 없습니다."));
+//
+//        member5.deleteMember();
+//
+//        memberRepository.save(member5);
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email1, deviceToken1);
+//
+//        // 게시판 구독
+//        subscriptionService.subscribeToTopic(email1, "2");
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_1);
+//
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_2);
+//
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_3);
+//
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_4);
+//
+//        // 게시판 구독
+//        subscriptionService.subscribeToTopic(email2, "1");
+//        subscriptionService.subscribeToTopic(email2, "2");
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // 로그인
+//        // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_1);
+//
+//        // 로그인
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_2);
+//
+//        // 로그인
+//        authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_3);
+//
+//        // 게시판 구독
+//        subscriptionService.subscribeToTopic(email3, "1");
+//        subscriptionService.subscribeToTopic(email3, "2");
 //    }
 //}

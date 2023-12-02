@@ -3,7 +3,7 @@ package com.letmeknow.service.notification;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.letmeknow.dto.NotificationDto;
+import com.letmeknow.dto.NotificationDtoWithArticleDto;
 import com.letmeknow.entity.Article;
 import com.letmeknow.entity.Board;
 import com.letmeknow.entity.notification.Notification;
@@ -34,13 +34,17 @@ public class NotificationService {
     private final SubscriptionRepository subscriptionRepository;
     private final MemberRepository memberRepository;
 
-    public List<NotificationDto> findWithNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
+    public List<NotificationDtoWithArticleDto> findWithNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
         Long memberId = memberRepository.findNotDeletedIdByEmail(email)
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
-        return notificationRepository.findWithNoOffset(lastId, pageSize, memberId).stream()
+        List<Notification> withNoOffset = notificationRepository.findByNoOffsetWithArticle(lastId, pageSize, memberId);
+
+        List<NotificationDtoWithArticleDto> collect = withNoOffset.stream()
             .map(Notification::toDto)
             .collect(Collectors.toList());
+
+        return collect;
     }
 
     @Transactional
@@ -69,7 +73,7 @@ public class NotificationService {
         // 해당 게시판을 구독한 회원들에게 Notification를 생성한다.
         for (Subscription subscription : subscriptions) {
             for (Article article : newArticles) {
-                Notification notification = Notification.buildNotificationWithMemberId()
+                Notification notification = Notification.builder()
                     .memberId(subscription.getMember().getId())
                     .article(article)
                     .build();

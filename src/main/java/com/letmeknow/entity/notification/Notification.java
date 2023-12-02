@@ -1,6 +1,6 @@
 package com.letmeknow.entity.notification;
 
-import com.letmeknow.dto.NotificationDto;
+import com.letmeknow.dto.NotificationDtoWithArticleDto;
 import com.letmeknow.entity.Article;
 import com.letmeknow.entity.BaseEntity;
 import com.letmeknow.entity.member.Member;
@@ -25,7 +25,7 @@ public class Notification extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID", insertable = false, updatable = false)
     private Member member;
 
-    @Column(name = "MEMBER_ID")
+    @Column(name = "MEMBER_ID", nullable = false)
     private Long memberId;
 
     @NotNull
@@ -37,15 +37,6 @@ public class Notification extends BaseEntity {
     private Boolean isRead;
 
     @Builder
-    protected Notification(Member member, Article article) {
-        this.member = member;
-        this.article = article;
-        this.article.addNotification(this);
-
-        this.isRead = false;
-    }
-
-    @Builder(builderMethodName = "buildNotificationWithMemberId")
     protected Notification(Long memberId, Article article) {
         this.memberId = memberId;
         this.article = article;
@@ -55,11 +46,11 @@ public class Notification extends BaseEntity {
     }
 
     //== Dto ==//
-    public NotificationDto toDto() {
-        return NotificationDto.builder()
+    public NotificationDtoWithArticleDto toDto() {
+        return NotificationDtoWithArticleDto.builder()
             .id(this.id)
             .memberId(this.memberId)
-            .articleId(this.article.getId())
+            .articleDto(this.article.toDto())
             .isRead(this.isRead)
             .build();
     }

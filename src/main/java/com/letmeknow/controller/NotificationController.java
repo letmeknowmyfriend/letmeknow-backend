@@ -2,7 +2,7 @@
 //
 //import com.letmeknow.auth.userdetail.PrincipalUserDetails;
 //import com.letmeknow.domain.member.Member;
-//import com.letmeknow.dto.auth.Response;
+//import com.letmeknow.dto.Response;
 //import com.letmeknow.enumstorage.response.Status;
 //import com.letmeknow.exception.member.NoSuchMemberException;
 //import com.letmeknow.exception.notification.NotificationException;
@@ -30,7 +30,7 @@
 //        // 이미 구독한 게시판이면
 //        catch (NotificationException e) {
 //            return Response.builder()
-//                    .status(Status.FAIL)
+//                    .status(Status.FAIL.getStatus())
 //                    .command("")
 //                    .cause(e.getMessage())
 //                .build();

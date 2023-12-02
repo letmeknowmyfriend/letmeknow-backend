@@ -1,5 +1,14 @@
 package com.letmeknow.message.messages;
 
-public class BoardMessages {
-    public static final String BOARD = "게시판 ";
+import lombok.Getter;
+
+@Getter
+public enum BoardMessages {
+    BOARD("게시판 ");
+
+    private final String message;
+
+    private BoardMessages(String message) {
+        this.message = message;
+    }
 }

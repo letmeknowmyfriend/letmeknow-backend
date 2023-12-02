@@ -1,5 +1,6 @@
 package com.letmeknow.entity;
 
+import com.letmeknow.dto.CollegeDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,5 +45,14 @@ public class College extends BaseEntity {
     //-- 연관 관계 편의 메소드 --//
     public void addBoard(Board board) {
         this.boards.add(board);
+    }
+
+    //-- DTO 생성 메소드 --//
+    public CollegeDto toDto() {
+        return CollegeDto.builder()
+            .id(this.id)
+            .collegeName(this.collegeName)
+            .schoolId(this.school.getId())
+            .build();
     }
 }

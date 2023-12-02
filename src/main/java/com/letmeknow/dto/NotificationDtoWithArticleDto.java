@@ -1,22 +1,25 @@
 package com.letmeknow.dto;
 
+import com.letmeknow.dto.crawling.ArticleDto;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PROTECTED;
 
+@Getter
 @NoArgsConstructor(access = PROTECTED, force = true)
-public class NotificationDto {
+public class NotificationDtoWithArticleDto {
     private final Long id;
     private final Long memberId;
-    private final Long articleId;
+    private final ArticleDto articleDto;
     private final Boolean isRead;
 
     @Builder
-    protected NotificationDto(Long id, Long memberId, Long articleId, Boolean isRead) {
+    protected NotificationDtoWithArticleDto(Long id, Long memberId, ArticleDto articleDto, Boolean isRead) {
         this.id = id;
         this.memberId = memberId;
-        this.articleId = articleId;
+        this.articleDto = articleDto;
         this.isRead = isRead;
     }
 }

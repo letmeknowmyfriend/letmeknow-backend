@@ -1,11 +1,10 @@
 package com.letmeknow.analyser;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.letmeknow.entity.Article;
-import com.letmeknow.entity.Board;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.dto.crawling.ArticleDto;
+import com.letmeknow.entity.Article;
+import com.letmeknow.entity.Board;
 import com.letmeknow.service.ArticleService;
 import com.letmeknow.service.BoardService;
 import com.letmeknow.service.notification.NotificationService;
@@ -23,7 +22,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,6 @@ public class Analyser extends QuartzJobBean {
     @Autowired
     private NotificationService notificationService;
 
-    @Transactional
     @Override
     public void executeInternal(JobExecutionContext context) {
         ////////////////////////////////////////////////////////////////////////////
@@ -92,14 +90,14 @@ public class Analyser extends QuartzJobBean {
                     elementIds.add("noticeList");
                 }
 
-                List<Article> whatToSave = new ArrayList();
+                List<ArticleCreationDto> whatToSave = new ArrayList();
 
                 // 푸시 알림 리스트
                 List<Message> messages = new ArrayList();
 
                 // 크롤링 할 대상에 대해
                 for (int noticeIndex = 0; noticeIndex < elementIds.size(); noticeIndex++) {
-                    List<Article> crawledArticles = new ArrayList();
+                    List<ArticleCreationDto> crawledArticles = new ArrayList();
 
                     // tag가 tbody이고 id가 dispList인 태그의 자식 태그들을 모두 가져옴
                     Element list = doc.getElementById(elementIds.get(noticeIndex));
@@ -123,8 +121,8 @@ public class Analyser extends QuartzJobBean {
                         String date = tds.get(3).text();
 
                         // 그리고 그 태그들을 모두 저장
-                        crawledArticles.add(Article.builder()
-                            .board(board)
+                        crawledArticles.add(ArticleCreationDto.builder()
+                            .boardId(board.getId())
                             .title(title)
                             .link(link)
                             .createdAt(date)
@@ -143,12 +141,13 @@ public class Analyser extends QuartzJobBean {
                     findWhereToStartAndSaveIntoWhatToSave(dbArticles, crawledArticles, whatToSave, messages, board.getId());
                 }
 
-                articleService.saveAllArticles(whatToSave);
 
                 // 새로 들어온게 있으면
                 if (!whatToSave.isEmpty()) {
+                    List<Article> articles = articleService.saveAllArticles(board.getId(), whatToSave);
+
                     // notification을 보내고, 푸시 알림을 보낸다.
-                    notificationService.saveAndSendNotifications(board, whatToSave);
+                    notificationService.saveAndSendNotifications(board, articles);
                 }
             } catch (IOException e) {
                 log.warn(e.getMessage());
@@ -157,7 +156,7 @@ public class Analyser extends QuartzJobBean {
         }
     }
 
-    private void findWhereToStartAndSaveIntoWhatToSave(List<ArticleDto> dbArticles, List<Article> crawledArticles, List<Article> whatToSave, List<Message> messages, long boardId) {
+    private void findWhereToStartAndSaveIntoWhatToSave(List<ArticleDto> dbArticles, List<ArticleCreationDto> crawledArticles, List<ArticleCreationDto> whatToSave, List<Message> messages, long boardId) {
         // 어디서부터 넣어야할지 비교하는 로직
         int crawledArticleIndex = -1;
 
@@ -197,8 +196,8 @@ public class Analyser extends QuartzJobBean {
 
             // 푸시 알림 리스트에 추가
             messages.add(Message.builder()
-                    .setTopic(String.valueOf(boardId))
-                    .putData("body", crawledArticles.get(i).getTitle())
+                .setTopic(String.valueOf(boardId))
+                .putData("body", crawledArticles.get(i).getTitle())
                 .build());
         }
     }

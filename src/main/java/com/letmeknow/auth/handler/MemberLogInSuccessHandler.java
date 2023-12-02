@@ -2,7 +2,7 @@ package com.letmeknow.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.letmeknow.auth.service.AuthService;
-import com.letmeknow.dto.auth.Response;
+import com.letmeknow.dto.Response;
 import com.letmeknow.exception.member.NoSuchMemberException;
 import com.letmeknow.exception.subscription.SubscriptionException;
 import com.letmeknow.message.messages.Messages;
@@ -51,7 +51,7 @@ public class MemberLogInSuccessHandler implements AuthenticationSuccessHandler {
             response.setHeader(REFRESH_TOKEN_HEADER, BEARER + accessTokenAndRefreshToken[1]);
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
-                .status(SUCCESS)
+                .status(SUCCESS.getStatus())
                 .message(new StringBuffer().append(SIGN_IN.getMessage()).append(Messages.SUCCESS.getMessage()).toString())
                 .build()));
         }
