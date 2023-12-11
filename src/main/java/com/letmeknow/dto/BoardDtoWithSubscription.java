@@ -11,12 +11,12 @@ import static lombok.AccessLevel.PROTECTED;
 public class BoardDtoWithSubscription {
     private final Long id;
     private final String boardName;
-    private final Boolean isThereSubscription;
+    private final Boolean isSubscribed;
 
     @Builder
-    protected BoardDtoWithSubscription(Long id, String boardName, Boolean isThereSubscription) {
+    protected BoardDtoWithSubscription(Long id, String boardName, Boolean isSubscribed) {
         this.id = id;
         this.boardName = boardName;
-        this.isThereSubscription = isThereSubscription;
+        this.isSubscribed = isSubscribed;
     }
 }
