@@ -57,13 +57,4 @@ public class Board extends BaseEntity {
     public void addArticle(Article article) {
         this.articles.add(article);
     }
-
-    //== DTO ==//
-    public BoardDtoWithSubscription toDtoWithSubscription() {
-        return BoardDtoWithSubscription.builder()
-                .id(this.id)
-                .boardName(this.boardName)
-                .isThereSubscription(subscriptions.size() > 0)
-                .build();
-    }
 }

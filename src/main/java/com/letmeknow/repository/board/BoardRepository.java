@@ -6,16 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    @Query(value = "SELECT b.*, subscription.*\n" +
+    @Query(
+        value = "SELECT b.BOARD_ID as id, b.board_name as boardName, IF(COUNT(s.SUBSCRIPTION_ID) > 0, 'TRUE', 'FALSE') as isSubscribed\n" +
         "FROM Board b\n" +
-        "LEFT JOIN subscription ON b.board_id = subscription.board_id\n" +
-        "AND subscription.member_id = :memberId\n" +
-        "WHERE b.college_id = :collegeId",
-    nativeQuery = true)
-    List<Board> findByCollegeIdWithSubscriptionByMemberId(@Param("collegeId") Long collegeId, @Param("memberId") Long memberId);
+        "LEFT JOIN subscription as s ON b.board_id = s.board_id\n" +
+        "AND s.member_id = :memberId\n" +
+        "WHERE b.college_id = :collegeId\n" +
+        "GROUP BY b.board_id\n",
+        nativeQuery = true)
+    List<BoardInterface> findByCollegeIdWithSubscriptionByMemberId(@Param("collegeId") Long collegeId, @Param("memberId") Long memberId);
     List<Board> findAll();
 }
