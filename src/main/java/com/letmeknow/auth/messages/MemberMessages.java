@@ -13,6 +13,7 @@ public enum MemberMessages {
     ID("아이디 "),
     PASSWORD("비밀번호 "),
     NEW_PASSWORD("새 비밀번호 "),
+    ADDRESS("주소 "),
     AGAIN("재입력 "),
     SEND(" 전송 "),
     VERIFICATION("인증 ");

@@ -29,6 +29,15 @@ public class Validator {
 
 
     public void validateMemberSignUpForm(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
+        // 도시 검사
+        isValidVarchar255(memberSignUpForm.getCity());
+
+        // 거리 검사
+        isValidVarchar255(memberSignUpForm.getStreet());
+
+        // 우편번호 검사
+        isValidVarchar255(memberSignUpForm.getZipcode());
+
         // 이름 검사
         isValidName(memberSignUpForm);
 
@@ -37,6 +46,12 @@ public class Validator {
 
         // 비밀번호 검사
         isValidPassword(memberSignUpForm.getEmail(), memberSignUpForm.getPassword(), memberSignUpForm.getPasswordAgain());
+    }
+
+    private void isValidVarchar255(String varchar255) throws MemberSignUpValidationException {
+        if (varchar255.length() > 255) {
+            throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(TOO_LONG.getMessage()).toString());
+        }
     }
 
     private void isValidName(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
