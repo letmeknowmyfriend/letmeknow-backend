@@ -1,2 +1,4 @@
 1700915030173|8|commit|connection 9|url jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul||
 1701446048973|2|rollback|connection 4|url jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul||
+1702282811999|28|commit|connection 5|url jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul||
+1702282975809|2|commit|connection 5|url jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul||

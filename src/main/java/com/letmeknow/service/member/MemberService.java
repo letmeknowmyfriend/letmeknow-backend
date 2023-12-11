@@ -228,6 +228,19 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    @Transactional
+    public void testMethod_consentToNotification(String email) {
+        Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
+            // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
+            .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
+
+        // 알림 수신 동의
+        member.consentToReceivePushNotification();
+
+        // 저장
+        memberRepository.save(member);
+    }
+
     // 알림 수신 거부
     @Transactional
     public void refuseToNotification(String email, String deviceToken, HttpServletResponse response) throws NoSuchDeviceTokenException, NoSuchMemberException {
