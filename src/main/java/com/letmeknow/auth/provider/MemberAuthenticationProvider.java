@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.letmeknow.auth.messages.MemberMessages.PASSWORD;
+import static com.letmeknow.auth.messages.MemberMessages.SIGN_IN;
+import static com.letmeknow.message.messages.Messages.FAIL;
 import static com.letmeknow.message.messages.Messages.INCORRECT;
 
 @Component
@@ -58,7 +60,7 @@ public class MemberAuthenticationProvider implements AuthenticationProvider {
 
         // 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException(new StringBuffer().append(INCORRECT.getMessage()).append(PASSWORD.getMessage()).toString());
+            throw new BadCredentialsException(new StringBuffer().append(SIGN_IN.getMessage()).append(FAIL.getMessage()).toString());
         }
 
         // 로그인 성공했으므로, 로그인 시도 횟수 초기화

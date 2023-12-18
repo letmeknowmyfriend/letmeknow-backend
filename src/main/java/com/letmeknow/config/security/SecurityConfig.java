@@ -22,6 +22,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
 //@EnableGlobalMethodSecurity(securedEnabled = true) //secured 어노테이션 활성화
@@ -87,12 +89,16 @@ public class SecurityConfig {
                 .authenticationProvider(memberAuthenticationProvider)
 
                 //로그아웃
-                .logout()
-                .logoutUrl("/api/auth/signout/v1")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .addLogoutHandler(jwtLogoutHandler);
+                .logout(logout ->
+                    logout.permitAll()
+                    .logoutUrl("/api/auth/signout/v1")
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    })
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                    .addLogoutHandler(jwtLogoutHandler)
+                );
 
         //OAuth2 로그인
 //        http
