@@ -115,7 +115,7 @@ public class Analyser extends QuartzJobBean {
                         String title = a.childNode(0).toString().trim();
 
                         // 링크
-                        long link = Long.parseLong(a.attr("data-itsp-view-link"));
+                        long articleId = Long.parseLong(a.attr("data-itsp-view-link"));
 
                         // 작성 일자
                         String date = tds.get(3).text();
@@ -124,7 +124,7 @@ public class Analyser extends QuartzJobBean {
                         crawledArticles.add(ArticleCreationDto.builder()
                             .boardId(board.getId())
                             .title(title)
-                            .link(link)
+                            .articleId(articleId)
                             .createdAt(date)
                             .isNotice(noticeIndex == 1)
                             .build());

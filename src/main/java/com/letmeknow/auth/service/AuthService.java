@@ -89,9 +89,6 @@ public class AuthService {
                         .ifPresent(member -> {
                             // 구독 해제 처리
                             subscriptionService.unsubscribeFromAllTopics(deviceToken, member);
-
-                            // Refresh Token 삭제
-                            refreshTokenRepository.delete(refreshTokenEntity);
                         });
                 },
                 () -> {
@@ -106,6 +103,9 @@ public class AuthService {
                                 });
                         });
                 });
+
+        // Device Token 삭제
+        deviceTokenRepository.deleteByDeviceToken(deviceToken);
 
         // ToDo: null 해도 되는지 테스트
         // Header에서 Access Token 삭제

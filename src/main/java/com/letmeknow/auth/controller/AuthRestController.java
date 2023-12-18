@@ -48,7 +48,7 @@ public class AuthRestController {
     private final Validator validator;
 
     @PostMapping("/signup/v1")
-    public ResponseEntity<Response> temporarySignUpV1(@Valid @RequestBody MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException, MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<Response> temporarySignUpV1(@RequestBody MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException, MessagingException, UnsupportedEncodingException {
         validator.validateMemberSignUpForm(memberSignUpForm);
 
         // 중복된 이메일이 존재하지 않으면,
@@ -77,7 +77,7 @@ public class AuthRestController {
         response.setHeader(REFRESH_TOKEN_HEADER, BEARER + jwts[1]);
 
         // redirect URL로 보내야함
-        return ResponseEntity.noContent()
+        return ResponseEntity.ok()
             .build();
     }
 
@@ -121,7 +121,6 @@ public class AuthRestController {
         return ResponseEntity.badRequest()
             .body(Response.builder()
                 .status(FAIL.getStatus())
-                .cause(e.getCause().toString())
                 .message(e.getMessage())
                 .build());
     }

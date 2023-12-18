@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(
-        value = "SELECT b.BOARD_ID as id, b.board_name as boardName, IF(COUNT(s.SUBSCRIPTION_ID) > 0, 'TRUE', 'FALSE') as isSubscribed\n" +
+        value = "SELECT b.BOARD_ID as id, b.board_name as boardName, b.board_url as boardUrl, IF(COUNT(s.SUBSCRIPTION_ID) > 0, 'TRUE', 'FALSE') as isSubscribed\n" +
         "FROM Board b\n" +
         "LEFT JOIN subscription as s ON b.board_id = s.board_id\n" +
         "AND s.member_id = :memberId\n" +

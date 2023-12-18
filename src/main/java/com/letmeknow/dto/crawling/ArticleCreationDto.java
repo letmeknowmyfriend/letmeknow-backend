@@ -1,7 +1,5 @@
 package com.letmeknow.dto.crawling;
 
-import com.letmeknow.entity.Article;
-import com.letmeknow.entity.Board;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +17,7 @@ public class ArticleCreationDto {
     private String title;
 
     @NotNull
-    private long link;
+    private long articleId;
 
     @NotBlank
     private String createdAt;
@@ -28,10 +26,10 @@ public class ArticleCreationDto {
     private Boolean isNotice;
 
     @Builder
-    protected ArticleCreationDto(long boardId, String title, long link, String createdAt, Boolean isNotice) {
+    protected ArticleCreationDto(long boardId, String title, long articleId, String createdAt, Boolean isNotice) {
         this.boardId = boardId;
         this.title = title;
-        this.link = link;
+        this.articleId = articleId;
         this.createdAt = createdAt;
         this.isNotice = isNotice;
     }

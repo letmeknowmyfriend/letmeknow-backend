@@ -3,10 +3,7 @@ package com.letmeknow.service;
 import com.letmeknow.dto.crawling.ArticleCreationDto;
 import com.letmeknow.entity.Article;
 import com.letmeknow.dto.crawling.ArticleDto;
-import com.letmeknow.entity.Board;
-import com.letmeknow.exception.NoSuchBoardException;
 import com.letmeknow.repository.article.ArticleRepository;
-import com.letmeknow.repository.board.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.letmeknow.message.messages.BoardMessages.BOARD;
-import static com.letmeknow.message.messages.Messages.NOT_EXISTS;
-import static com.letmeknow.message.messages.Messages.SUCH;
 
 @Service
 @Transactional(readOnly = true)
@@ -40,7 +33,7 @@ public class ArticleService {
             Article newArticle = Article.builder()
                 .boardId(boardId)
                 .title(article.getTitle())
-                .link(article.getLink())
+                .link(article.getArticleId())
                 .createdAt(article.getCreatedAt())
                 .isNotice(article.getIsNotice())
                 .build();

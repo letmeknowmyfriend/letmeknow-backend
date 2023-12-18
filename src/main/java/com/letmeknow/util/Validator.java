@@ -49,6 +49,18 @@ public class Validator {
     }
 
     private void isValidVarchar255(String varchar255) throws MemberSignUpValidationException {
+        if (varchar255 == null) {
+            throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(NOT_FOUND.getMessage()).toString());
+        }
+
+        if (varchar255.isBlank()) {
+            throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(NOT_FOUND.getMessage()).toString());
+        }
+
+        if (varchar255.isBlank()) {
+            throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(NOT_FOUND.getMessage()).toString());
+        }
+
         if (varchar255.length() > 255) {
             throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(TOO_LONG.getMessage()).toString());
         }

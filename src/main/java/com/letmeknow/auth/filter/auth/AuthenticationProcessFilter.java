@@ -1,6 +1,10 @@
 package com.letmeknow.auth.filter.auth;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letmeknow.dto.Response;
+import com.letmeknow.exception.auth.jwt.NoAccessTokenException;
+import com.letmeknow.message.messages.Messages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +25,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.letmeknow.auth.messages.JwtMessages.ACCESS_TOKEN;
+import static com.letmeknow.auth.messages.MemberMessages.SIGN_IN;
+import static com.letmeknow.enumstorage.response.Status.FAIL;
+import static com.letmeknow.enumstorage.response.Status.SUCCESS;
+import static com.letmeknow.message.messages.Messages.INVALID;
+
 
 /**
  * /auth/login 이외의 요청이 들어올 때, access token이 유효한지 검증하고 인증 처리/인증 실패/토큰 재발급 등을 수행
@@ -29,6 +39,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationProcessFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final ObjectMapper objectMapper;
 
     private static final List<String> NO_CHECK_URL = Arrays.asList("/api/auth", "/auth/member");
 
@@ -58,10 +69,15 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
             return; //return으로 이후 현재 필터 진행 막기
         }
         // accessToken이 유효하지 않으면,
-        catch (JWTVerificationException e) {
+        catch (NoAccessTokenException | IllegalArgumentException e) {
             // 원래 가려던 곳 상태 저장해주기
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader("Location", "/api/auth/reissue/v1?redirectUrl=" + request.getRequestURI());
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                .status(FAIL.getStatus())
+                .message(new StringBuffer().append(ACCESS_TOKEN.getMessage()).append(INVALID.getMessage()).toString())
+                .build()));
         }
     }
 

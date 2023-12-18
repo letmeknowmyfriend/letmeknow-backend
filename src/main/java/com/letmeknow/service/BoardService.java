@@ -33,6 +33,7 @@ public class BoardService {
             .map(boardInterface -> BoardDtoWithSubscription.builder()
                 .id(boardInterface.getId())
                 .boardName(boardInterface.getBoardName())
+                .boardUrl(boardInterface.getBoardUrl())
                 .isSubscribed(boardInterface.getIsSubscribed())
                 .build())
             .collect(Collectors.toList());
