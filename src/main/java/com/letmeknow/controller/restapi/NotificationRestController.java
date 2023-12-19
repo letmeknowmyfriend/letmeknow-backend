@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 
 import java.util.List;
 
@@ -107,7 +108,7 @@ public class NotificationRestController {
         );
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, NoSuchDeviceTokenException.class, NoSuchMemberException.class})
+    @ExceptionHandler({IllegalArgumentException.class, NoSuchDeviceTokenException.class, NoSuchMemberException.class, ConstraintViolationException.class})
     public ResponseEntity handleException(Exception e) {
         return ResponseEntity.badRequest().body(
             Response.builder()

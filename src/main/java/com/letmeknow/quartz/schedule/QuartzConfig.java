@@ -86,14 +86,18 @@ public class QuartzConfig {
 //                .build();
         return newTrigger()
                 .withIdentity("trigger1", "group1")
-//                .startNow()
-//                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
-                // 매일 10시 30분부터 17시 30분까지 1시간마다 실행
-                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"))
-//                .withSchedule(simpleSchedule()
-////                        .withIntervalInSeconds(5)
-//                        .withRepeatCount(0)) // 1번만 실행
                 .forJob(jobDetail())
+
+//                // 매일 10시 30분부터 17시 30분까지 1시간마다 실행
+//                .startNow()
+//                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"))
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
+                    .withSchedule(simpleSchedule()
+                        .withRepeatCount(0)) // 1번만 실행
+
                 .build();
     }
 

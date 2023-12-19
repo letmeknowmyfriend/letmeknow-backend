@@ -1,6 +1,5 @@
 package com.letmeknow.entity;
 
-import com.letmeknow.dto.BoardDtoWithSubscription;
 import com.letmeknow.entity.notification.Subscription;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,7 +24,10 @@ public class Board extends BaseEntity {
     private String boardName;
 
     @NotBlank
-    private String boardUrl;
+    private String boardCrawlingUrl;
+
+    @NotBlank
+    private String boardViewUrl;
 
     @NotNull
     private Boolean isThereNotice;
@@ -44,9 +46,10 @@ public class Board extends BaseEntity {
     private List<Article> articles = new ArrayList();
 
     @Builder
-    protected Board(String boardName, String boardUrl, Boolean isThereNotice, College college) {
+    protected Board(String boardName, String boardCrawlingUrl, String boardViewUrl, Boolean isThereNotice, College college) {
         this.boardName = boardName;
-        this.boardUrl = boardUrl;
+        this.boardCrawlingUrl = boardCrawlingUrl;
+        this.boardViewUrl = boardViewUrl;
         this.isThereNotice = isThereNotice;
         this.college = college;
 

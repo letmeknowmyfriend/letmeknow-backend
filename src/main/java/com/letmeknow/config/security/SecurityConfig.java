@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .antMatchers("/api/school/**").permitAll()
                         .antMatchers("/api/college/**").permitAll()
                         .antMatchers("/api/board/**").permitAll()
+                        .antMatchers("/api/article/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
 //                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()

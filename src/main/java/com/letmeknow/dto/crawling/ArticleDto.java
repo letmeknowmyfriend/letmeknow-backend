@@ -20,7 +20,7 @@ public class ArticleDto {
     private String title;
 
     @NotNull
-    private long link;
+    private long articleLink;
 
     @NotBlank
     private String createdAt;
@@ -29,11 +29,11 @@ public class ArticleDto {
     private Boolean isNotice;
 
     @Builder
-    protected ArticleDto(long id, long boardId, String title, long link, String createdAt, Boolean isNotice) {
+    protected ArticleDto(long id, long boardId, String title, long articleLink, String createdAt, Boolean isNotice) {
         this.id = id;
         this.boardId = boardId;
         this.title = title;
-        this.link = link;
+        this.articleLink = articleLink;
         this.createdAt = createdAt;
         this.isNotice = isNotice;
     }

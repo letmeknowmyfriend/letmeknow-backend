@@ -20,7 +20,6 @@ import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class Analyser extends QuartzJobBean {
 //                }
 //                ////////////////////////////////////////////////////////////////////////////
                 // 크롤링
-                Connection connection = Jsoup.connect(board.getBoardUrl());
+                Connection connection = Jsoup.connect(board.getBoardCrawlingUrl());
                 connection.timeout(100_000); // 100초
                 final Response response = connection.execute();
                 final Document doc = response.parse();
@@ -124,7 +123,7 @@ public class Analyser extends QuartzJobBean {
                         crawledArticles.add(ArticleCreationDto.builder()
                             .boardId(board.getId())
                             .title(title)
-                            .articleId(articleId)
+                            .articleLink(articleId)
                             .createdAt(date)
                             .isNotice(noticeIndex == 1)
                             .build());
