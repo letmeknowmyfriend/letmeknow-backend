@@ -1,6 +1,7 @@
 package com.letmeknow.repository.article;
 
 import com.letmeknow.entity.Article;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,21 @@ import static com.letmeknow.entity.QArticle.*;
 @RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
     private final EntityManager em;
+
+    @Override
+    public List<Article> findByNoOffset(Long boardId, Long lastId, Long pageSize) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return queryFactory
+                .selectFrom(article)
+            .where(
+                ltId(lastId),
+                article.board.id.eq(boardId)
+            )
+            .orderBy(article.id.desc())
+            .limit(getPageSize(pageSize))
+            .fetch();
+    }
 
     @Override
     public List<Article> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
@@ -30,5 +46,13 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
     @Override
     public void saveAllArticles(List<Article> articles) {
         em.persist(articles);
+    }
+
+    private BooleanExpression ltId(Long lastId) {
+        return lastId == null ? null : article.id.lt(lastId);
+    }
+
+    private long getPageSize(Long pageSize) {
+        return pageSize == null ? 60 : pageSize;
     }
 }

@@ -3,7 +3,6 @@ package com.letmeknow.service;
 import com.letmeknow.dto.BoardDtoWithSubscription;
 import com.letmeknow.entity.Board;
 import com.letmeknow.exception.member.NoSuchMemberException;
-import com.letmeknow.repository.board.BoardInterface;
 import com.letmeknow.repository.board.BoardRepository;
 import com.letmeknow.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    public List<BoardDtoWithSubscription> findAllByCollegeIdWithSubscription(Long collegeId, String email) throws NoSuchMemberException {
+    public List<BoardDtoWithSubscription> findAllByCollegeIdWithIsSubscribed(Long collegeId, String email) throws NoSuchMemberException {
         Long memberId = memberRepository.findNotDeletedIdByEmail(email)
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
@@ -33,7 +32,7 @@ public class BoardService {
             .map(boardInterface -> BoardDtoWithSubscription.builder()
                 .id(boardInterface.getId())
                 .boardName(boardInterface.getBoardName())
-                .boardUrl(boardInterface.getBoardUrl())
+                .boardViewUrl(boardInterface.getBoardViewUrl())
                 .isSubscribed(boardInterface.getIsSubscribed())
                 .build())
             .collect(Collectors.toList());

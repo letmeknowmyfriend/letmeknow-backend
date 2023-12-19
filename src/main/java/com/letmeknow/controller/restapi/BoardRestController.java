@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
@@ -28,7 +29,7 @@ public class BoardRestController {
     public ResponseEntity list_v1(@RequestParam Long collegeId, HttpServletRequest request) throws JsonProcessingException {
         String email = request.getAttribute("email").toString();
 
-        List<BoardDtoWithSubscription> board = boardService.findAllByCollegeIdWithSubscription(collegeId, email);
+        List<BoardDtoWithSubscription> board = boardService.findAllByCollegeIdWithIsSubscribed(collegeId, email);
 
         return ResponseEntity.ok(
             Response.builder()
@@ -41,6 +42,16 @@ public class BoardRestController {
     @ExceptionHandler(JsonProcessingException.class)
     public ResponseEntity handleException(Exception e) {
         return ResponseEntity.internalServerError().body(
+            Response.builder()
+                .status(FAIL.getStatus())
+                .message(e.getMessage())
+                .build()
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(
             Response.builder()
                 .status(FAIL.getStatus())
                 .message(e.getMessage())

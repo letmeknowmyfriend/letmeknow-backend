@@ -1,6 +1,8 @@
 package com.letmeknow.controller;
 
+import com.letmeknow.dto.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,10 @@ import com.letmeknow.message.messages.EmailMessage;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
 import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.member.TemporaryMemberService;
+
+import javax.validation.ConstraintViolationException;
+
+import static com.letmeknow.enumstorage.response.Status.FAIL;
 
 
 @Controller
@@ -242,4 +248,14 @@ public class AuthController {
 //
 //        return "redirect:/";
 //    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(
+            Response.builder()
+                .status(FAIL.getStatus())
+                .message(e.getMessage())
+                .build()
+        );
+    }
 }

@@ -60,28 +60,32 @@ public class SetUp {
 
         Board 일반공지 = Board.builder()
             .boardName("일반공지")
-            .boardUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=700&menuSeq=5168&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardCrawlingUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=700&menuSeq=5168&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardViewUrl("https://caku.konkuk.ac.kr/noticeView.do?siteId=CAKU&boardSeq=700&menuSeq=5168&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=12&pageNum=1&seq=")
             .isThereNotice(true)
             .college(college)
             .build();
 
         Board 취업_장학 = Board.builder()
             .boardName("취업/장학")
-            .boardUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=701&menuSeq=5170&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardCrawlingUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=701&menuSeq=5170&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardViewUrl("https://caku.konkuk.ac.kr/noticeView.do?siteId=CAKU&boardSeq=701&menuSeq=5170&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=12&pageNum=1&seq=")
             .isThereNotice(false)
             .college(college)
             .build();
 
         Board 공모_특강 = Board.builder()
             .boardName("공모/특강")
-            .boardUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=702&menuSeq=5172&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardCrawlingUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=702&menuSeq=5172&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardViewUrl("https://caku.konkuk.ac.kr/noticeView.do?siteId=CAKU&boardSeq=702&menuSeq=5172&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=12&pageNum=1&seq=")
             .isThereNotice(false)
             .college(college)
             .build();
 
         Board 학사_규정 = Board.builder()
             .boardName("학사규정")
-            .boardUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=703&menuSeq=5174&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardCrawlingUrl("https://caku.konkuk.ac.kr/noticeList.do?siteId=CAKU&boardSeq=703&menuSeq=5174&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=60&pageNum=1")
+            .boardViewUrl("https://caku.konkuk.ac.kr/noticeView.do?siteId=CAKU&boardSeq=703&menuSeq=5174&searchBy=&searchValue=&categorySeq=0&curBoardDispType=LIST&curPage=12&pageNum=1&seq=")
             .isThereNotice(true)
             .college(college)
             .build();

@@ -26,7 +26,7 @@ public class SubscriptionRestController {
 
     // 게시판 구독
     @PostMapping(value = "/subscribe/v1/{boardId}")
-    public ResponseEntity subscribe_v1(@PathVariable long boardId, HttpServletRequest request) {
+    public ResponseEntity subscribe_v1(@PathVariable Long boardId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
         subscriptionService.subscribeToTopic(email, String.valueOf(boardId));

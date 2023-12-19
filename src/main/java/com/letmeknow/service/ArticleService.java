@@ -19,6 +19,12 @@ import java.util.stream.Collectors;
 public class ArticleService {
     private final ArticleRepository articleRepository;
 
+    public List<ArticleDto> findByNoOffset(Long boardId, Long lastId, Long pageSize) {
+        return articleRepository.findByNoOffset(boardId, lastId, pageSize).stream()
+                .map(Article::toDto)
+                .collect(Collectors.toList());
+    }
+
     public List<ArticleDto> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
         return articleRepository.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardId, limit, isNotice).stream()
                 .map(Article::toDto)
@@ -33,7 +39,7 @@ public class ArticleService {
             Article newArticle = Article.builder()
                 .boardId(boardId)
                 .title(article.getTitle())
-                .link(article.getArticleId())
+                .articleLink(article.getArticleLink())
                 .createdAt(article.getCreatedAt())
                 .isNotice(article.getIsNotice())
                 .build();
