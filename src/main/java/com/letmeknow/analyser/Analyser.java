@@ -164,7 +164,7 @@ public class Analyser extends QuartzJobBean {
             boolean sameArticleFound = false;
 
             for (int j = 0; j < crawledArticles.size(); j++) {
-                if (dbArticles.get(i).getTitle().equals(crawledArticles.get(j).getTitle())) {
+                if (dbArticles.get(i).getArticleName().equals(crawledArticles.get(j).getTitle())) {
                     crawledArticleIndex = j - 1;
 
                     sameArticleFound = true;

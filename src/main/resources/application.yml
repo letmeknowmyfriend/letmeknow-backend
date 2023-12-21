@@ -7,7 +7,7 @@ spring:
     jpa:
         database: mysql
         hibernate:
-            ddl-auto: create-drop
+            ddl-auto: validate
 #        properties:
 #            hibernate:
 #                show_sql: true
@@ -89,7 +89,7 @@ jwt:
             header: AuthorizationRefresh
 
 server:
-    port: 9090
+    port: { SERVER_PORT }
     error:
         include-message: always
         include-binding-errors: always
@@ -112,3 +112,15 @@ decorator:
         p6spy:
             enable-logging: true
 # p6spy
+
+# cors
+cors.allowed-origin: ${DOMAIN}
+# cors
+
+# domain
+domain: ${DOMAIN}
+
+# port
+port: ${SERVER_PORT}
+
+

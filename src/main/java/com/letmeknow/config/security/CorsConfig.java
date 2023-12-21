@@ -1,5 +1,6 @@
 package com.letmeknow.config.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,6 +12,9 @@ import java.util.List;
 
 @Configuration
 public class CorsConfig {
+    @Value("${cors.allowed-origin}")
+    private String allowedOrigin;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -19,7 +23,7 @@ public class CorsConfig {
         config.setAllowedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
         config.setExposedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
 
-        config.setAllowedOrigins(List.of("https://localhost:9090"));
+        config.setAllowedOrigins(List.of(allowedOrigin + ":9090"));
         config.setAllowedMethods(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

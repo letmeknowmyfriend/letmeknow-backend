@@ -38,7 +38,7 @@ public class ArticleService {
         for (ArticleCreationDto article : articles) {
             Article newArticle = Article.builder()
                 .boardId(boardId)
-                .title(article.getTitle())
+                .articleName(article.getTitle())
                 .articleLink(article.getArticleLink())
                 .createdAt(article.getCreatedAt())
                 .isNotice(article.getIsNotice())
