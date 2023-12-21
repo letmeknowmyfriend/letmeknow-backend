@@ -9,16 +9,18 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED, force = true)
-public class NotificationDtoWithArticleDto {
+public class NotificationDtoWithBoardViewUrlAndArticleDto {
     private final Long id;
     private final Long memberId;
+    private final String boardViewUrl;
     private final ArticleDto articleDto;
     private final Boolean isRead;
 
     @Builder
-    protected NotificationDtoWithArticleDto(Long id, Long memberId, ArticleDto articleDto, Boolean isRead) {
+    protected NotificationDtoWithBoardViewUrlAndArticleDto(Long id, Long memberId, String boardViewUrl, ArticleDto articleDto, Boolean isRead) {
         this.id = id;
         this.memberId = memberId;
+        this.boardViewUrl = boardViewUrl;
         this.articleDto = articleDto;
         this.isRead = isRead;
     }

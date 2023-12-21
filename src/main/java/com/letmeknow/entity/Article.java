@@ -24,15 +24,14 @@ public class Article extends BaseEntity {
     @Column(name = "ARTICLE_ID")
     private long id;
 
+    @Column(name = "BOARD_ID", nullable = false)
+    private Long boardId;
     @JoinColumn(name = "BOARD_ID", insertable = false, updatable = false)
     @ManyToOne(fetch = LAZY, targetEntity = Board.class)
     private Board board;
 
-    @Column(name = "BOARD_ID", nullable = false)
-    private Long boardId;
-
     @NotBlank
-    private String title;
+    private String articleName;
 
     @NotNull
     private long articleLink;
@@ -48,9 +47,9 @@ public class Article extends BaseEntity {
     private List<Notification> notifications = new ArrayList<>();
 
     @Builder
-    protected Article(Long boardId, String title, long articleLink, String createdAt, Boolean isNotice) {
+    protected Article(Long boardId, String articleName, long articleLink, String createdAt, Boolean isNotice) {
         this.boardId = boardId;
-        this.title = title;
+        this.articleName = articleName;
         this.articleLink = articleLink;
         this.createdAt = createdAt;
         this.isNotice = isNotice;
@@ -66,7 +65,7 @@ public class Article extends BaseEntity {
         return ArticleDto.builder()
                 .id(this.id)
                 .boardId(this.board.getId())
-                .title(this.title)
+                .articleName(this.articleName)
                 .articleLink(this.articleLink)
                 .createdAt(this.createdAt)
                 .isNotice(this.isNotice)

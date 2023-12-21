@@ -24,6 +24,7 @@ public class NotificationRepositoryImpl implements NotificationRepositoryQueryDs
                 ltId(lastId),
                 notification.memberId.eq(memberId)
             )
+            .leftJoin(notification.board).fetchJoin()
             .leftJoin(notification.article).fetchJoin()
             .orderBy(notification.id.desc())
             .limit(getPageSize(pageSize))

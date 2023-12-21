@@ -15,6 +15,7 @@ import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
 import com.letmeknow.util.email.Email;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,12 @@ public class TemporaryMemberService {
 
     private final PasswordEncoder passwordEncoder;
     private final CodeGenerator codeGenerator;
+
+    @Value("${domain}")
+    private String domain;
+
+    @Value("${port}")
+    private String port;
 
     public TemporaryMemberDto findTemporaryMemberByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findByEmail(email)
@@ -79,9 +86,11 @@ public class TemporaryMemberService {
                 .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(memberCreationDto.getEmail())
                 .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_LINK1.getMessage() +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                        domain + ":" + port +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_LINK2.getMessage())
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
 
         return temporaryMemberId;
@@ -103,9 +112,11 @@ public class TemporaryMemberService {
                 .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
                 .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_LINK1.getMessage() +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                        domain + ":" + port +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_LINK2.getMessage())
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 
@@ -125,9 +136,11 @@ public class TemporaryMemberService {
                 .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
                 .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_LINK1.getMessage() +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                        domain + ":" + port +
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_LINK2.getMessage())
+                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 

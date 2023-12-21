@@ -1,5 +1,6 @@
 package com.letmeknow.entity;
 
+import com.letmeknow.entity.notification.Notification;
 import com.letmeknow.entity.notification.Subscription;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,6 +40,10 @@ public class Board extends BaseEntity {
 
     @NotNull
     @OneToMany(mappedBy = "board")
+    private List<Notification> notifications = new ArrayList<>();
+
+    @NotNull
+    @OneToMany(mappedBy = "board")
     private List<Subscription> subscriptions = new ArrayList<>();
 
     @NotNull
@@ -54,10 +59,5 @@ public class Board extends BaseEntity {
         this.college = college;
 
         college.addBoard(this);
-    }
-
-    // 연관 관계 편의 메소드
-    public void addArticle(Article article) {
-        this.articles.add(article);
     }
 }

@@ -2,7 +2,7 @@ package com.letmeknow.controller.restapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letmeknow.dto.NotificationDtoWithArticleDto;
+import com.letmeknow.dto.NotificationDtoWithBoardViewUrlAndArticleDto;
 import com.letmeknow.dto.Response;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.member.NoSuchMemberException;
@@ -38,12 +38,12 @@ public class NotificationRestController {
     public ResponseEntity list_v1(@RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize, HttpServletRequest request) throws JsonProcessingException {
         String email = (String) request.getAttribute("email");
 
-        List<NotificationDtoWithArticleDto> notificationDtoWithArticleDtos = notificationService.findWithNoOffset(lastId, pageSize, email);
+        List<NotificationDtoWithBoardViewUrlAndArticleDto> notificationDtoWithBoardViewUrlAndArticleDtos = notificationService.findWithNoOffset(lastId, pageSize, email);
 
         return ResponseEntity.ok(
             Response.builder()
                 .status(SUCCESS.getStatus())
-                .data(objectMapper.writeValueAsString(notificationDtoWithArticleDtos))
+                .data(objectMapper.writeValueAsString(notificationDtoWithBoardViewUrlAndArticleDtos))
             .build()
         );
     }

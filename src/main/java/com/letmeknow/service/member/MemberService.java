@@ -4,7 +4,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.letmeknow.auth.entity.DeviceToken;
 import com.letmeknow.auth.entity.RefreshToken;
-import com.letmeknow.auth.repository.devicetoken.DeviceTokenRepository;
 import com.letmeknow.auth.repository.refreshtoken.RefreshTokenRepository;
 import com.letmeknow.auth.service.JwtService;
 import com.letmeknow.dto.member.MemberFindDto;
@@ -21,13 +20,13 @@ import com.letmeknow.form.MemberAddressUpdateForm;
 import com.letmeknow.message.messages.EmailMessage;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.repository.notification.SubscriptionRepository;
-import com.letmeknow.service.DeviceTokenService;
 import com.letmeknow.service.SubscriptionService;
 import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
 import com.letmeknow.util.Validator;
 import com.letmeknow.util.email.Email;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +60,12 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final CodeGenerator codeGenerator;
     private final Validator validator;
+
+    @Value("${domain}")
+    private String domain;
+
+    @Value("${port}")
+    private String port;
 
     public MemberFindDto findMemberFindDtoById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
@@ -188,9 +193,11 @@ public class MemberService {
                 .subject(EmailMessage.CHANGE_PASSWORD_EMAIL_SUBJECT.getMessage())
                 .receiver(email)
                 .message(EmailMessage.CHANGE_PASSWORD_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.CHANGE_PASSWORD_EMAIL_LINK1.getMessage() +
+                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_1.getMessage() +
+                        domain + ":" + port +
+                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.CHANGE_PASSWORD_EMAIL_LINK2.getMessage())
+                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 

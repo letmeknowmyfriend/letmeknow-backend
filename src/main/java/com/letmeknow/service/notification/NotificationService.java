@@ -3,7 +3,7 @@ package com.letmeknow.service.notification;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.letmeknow.dto.NotificationDtoWithArticleDto;
+import com.letmeknow.dto.NotificationDtoWithBoardViewUrlAndArticleDto;
 import com.letmeknow.entity.Article;
 import com.letmeknow.entity.Board;
 import com.letmeknow.entity.notification.Notification;
@@ -34,14 +34,14 @@ public class NotificationService {
     private final SubscriptionRepository subscriptionRepository;
     private final MemberRepository memberRepository;
 
-    public List<NotificationDtoWithArticleDto> findWithNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
+    public List<NotificationDtoWithBoardViewUrlAndArticleDto> findWithNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
         Long memberId = memberRepository.findNotDeletedIdByEmail(email)
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
         List<Notification> withNoOffset = notificationRepository.findByNoOffsetWithArticle(lastId, pageSize, memberId);
 
-        List<NotificationDtoWithArticleDto> collect = withNoOffset.stream()
-            .map(Notification::toDto)
+        List<NotificationDtoWithBoardViewUrlAndArticleDto> collect = withNoOffset.stream()
+            .map(Notification::toDtoWithBoardViewUrlAndArticleDto)
             .collect(Collectors.toList());
 
         return collect;
@@ -75,6 +75,7 @@ public class NotificationService {
             for (Article article : newArticles) {
                 Notification notification = Notification.builder()
                     .memberId(subscription.getMember().getId())
+                    .board(board)
                     .article(article)
                     .build();
 

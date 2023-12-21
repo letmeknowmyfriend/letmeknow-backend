@@ -17,7 +17,7 @@ public class ArticleDto {
     private long boardId;
 
     @NotBlank
-    private String title;
+    private String articleName;
 
     @NotNull
     private long articleLink;
@@ -29,10 +29,10 @@ public class ArticleDto {
     private Boolean isNotice;
 
     @Builder
-    protected ArticleDto(long id, long boardId, String title, long articleLink, String createdAt, Boolean isNotice) {
+    protected ArticleDto(long id, long boardId, String articleName, long articleLink, String createdAt, Boolean isNotice) {
         this.id = id;
         this.boardId = boardId;
-        this.title = title;
+        this.articleName = articleName;
         this.articleLink = articleLink;
         this.createdAt = createdAt;
         this.isNotice = isNotice;
