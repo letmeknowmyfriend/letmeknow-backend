@@ -31,6 +31,7 @@ import static com.letmeknow.auth.messages.MemberMessages.EMAIL;
 import static com.letmeknow.auth.messages.MemberMessages.PASSWORD;
 import static com.letmeknow.message.messages.Messages.*;
 import static com.letmeknow.message.messages.NotificationMessages.DEVICE_TOKEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class MemberAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private final ObjectMapper objectMapper;
@@ -58,7 +59,7 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         // request의 method가 POST가 아니거나, Content-Type이 application/json이 아니면 예외 발생
-        if (request.getContentType() == null || !request.getMethod().equals("POST") || !request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
+        if (request.getContentType() == null || !request.getMethod().equals("POST") || !request.getContentType().contains(APPLICATION_JSON_VALUE)) {
             throw new InvalidRequestException(new StringBuffer().append(REQUEST.getMessage()).append(INVALID.getMessage()).toString());
         }
 
@@ -68,13 +69,13 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
 
         // ToDo: 테스트 할 때만 끔
         // DeviceToken 유효성 검사
-//        try {
-//            FirebaseMessaging.getInstance().send(Message.builder()
-//                        .setToken(deviceToken)
-//                .build());
-//        } catch (FirebaseMessagingException e) {
-//            throw new InvalidRequestException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
-//        }
+        try {
+            FirebaseMessaging.getInstance().send(Message.builder()
+                        .setToken(deviceToken)
+                .build());
+        } catch (FirebaseMessagingException e) {
+            throw new InvalidRequestException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
+        }
 
         // DeviceToken을 request의 attribute에 담는다.
         request.setAttribute("DeviceToken", deviceToken);

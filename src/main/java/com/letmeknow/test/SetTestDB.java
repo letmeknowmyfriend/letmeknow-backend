@@ -84,7 +84,7 @@
 //
 //        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //        // 임시 회원1 생성
-//        temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+//        temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
 //                .name("temporaryMember1")
 //                .email("temporaryMember1@gmail.com")
 //                .password("password")

@@ -6,6 +6,7 @@ import com.letmeknow.dto.Response;
 import com.letmeknow.exception.auth.jwt.NoAccessTokenException;
 import com.letmeknow.message.messages.Messages;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ import static com.letmeknow.auth.messages.MemberMessages.SIGN_IN;
 import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
 import static com.letmeknow.message.messages.Messages.INVALID;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 
 /**
@@ -71,7 +73,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
         // accessToken이 유효하지 않으면,
         catch (NoAccessTokenException | IllegalArgumentException e) {
             // 원래 가려던 곳 상태 저장해주기
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(SC_UNAUTHORIZED);
             response.setHeader("Location", "/api/auth/reissue/v1?redirectUrl=" + request.getRequestURI());
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(Response.builder()

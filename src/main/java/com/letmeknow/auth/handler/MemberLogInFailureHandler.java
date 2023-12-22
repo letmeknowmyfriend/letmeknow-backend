@@ -5,6 +5,7 @@ import com.letmeknow.dto.Response;
 import com.letmeknow.exception.auth.InvalidRequestException;
 import com.letmeknow.exception.member.MemberStateException;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 @Component
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
                 temporaryMemberService.findTemporaryMemberByEmail(email);
 
                 // 이메일 재전송 요청 페이지로 redirect
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(SC_UNAUTHORIZED);
                 response.setHeader("Location", "/api/auth/member/notice/verification-email/v1?email=" + email);
                 return;
             }
@@ -53,7 +55,7 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
             catch (NoSuchTemporaryMemberException e)
             {
                 // 회원가입 페이지로 redirect
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(SC_UNAUTHORIZED);
                 response.setHeader("Location", "/api/auth/signup/v1");
                 return;
             }
@@ -61,18 +63,18 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
         // 계정이 잠겨있는 경우
         else if (exception instanceof MemberStateException) {
             // 잠긴 계정 알림 페이지로 redirect
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(SC_UNAUTHORIZED);
             response.setHeader("Location", "/api/auth/member/notice/locked/v1?email=" + email);
             return;
         }
         // 비밀번호가 틀린 경우
         else if (exception instanceof BadCredentialsException) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(SC_UNAUTHORIZED);
             return;
         }
         // 요청이 유효하지 않은 경우
         else if (exception instanceof InvalidRequestException) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
 
             // UTF-8로 인코딩, body에 메시지 담아서 보내기
             response.setCharacterEncoding("UTF-8");

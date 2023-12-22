@@ -32,7 +32,11 @@ public enum Messages {
     ATTEMPT("시도 "),
     REQUEST("요청 "),
     REQUEST_HEADER("Request Header "),
-    HEADER("header ");
+    HEADER("header "),
+    TIME("시간 "),
+    PASSED("지남 "),
+    CHANGE("변경 "),
+    ;
 
     private final String message;
 

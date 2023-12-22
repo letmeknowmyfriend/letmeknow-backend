@@ -17,6 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
+import static com.letmeknow.message.messages.Messages.INVALID;
+import static com.letmeknow.message.messages.Messages.REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.GONE;
 
 @RestController
 @RequestMapping(value = "/api/subscription", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -52,9 +56,19 @@ public class SubscriptionRestController {
         );
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class, NoSuchBoardException.class, NoSuchMemberException.class})
-    public ResponseEntity handleIllegalArgumentException(RuntimeException e) {
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
+    public ResponseEntity handle400Exception(RuntimeException e) {
         return ResponseEntity.badRequest().body(
+            Response.builder()
+                    .status(FAIL.getStatus())
+                    .message(new StringBuffer().append(REQUEST.getMessage()).append(INVALID.getMessage()).toString())
+                .build()
+        );
+    }
+
+    @ExceptionHandler({NoSuchBoardException.class, NoSuchMemberException.class})
+    public ResponseEntity handle410Exception(RuntimeException e) {
+        return ResponseEntity.status(GONE).body(
             Response.builder()
                     .status(FAIL.getStatus())
                     .message(e.getMessage())

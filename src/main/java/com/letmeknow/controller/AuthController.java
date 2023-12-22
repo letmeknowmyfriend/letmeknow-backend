@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.letmeknow.message.messages.EmailMessage;
+import com.letmeknow.enumstorage.EmailEnum;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
 import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.member.TemporaryMemberService;
@@ -95,7 +95,7 @@ public class AuthController {
 //        {
 //            try {
 //                //임시 회원가입을 시도한다.
-//                temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+//                temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
 //                        .name(memberSignUpForm.getName())
 //                        .email(memberSignUpForm.getEmail())
 //                        .password(memberSignUpForm.getPassword())
@@ -133,23 +133,7 @@ public class AuthController {
 //        return "auth/signUpForm";
 //    }
 
-    @GetMapping("/member/verification-email")
-    public String verifyEmail(@RequestParam String verificationCode, Model model) {
-        try {
-            temporaryMemberService.verifyEmailAndTurnIntoMember(verificationCode);
-            model.addAttribute("message", EmailMessage.VERIFICATION_EMAIL_SUCCESS.getMessage())
-                    .addAttribute("href", "/auth/login");
 
-            return "message/message";
-
-        }
-        catch (NoSuchTemporaryMemberException e) {
-            model.addAttribute("message", e.getMessage())
-                    .addAttribute("href", "/auth/login");
-
-            return "message/message";
-        }
-    }
 
 //    @GetMapping("/auth/member/notice/verification-email")
 //    public String verificationEmailNotice(@PathVariable long temporaryMemberId, Model model) {
@@ -157,84 +141,7 @@ public class AuthController {
 //        return "/auth/notice/verificationEmailNotice";
 //    }
 //
-//    @GetMapping("/auth/member/change-password/{passwordVerificationCode}")
-//    public String changePasswordForm(@PathVariable String passwordVerificationCode, Model model) {
-//        //verificationCode로 인증
-//        try
-//        {
-//            memberService.verifyPasswordVerificationCode(passwordVerificationCode);
-//        }
-//        //verificationCode가 유효하지 않으면
-//        catch (NoSuchMemberException e)
-//        {
-//            model.addAttribute("message", PasswordMessage.NOT_VALID_PASSWORD_VERIFICATION_CODE.getMessage())
-//                    .addAttribute("href", "/auth/login");
-//
-//            return "message/message";
-//        }
-//
-//        //인증 성공시
-//        model.addAttribute("memberChangePasswordForm", new MemberChangePasswordForm())
-//                .addAttribute("passwordVerificationCode", passwordVerificationCode);
-//
-//        return "auth/member/changePasswordForm";
-//    }
-//
-//    @PostMapping("/auth/member/change-password/{passwordVerificationCode}")
-//    public String changePassword(@PathVariable String passwordVerificationCode, MemberChangePasswordForm memberChangePasswordForm, Model model, BindingResult result) {
-//        //새 비밀번호 일치 검사
-//        if (!memberChangePasswordForm.getNewPassword().equals(memberChangePasswordForm.getNewPasswordAgain())) {
-//            result.addError(new FieldError("memberChangePasswordForm", "newPassword", PasswordErrorMessage.PASSWORD_AGAIN_IS_NOT_EQUAL.getMessage()));
-//            result.addError(new FieldError("memberChangePasswordForm", "newPasswordAgain", PasswordErrorMessage.PASSWORD_AGAIN_IS_NOT_EQUAL.getMessage()));
-//        }
-//
-//        //잘못된 값이 들어오면, 다시 로그인 폼으로 돌아간다.
-//        if (result.hasErrors()) {
-//            model.addAttribute("passwordVerificationCode", passwordVerificationCode);
-//            model.addAttribute("memberChangePasswordForm", memberChangePasswordForm);
-//
-//            return "auth/member/changePasswordForm";
-//        }
-//
-//        //새 비밀번호 규칙 검사
-//        try
-//        {
-//            validator.isValidPassword(memberChangePasswordForm.getNewPassword());
-//        }
-//        catch (PasswordException e)
-//        {
-//            result.addError(new FieldError("memberChangePasswordForm", "newPassword", e.getMessage()));
-//            result.addError(new FieldError("memberChangePasswordForm", "newPasswordAgain", e.getMessage()));
-//        }
-//
-//        //잘못된 값이 들어오면, 다시 로그인 폼으로 돌아간다.
-//        if (result.hasErrors()) {
-//            model.addAttribute("passwordVerificationCode", passwordVerificationCode);
-//            model.addAttribute("memberChangePasswordForm", memberChangePasswordForm);
-//
-//            return "auth/member/changePasswordForm";
-//        }
-//
-//        try
-//        {
-//            //비밀번호 변경, 상태 변경, verificationCode로 인증, verificationCode 삭제
-//            memberService.changePassword(passwordVerificationCode, memberChangePasswordForm.getNewPassword());
-//        }
-//        //verificationCode가 유효하지 않으면
-//        catch (NoSuchMemberException e)
-//        {
-//            model.addAttribute("message", PasswordMessage.NOT_VALID_PASSWORD_VERIFICATION_CODE.getMessage())
-//                    .addAttribute("href", "/auth/login");
-//
-//            return "message/message";
-//        }
-//
-//        //모든 작업 성공시, 로그인 페이지로 redirect
-//        model.addAttribute("message", MemberMessage.CHANGE_PASSWORD_SUCCESS.getMessage())
-//                .addAttribute("href", "/auth/login");
-//
-//        return "message/message";
-//    }
+
 //
 //    @GetMapping("/auth/member/notice/change-password")
 //    public String changePasswordNotice() {

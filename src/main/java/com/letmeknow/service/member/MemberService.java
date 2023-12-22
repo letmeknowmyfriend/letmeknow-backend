@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.letmeknow.auth.entity.DeviceToken;
 import com.letmeknow.auth.entity.RefreshToken;
+import com.letmeknow.auth.repository.devicetoken.DeviceTokenRepository;
 import com.letmeknow.auth.repository.refreshtoken.RefreshTokenRepository;
 import com.letmeknow.auth.service.JwtService;
 import com.letmeknow.dto.member.MemberFindDto;
@@ -12,14 +13,12 @@ import com.letmeknow.entity.member.Member;
 import com.letmeknow.entity.notification.Subscription;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
-import com.letmeknow.exception.member.MemberSignUpValidationException;
-import com.letmeknow.exception.member.NewPasswordNotMatchException;
-import com.letmeknow.exception.member.NoSuchMemberException;
-import com.letmeknow.exception.member.PasswordIncorrectException;
+import com.letmeknow.exception.member.*;
 import com.letmeknow.form.MemberAddressUpdateForm;
-import com.letmeknow.message.messages.EmailMessage;
+import com.letmeknow.enumstorage.EmailEnum;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.repository.notification.SubscriptionRepository;
+import com.letmeknow.service.DeviceTokenService;
 import com.letmeknow.service.SubscriptionService;
 import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
@@ -45,16 +44,19 @@ import static com.letmeknow.auth.service.JwtService.REFRESH_TOKEN_HEADER;
 import static com.letmeknow.message.messages.MemberMessage.CONSENT_TO_PUSH_NOTIFICATION;
 import static com.letmeknow.message.messages.Messages.*;
 import static com.letmeknow.message.messages.NotificationMessages.DEVICE_TOKEN;
+import static java.time.LocalDateTime.now;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
     private final SubscriptionService subscriptionService;
+    private final DeviceTokenService deviceTokenService;
 
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
 
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
@@ -70,7 +72,7 @@ public class MemberService {
     public MemberFindDto findMemberFindDtoById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
                 //회원이 없으면 예외 발생
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()))
+                .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()))
                 //Dto로 변환
                 .toMemberFindDto();
     }
@@ -78,15 +80,20 @@ public class MemberService {
     public MemberFindDto findMemberFindDtoByEmail(String email) throws NoSuchMemberException {
         return memberRepository.findNotDeletedByEmail(email)
                 //해당하는 이메일을 가진 회원이 없으면, 예외 발생
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()))
+                .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()))
                 //Dto로 변환
                 .toMemberFindDto();
     }
 
-    public long verifyPasswordVerificationCode(String passwordVerificationCode) throws NoSuchMemberException {
+    public Long verifyPasswordVerificationCode(String passwordVerificationCode) throws NoSuchMemberException, VerificationInvalidException {
         Member member = memberRepository.findNotDeletedByPasswordVerificationCode(passwordVerificationCode)
                 //해당하는 비밀번호 변경 코드를 가진 회원이 없으면, 예외 발생
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage()));
+                .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
+
+        // verificationCodeExpiration 검증
+        if (member.getPasswordVerificationCodeExpiration().isBefore(now())) {
+            throw new VerificationInvalidException(new StringBuffer().append(VERIFICATION.getMessage()).append(TIME.getMessage()).append(PASSED.getMessage()).toString());
+        }
 
         return member.getId();
     }
@@ -97,8 +104,9 @@ public class MemberService {
      * @param newPassword
      * @throws NoSuchMemberException
      */
+    // ToDo: verificationCode 유효 기간 확인할 것!
     @Transactional
-    public void changePassword(String passwordVerificationCode, String newPassword) throws NoSuchMemberException {
+    public void changePassword(String passwordVerificationCode, String newPassword, String newPasswordAgain) throws NoSuchMemberException, VerificationInvalidException, MemberSignUpValidationException {
         Member member = memberRepository.findNotDeletedByPasswordVerificationCode(passwordVerificationCode)
                 //해당하는 비밀번호 변경 코드를 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage()));
@@ -108,19 +116,27 @@ public class MemberService {
             throw new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage());
         }
 
-        //비밀번호 변경
+        // verificationCodeExpiration 검증
+        if (member.getPasswordVerificationCodeExpiration().isBefore(now())) {
+            throw new VerificationInvalidException(new StringBuffer().append(VERIFICATION.getMessage()).append(TIME.getMessage()).append(PASSED.getMessage()).toString());
+        }
+
+        // 새 비밀번호 규칙 검사
+        validator.isValidPassword(member.getEmail(), newPassword, newPasswordAgain);
+
+        // 비밀번호 변경
         member.changePassword(passwordEncoder.encode(newPassword));
 
-        //상태 변경
+        // 상태 변경
         member.unlock();
 
-        //logInAttempt 초기화
+        // logInAttempt 초기화
         member.resetLogInAttempt();
 
-        //verificationCode 삭제
+        // verificationCode 삭제
         member.deletePasswordVerificationCode();
 
-        //저장
+        // 저장
         memberRepository.save(member);
     }
 
@@ -172,12 +188,16 @@ public class MemberService {
         // 회원의 정보 업데이트
         member.changePassword(memberPasswordUpdateDto.getNewPassword());
 
+        // ToDo: Device Token과 Refresh Token 전부 날리기 & 잘 되는 지 확인
+        // 회원이 가지고 있는  Device Token 삭제
+        deviceTokenRepository.deleteByMemberId(member.getId());
+
         // 회원의 정보 저장
         memberRepository.save(member);
     }
 
-    @Transactional
-    public void sendPasswordChangeVerificationEmail(String email) throws UnsupportedEncodingException, MessagingException, NoSuchMemberException {
+    @Transactional(rollbackFor = Exception.class)
+    public void sendChangePasswordVerificationEmail(String email) throws NoSuchMemberException, UnsupportedEncodingException, MessagingException {
         Member member = memberRepository.findNotDeletedByEmail(email)
                 // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
@@ -190,14 +210,14 @@ public class MemberService {
 
         // 비밀번호 재설정 이메일 발송
         emailService.sendMail(Email.builder()
-                .subject(EmailMessage.CHANGE_PASSWORD_EMAIL_SUBJECT.getMessage())
+                .subject(EmailEnum.CHANGE_PASSWORD_EMAIL_SUBJECT.getMessage())
                 .receiver(email)
-                .message(EmailMessage.CHANGE_PASSWORD_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_1.getMessage() +
+                .message(EmailEnum.CHANGE_PASSWORD_EMAIL_MESSAGE.getMessage() +
+                        EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_1.getMessage() +
                         domain + ":" + port +
-                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_2.getMessage() +
+                        EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.CHANGE_PASSWORD_EMAIL_CONTENT_3.getMessage())
+                        EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 
@@ -205,7 +225,7 @@ public class MemberService {
     @Transactional
     public void consentToNotification(String email, String deviceToken, HttpServletResponse response) throws NoSuchDeviceTokenException, NoSuchMemberException {
         // ToDo: 테스트 할 때만 끔 // 추출한 deviceToken이 유효한지 확인한다.
-//        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
+        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
 
         Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
                 // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
@@ -236,7 +256,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void testMethod_consentToNotification(String email) {
+    public void consentToNotification(String email) {
         Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
             // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
@@ -252,7 +272,7 @@ public class MemberService {
     @Transactional
     public void refuseToNotification(String email, String deviceToken, HttpServletResponse response) throws NoSuchDeviceTokenException, NoSuchMemberException {
         // ToDo: 테스트 할 때만 끔 // 추출한 deviceToken이 유효한지 확인한다.
-//        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
+        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
 
         Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
                 // 해당하는 이메일을 가진 회원이 없으면, 예외 발생

@@ -13,6 +13,8 @@ public class MemberCreationDto {
     @NotBlank
     private String password;
     @NotBlank
+    private String passwordAgain;
+    @NotBlank
     private String city;
     @NotBlank
     private String street;
@@ -20,10 +22,11 @@ public class MemberCreationDto {
     private String zipcode;
 
     @Builder
-    protected MemberCreationDto(String name, String email, String password, String city, String street, String zipcode) {
+    protected MemberCreationDto(String name, String email, String password, String passwordAgain, String city, String street, String zipcode) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.passwordAgain = passwordAgain;
         this.city = city;
         this.street = street;
         this.zipcode = zipcode;

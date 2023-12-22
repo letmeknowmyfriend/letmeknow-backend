@@ -1,5 +1,6 @@
 package com.letmeknow.util;
 
+import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.enumstorage.errormessage.auth.PasswordErrorMessage;
 import com.letmeknow.exception.member.MemberSignUpValidationException;
 import com.letmeknow.form.auth.MemberSignUpForm;
@@ -28,7 +29,7 @@ public class Validator {
     private static final Pattern passwordFormatPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,30}$");
 
 
-    public void validateMemberSignUpForm(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
+    public void validateNewMember(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
         // 도시 검사
         isValidVarchar255(memberSignUpForm.getCity());
 
@@ -39,10 +40,10 @@ public class Validator {
         isValidVarchar255(memberSignUpForm.getZipcode());
 
         // 이름 검사
-        isValidName(memberSignUpForm);
+        isValidName(memberSignUpForm.getName());
 
         // 이메일 검사
-        isValidEmail(memberSignUpForm);
+        isValidEmail(memberSignUpForm.getEmail());
 
         // 비밀번호 검사
         isValidPassword(memberSignUpForm.getEmail(), memberSignUpForm.getPassword(), memberSignUpForm.getPasswordAgain());
@@ -66,9 +67,9 @@ public class Validator {
         }
     }
 
-    private void isValidName(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
+    private void isValidName(String input) throws MemberSignUpValidationException {
         // 이름 검사
-        String name = Optional.ofNullable(memberSignUpForm.getName()).orElseThrow(
+        String name = Optional.ofNullable(input).orElseThrow(
             () -> new MemberSignUpValidationException(MemberCause.NAME, new StringBuffer().append(NAME.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
         if (name.isBlank()) {
@@ -80,9 +81,9 @@ public class Validator {
         }
     }
 
-    private void isValidEmail(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
+    private void isValidEmail(String input) throws MemberSignUpValidationException {
         // 이메일 규칙 검사
-        String email = Optional.ofNullable(memberSignUpForm.getEmail()).orElseThrow(
+        String email = Optional.ofNullable(input).orElseThrow(
             () -> new MemberSignUpValidationException(MemberCause.EMAIL, new StringBuffer().append(EMAIL.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
         if (email.isBlank()) {
@@ -103,13 +104,13 @@ public class Validator {
         passwordAgain = Optional.ofNullable(passwordAgain).orElseThrow(
             () -> new MemberSignUpValidationException(MemberCause.PASSWORD, new StringBuffer().append(PASSWORD.getMessage()).append(AGAIN).append(NOT_EXISTS.getMessage()).toString()));
 
-        // 비밀번호 일치 검사
-        if (!password.equals(passwordAgain)) {
-            throw new MemberSignUpValidationException(MemberCause.PASSWORD, new StringBuffer().append(PASSWORD.getMessage()).append(AGAIN).append(NOT_EQUAL).toString());
-        }
-
         if (password.isBlank()) {
             throw new MemberSignUpValidationException(MemberCause.PASSWORD, new StringBuffer().append(PASSWORD.getMessage()).append(NOT_EXISTS.getMessage()).toString());
+        }
+
+        // 비밀번호 일치 검사
+        if (!password.equals(passwordAgain)) {
+            throw new MemberSignUpValidationException(MemberCause.PASSWORD, new StringBuffer().append(PASSWORD.getMessage()).append(AGAIN.getMessage()).append(NOT_EQUAL.getMessage()).toString());
         }
 
         // 비밀번호 포맷 확인(영문, 특수문자, 숫자 포함 8자 이상, 30자 이하)

@@ -26,14 +26,4 @@ public class DeviceTokenRepositoryImpl implements DeviceTokenRepositoryQueryDsl 
             .fetchOne()
         );
     }
-
-    @Override
-    public void deleteByRefreshTokenId(long refreshTokenId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-
-        queryFactory
-            .delete(deviceToken1)
-            .where(deviceToken1.refreshToken.id.eq(refreshTokenId))
-            .execute();
-    }
 }

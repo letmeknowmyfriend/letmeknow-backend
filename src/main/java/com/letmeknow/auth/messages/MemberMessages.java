@@ -17,6 +17,7 @@ public enum MemberMessages {
     ADDRESS("주소 "),
     AGAIN("재입력 "),
     SEND(" 전송 "),
+    MAIL("메일 "),
     VERIFICATION("인증 ");
 
     private final String message;
