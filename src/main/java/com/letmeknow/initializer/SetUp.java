@@ -8,6 +8,7 @@ import com.letmeknow.entity.School;
 import com.letmeknow.entity.member.Member;
 import com.letmeknow.exception.member.MemberSignUpValidationException;
 import com.letmeknow.exception.member.NoSuchMemberException;
+import com.letmeknow.form.auth.MemberSignUpForm;
 import com.letmeknow.repository.board.BoardRepository;
 import com.letmeknow.repository.college.CollegeRepository;
 import com.letmeknow.repository.member.MemberRepository;
@@ -117,6 +118,9 @@ public class SetUp {
         // 회원5 정보
         String email5 = "member5@gmail.com";
 
+        // ChaCha 정보
+        String chachaEmail = "cha3088@gmail.com";
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 회원1 생성
         memberRepository.save(Member.builder()
@@ -131,10 +135,11 @@ public class SetUp {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 임시 회원1 생성
-        temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
-            .name("temporaryMember1")
+        temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
+            .name("tempMem1")
             .email("temporaryMember1@gmail.com")
-            .password("password")
+            .password("passWord1234!")
+            .passwordAgain("passWord1234!")
             .city("city")
             .street("street")
             .zipcode("zipcode")
@@ -197,12 +202,24 @@ public class SetUp {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // ChaCha 생성
+        memberRepository.save(Member.builder()
+            .name("Cha Cha")
+            .email(chachaEmail)
+            .password(passwordEncoder.encode("password"))
+            .city("city")
+            .street("street")
+            .zipcode("zipcode")
+            .build());
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 로그인
         // 회원의 기기 토큰을 찾고, FCM 구독을 추가한다.
         authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email1, deviceToken1);
 
         // 알림 동의
-        memberService.testMethod_consentToNotification(email1);
+        memberService.consentToNotification(email1);
 
         // 게시판 구독
         subscriptionService.subscribeToTopic(email1, "2");
@@ -226,7 +243,7 @@ public class SetUp {
         authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email2, deviceToken2_4);
 
         // 알림 동의
-        memberService.testMethod_consentToNotification(email2);
+        memberService.consentToNotification(email2);
 
         // 게시판 구독
         subscriptionService.subscribeToTopic(email2, "1");
@@ -243,10 +260,20 @@ public class SetUp {
         authService.whenMemberSignIn_IssueJwts_StoreDeviceToken_SubscribeToAllTopics(email3, deviceToken3_3);
 
         // 알림 동의
-        memberService.testMethod_consentToNotification(email3);
+        memberService.consentToNotification(email3);
 
         // 게시판 구독
         subscriptionService.subscribeToTopic(email3, "1");
         subscriptionService.subscribeToTopic(email3, "2");
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 알림 동의
+        memberService.consentToNotification(chachaEmail);
+
+        // 게시판 구독
+        subscriptionService.subscribeToTopic(chachaEmail, "2");
+        subscriptionService.subscribeToTopic(chachaEmail, "4");
     }
 }

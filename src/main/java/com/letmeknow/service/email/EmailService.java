@@ -11,6 +11,10 @@ import com.letmeknow.util.email.Email;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import static com.letmeknow.auth.messages.MemberMessages.MAIL;
+import static com.letmeknow.auth.messages.MemberMessages.SEND;
+import static com.letmeknow.message.messages.Messages.FAIL;
+
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
@@ -30,9 +34,7 @@ public class EmailService {
             return "success";
         }
         catch (Exception e) {
-            sendMail(email);
+            throw new MessagingException(new StringBuffer().append(MAIL.getMessage()).append(SEND.getMessage()).append(FAIL.getMessage()).toString());
         }
-
-        throw new MessagingException("메일 전송에 실패했습니다.");
     }
 }

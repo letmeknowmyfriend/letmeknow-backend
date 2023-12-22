@@ -6,7 +6,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <p th:text="${message}" />
+        <script th:inline="javascript">
+            let message = [[${message}]];
+            alert(message);
+        </script>
     </body>
+
 
 </html>

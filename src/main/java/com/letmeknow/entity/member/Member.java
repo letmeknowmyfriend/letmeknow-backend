@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -86,6 +87,7 @@ public class Member extends BaseEntity {
     private Boolean consentToReceivePushNotification;
 
     private String passwordVerificationCode;
+    private LocalDateTime passwordVerificationCodeExpiration;
 
     @Builder
     protected Member(String name, String email, String password, String city, String street, String zipcode) {
@@ -147,10 +149,12 @@ public class Member extends BaseEntity {
 
     public void updatePasswordVerificationCode(String passwordVerificationCode) {
         this.passwordVerificationCode = passwordVerificationCode;
+        this.passwordVerificationCodeExpiration = LocalDateTime.now().plusMinutes(10);
     }
 
     public void deletePasswordVerificationCode() {
-        this.passwordVerificationCode = "";
+        this.passwordVerificationCode = null;
+        this.passwordVerificationCodeExpiration = null;
     }
 
     public void deleteMember() {

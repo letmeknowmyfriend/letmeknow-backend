@@ -60,7 +60,7 @@ public class AuthService {
         String deviceToken = deviceTokenService.extractDeviceTokenFromHeader(request);
 
         // ToDo: 테스트 할 때만 끔 // 추출한 deviceToken이 유효한지 확인한다.
-//        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
+        deviceTokenService.validateAndExtractDeviceToken(deviceToken);
 
         // Header에서 refreshToken 추출
         String refreshToken = jwtService.extractRefreshToken(request);

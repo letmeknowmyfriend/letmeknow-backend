@@ -122,7 +122,7 @@ public class Analyser extends QuartzJobBean {
                         // 그리고 그 태그들을 모두 저장
                         crawledArticles.add(ArticleCreationDto.builder()
                             .boardId(board.getId())
-                            .title(title)
+                            .title(title.trim())
                             .articleLink(articleId)
                             .createdAt(date)
                             .isNotice(noticeIndex == 1)

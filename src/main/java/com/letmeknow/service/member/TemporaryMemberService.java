@@ -7,12 +7,14 @@ import com.letmeknow.entity.member.TemporaryMember;
 import com.letmeknow.enumstorage.errormessage.member.temporarymember.TemporaryMemberErrorMessage;
 import com.letmeknow.exception.member.MemberSignUpValidationException;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
-import com.letmeknow.message.messages.EmailMessage;
+import com.letmeknow.enumstorage.EmailEnum;
+import com.letmeknow.form.auth.MemberSignUpForm;
 import com.letmeknow.message.cause.MemberCause;
 import com.letmeknow.repository.member.MemberRepository;
 import com.letmeknow.repository.member.temporarymember.TemporaryMemberRepository;
 import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
+import com.letmeknow.util.Validator;
 import com.letmeknow.util.email.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,7 @@ public class TemporaryMemberService {
 
     private final PasswordEncoder passwordEncoder;
     private final CodeGenerator codeGenerator;
+    private final Validator validator;
 
     @Value("${domain}")
     private String domain;
@@ -62,35 +65,38 @@ public class TemporaryMemberService {
     }
 
     @Transactional
-    public long joinTemporaryMember(@Valid MemberCreationDto memberCreationDto) throws MemberSignUpValidationException, UnsupportedEncodingException, MessagingException, ConstraintViolationException {
+    public Long joinTemporaryMember(@Valid MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException, UnsupportedEncodingException, MessagingException, ConstraintViolationException {
         // 중복된 이메일이 존재하는지 확인한다.
-        isEmailUsed(memberCreationDto.getEmail());
+        isEmailUsed(memberSignUpForm.getEmail());
+
+        // ToDo: Validation 추가
+        validator.validateNewMember(memberSignUpForm);
 
         // verificationCode 생성
         String verificationCode = codeGenerator.generateCode(20);
 
         //temporaryMember 생성
-        long temporaryMemberId = temporaryMemberRepository.save(TemporaryMember.builder()
-                        .name(memberCreationDto.getName())
-                        .email(memberCreationDto.getEmail())
-                        .password(passwordEncoder.encode(memberCreationDto.getPassword()))
-                        .city(memberCreationDto.getCity())
-                        .street(memberCreationDto.getStreet())
-                        .zipcode(memberCreationDto.getZipcode())
+        Long temporaryMemberId = temporaryMemberRepository.save(TemporaryMember.builder()
+                        .name(memberSignUpForm.getName())
+                        .email(memberSignUpForm.getEmail())
+                        .password(passwordEncoder.encode(memberSignUpForm.getPassword()))
+                        .city(memberSignUpForm.getCity())
+                        .street(memberSignUpForm.getStreet())
+                        .zipcode(memberSignUpForm.getZipcode())
                         .verificationCode(verificationCode)
                         .build())
                 .getId();
 
         //이메일 발송
         emailService.sendMail(Email.builder()
-                .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
-                .receiver(memberCreationDto.getEmail())
-                .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
+                .receiver(memberSignUpForm.getEmail())
+                .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
                         domain + ":" + port +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
 
         return temporaryMemberId;
@@ -109,14 +115,14 @@ public class TemporaryMemberService {
 
         //이메일 발송
         emailService.sendMail(Email.builder()
-                .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
+                .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
-                .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
                         domain + ":" + port +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 
@@ -133,14 +139,14 @@ public class TemporaryMemberService {
 
         //이메일 발송
         emailService.sendMail(Email.builder()
-                .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
+                .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
-                .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
+                .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
                         domain + ":" + port +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
-                        EmailMessage.VERIFICATION_EMAIL_CONTENT_3.getMessage())
+                        EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
                 .build());
     }
 

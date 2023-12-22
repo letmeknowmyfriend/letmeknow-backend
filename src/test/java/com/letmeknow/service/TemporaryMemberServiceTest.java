@@ -39,7 +39,7 @@ class TemporaryMemberServiceTest {
     @DisplayName("임시 회원 가입 - 성공")
     void joinTemporaryMember() throws MemberSignUpValidationException, MessagingException, UnsupportedEncodingException {
         // given
-        long temporaryMemberId = temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+        long temporaryMemberId = temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
                 .name("temporaryMember2")
                 .email("temporaryMember2@gmail.com")
                 .password("password")
@@ -61,7 +61,7 @@ class TemporaryMemberServiceTest {
     void joinTemporaryMemberFormValidation() {
         // given
         // password 없을 때
-        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
             .name("temporaryMember2")
             .email("temporaryMember2@gmail.com")
             .password("")
@@ -78,7 +78,7 @@ class TemporaryMemberServiceTest {
     void joinTemporaryMemberWithDuplicatedEmail() {
         // given
         // 중복된 이메일
-        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
             .name("temporaryMember2")
             .email("member2@gmail.com")
             .password("password")
@@ -95,7 +95,7 @@ class TemporaryMemberServiceTest {
     void joinTemporaryMemberWithDuplicatedTemporaryMemberEmail() {
         // given
         // 중복된 이메일
-        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
             .name("temporaryMember1")
             .email("temporaryMember1@gmail.com")
             .password("password")
@@ -112,7 +112,7 @@ class TemporaryMemberServiceTest {
     void joinTemporaryMemberWithDeletedEmail() {
         // given
         // 지워진 이메일
-        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberCreationDto.builder()
+        assertThatThrownBy(() -> temporaryMemberService.joinTemporaryMember(MemberSignUpForm.builder()
             .name("temporaryMember1")
             .email("member5@gmail.com")
             .password("password")

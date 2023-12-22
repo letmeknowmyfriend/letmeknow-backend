@@ -6,5 +6,4 @@ import java.util.Optional;
 
 public interface DeviceTokenRepositoryQueryDsl {
     Optional<DeviceToken> findByDeviceTokenWithJWTs(String deviceToken);
-    void deleteByRefreshTokenId(long refreshTokenId);
 }

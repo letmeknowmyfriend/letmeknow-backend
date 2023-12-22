@@ -8,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import com.letmeknow.dto.jwt.JwtFindDto;
 import com.letmeknow.dto.member.MemberFindDto;
-import com.letmeknow.message.messages.EmailMessage;
+import com.letmeknow.enumstorage.EmailEnum;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
 import com.letmeknow.auth.service.JwtService;
 import com.letmeknow.service.member.MemberService;
@@ -61,7 +61,7 @@ public class JwtTest {
                         .param("zipcode", "12345"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("message/message"))
-                .andExpect(model().attribute("message", EmailMessage.VERIFICATION_EMAIL_SENT.getMessage()))
+                .andExpect(model().attribute("message", EmailEnum.VERIFICATION_EMAIL_SENT.getMessage()))
                 .andExpect(model().attribute("href", "/auth/login"));
 
         //then
@@ -79,7 +79,7 @@ public class JwtTest {
         mockMvc.perform(get("/auth/member/verification-email/" + URLEncoder.encode(verificationCode, "UTF-8")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("message/message"))
-                .andExpect(model().attribute("message", EmailMessage.VERIFICATION_EMAIL_SUCCESS.getMessage()))
+                .andExpect(model().attribute("message", EmailEnum.VERIFICATION_EMAIL_SUCCESS.getMessage()))
                 .andExpect(model().attribute("href", "/auth/login"));
 
         //then

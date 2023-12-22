@@ -1,10 +1,9 @@
-package com.letmeknow.message.messages;
+package com.letmeknow.enumstorage;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 
 @Getter
-public enum EmailMessage {
+public enum EmailEnum {
     VERIFICATION_EMAIL_SUBJECT("LetMeKnow 회원가입 인증 메일입니다."),
     VERIFICATION_EMAIL_MESSAGE("LetMeKnow 회원가입 인증 메일입니다.<br>" + "이메일을 인증하려면 아래 링크를 눌러주세요.<br><br>"),
 
@@ -33,7 +32,7 @@ public enum EmailMessage {
 
     private final String message;
 
-    EmailMessage(String message) {
+    EmailEnum(String message) {
         this.message = message;
     }
 }

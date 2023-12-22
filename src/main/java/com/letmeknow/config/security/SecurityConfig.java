@@ -10,6 +10,7 @@ import com.letmeknow.auth.provider.MemberAuthenticationProvider;
 import com.letmeknow.auth.service.PrincipalUserDetailsService;
 import com.letmeknow.enumstorage.role.MemberRole;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -23,6 +24,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 import javax.servlet.http.HttpServletResponse;
+
+import static org.apache.http.HttpStatus.SC_OK;
 
 @Configuration
 @EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
@@ -58,8 +61,8 @@ public class SecurityConfig {
                         .antMatchers("/api/college/**").permitAll()
                         .antMatchers("/api/board/**").permitAll()
                         .antMatchers("/api/article/**").permitAll()
+                        .antMatchers("/api/member/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
-//                        .antMatchers("**/api/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -94,7 +97,7 @@ public class SecurityConfig {
                     logout.permitAll()
                     .logoutUrl("/api/auth/signout/v1")
                     .logoutSuccessHandler((request, response, authentication) -> {
-                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setStatus(SC_OK);
                     })
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
