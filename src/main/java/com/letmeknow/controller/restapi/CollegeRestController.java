@@ -24,7 +24,7 @@ public class CollegeRestController {
     private final ObjectMapper objectMapper;
 
     // 단과대 리스트 조회
-    @GetMapping(value = "/v1")
+    @GetMapping(value = "/list/v1")
     public ResponseEntity list_v1(@RequestParam Long schoolId) throws JsonProcessingException {
         List<CollegeDto> collegeDtos = collegeService.findBySchoolId(schoolId);
 

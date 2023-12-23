@@ -26,7 +26,7 @@ public class SchoolRestController {
     private final ObjectMapper objectMapper;
 
     // 학교 리스트 조회
-    @GetMapping(value = "/v1")
+    @GetMapping(value = "/list/v1")
     public ResponseEntity list_v1() throws JsonProcessingException {
         List<SchoolDto> schoolDtos = schoolService.findAll();
 

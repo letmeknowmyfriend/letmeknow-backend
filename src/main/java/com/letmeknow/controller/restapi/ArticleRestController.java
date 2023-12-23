@@ -26,10 +26,8 @@ public class ArticleRestController {
     private final ObjectMapper objectMapper;
 
     // 게시글 리스트 조회
-    @GetMapping(value = "/v1")
-    public ResponseEntity list_v1(@RequestParam Long boardId, @RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize, HttpServletRequest request) throws JsonProcessingException {
-        String email = request.getAttribute("email").toString();
-
+    @GetMapping(value = "/list/v1")
+    public ResponseEntity list_v1(@RequestParam Long boardId, @RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize) throws JsonProcessingException {
         List<ArticleDto> articleDtos = articleService.findByNoOffset(boardId, lastId, pageSize);
 
         return ResponseEntity.ok(
@@ -40,12 +38,15 @@ public class ArticleRestController {
         );
     }
 
-    @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity handleException(Exception e) {
-        return ResponseEntity.internalServerError().body(
+    // 게시글 검색
+    @GetMapping(value = "/search/v1")
+    public ResponseEntity search_v1(@RequestParam Long boardId, @RequestParam(required = false) String keyword, @RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize) throws JsonProcessingException {
+        List<ArticleDto> articleDtos = articleService.findByNoOffsetWithKeyword(boardId, keyword, lastId, pageSize);
+
+        return ResponseEntity.ok(
             Response.builder()
-                .status(FAIL.getStatus())
-                .message(e.getMessage())
+                .status(SUCCESS.getStatus())
+                .data(objectMapper.writeValueAsString(articleDtos))
                 .build()
         );
     }
@@ -53,6 +54,16 @@ public class ArticleRestController {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body(
+            Response.builder()
+                .status(FAIL.getStatus())
+                .message(e.getMessage())
+                .build()
+        );
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity handleException(Exception e) {
+        return ResponseEntity.internalServerError().body(
             Response.builder()
                 .status(FAIL.getStatus())
                 .message(e.getMessage())

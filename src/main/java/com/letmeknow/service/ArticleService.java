@@ -25,6 +25,12 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
+    public List<ArticleDto> findByNoOffsetWithKeyword(Long boardId, String keyword, Long lastId, Long pageSize) {
+        return articleRepository.findByNoOffsetWithKeyword(boardId, keyword, lastId, pageSize).stream()
+                .map(Article::toDto)
+                .collect(Collectors.toList());
+    }
+
     public List<ArticleDto> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
         return articleRepository.findAllByBoardIdAndIsNoticeOrderByIdDescLimit(boardId, limit, isNotice).stream()
                 .map(Article::toDto)
