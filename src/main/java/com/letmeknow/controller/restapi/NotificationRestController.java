@@ -22,13 +22,13 @@ import java.util.List;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
+import static javax.servlet.http.HttpServletResponse.SC_GONE;
 
 @RestController
 @RequestMapping(value = "/api/notification", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class NotificationRestController {
     private final NotificationService notificationService;
-    private final DeviceTokenService deviceTokenService;
     private final MemberService memberService;
 
     private final ObjectMapper objectMapper;
@@ -91,41 +91,19 @@ public class NotificationRestController {
         );
     }
 
-    // 푸시 알림 동의
-    @PostMapping(value = "/consent/v1")
-    public ResponseEntity consent_v1(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, NoSuchDeviceTokenException, NoSuchMemberException {
-        String deviceToken = deviceTokenService.extractDeviceTokenFromHeader(request);
-
-        String email = (String) request.getAttribute("email");
-
-        memberService.consentToNotification(email, deviceToken, response);
-
-        return ResponseEntity.ok(
-            Response.builder()
-                .status(SUCCESS.getStatus())
-            .build()
-        );
-    }
-
-    // 푸시 알림 거부
-    @PostMapping(value = "/refuse/v1")
-    public ResponseEntity refuse_v1(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, NoSuchDeviceTokenException, NoSuchMemberException {
-        String deviceToken = deviceTokenService.extractDeviceTokenFromHeader(request);
-
-        String email = (String) request.getAttribute("email");
-
-        memberService.refuseToNotification(email, deviceToken, response);
-
-        return ResponseEntity.ok(
-            Response.builder()
-                .status(SUCCESS.getStatus())
-            .build()
-        );
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class, NoSuchDeviceTokenException.class, NoSuchMemberException.class, ConstraintViolationException.class})
+    @ExceptionHandler({IllegalArgumentException.class, NoSuchDeviceTokenException.class, ConstraintViolationException.class})
     public ResponseEntity handleException(Exception e) {
         return ResponseEntity.badRequest().body(
+            Response.builder()
+                .status(FAIL.getStatus())
+                .message(e.getMessage())
+            .build()
+        );
+    }
+
+    @ExceptionHandler(NoSuchMemberException.class)
+    public ResponseEntity handle410Exception(RuntimeException e) {
+        return ResponseEntity.status(SC_GONE).body(
             Response.builder()
                 .status(FAIL.getStatus())
                 .message(e.getMessage())

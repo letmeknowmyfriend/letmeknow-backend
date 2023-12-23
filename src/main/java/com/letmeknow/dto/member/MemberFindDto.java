@@ -1,5 +1,6 @@
 package com.letmeknow.dto.member;
 
+import com.letmeknow.dto.address.AddressDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.Set;
 @Getter
 public class MemberFindDto {
     @NotNull
-    private long id;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -24,34 +25,19 @@ public class MemberFindDto {
     @NotBlank
     private String city;
 
-    @NotBlank
-    private String street;
-
-    @NotBlank
-    private String zipcode;
-
-    @NotBlank
-    private String status;
+    @NotNull
+    private AddressDto address;
 
     @NotNull
-    private Set<Long> jwtIds;
-
-    @NotNull
-    private int logInAttempt;
-
-    private String passwordVerificationCode;
+    private Boolean consentToReceivePushNotification;
 
     @Builder
-    protected MemberFindDto(long id, String name, String email, String city, String street, String zipcode, String status, Set<Long> jwtIds, int logInAttempt, String passwordVerificationCode) {
+    protected MemberFindDto(Long id, String name, String email, String city, AddressDto address, Boolean consentToReceivePushNotification) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.city = city;
-        this.street = street;
-        this.zipcode = zipcode;
-        this.status = status;
-        this.jwtIds = jwtIds;
-        this.logInAttempt = logInAttempt;
-        this.passwordVerificationCode = passwordVerificationCode;
+        this.address = address;
+        this.consentToReceivePushNotification = consentToReceivePushNotification;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
@@ -30,7 +31,7 @@ public class SubscriptionRestController {
 
     // 게시판 구독
     @PostMapping(value = "/subscribe/v1/{boardId}")
-    public ResponseEntity subscribe_v1(@PathVariable Long boardId, HttpServletRequest request) {
+    public ResponseEntity subscribe_v1(@PathVariable @NotNull Long boardId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
         subscriptionService.subscribeToTopic(email, String.valueOf(boardId));
@@ -44,7 +45,7 @@ public class SubscriptionRestController {
 
     // 게시판 구독 취소
     @DeleteMapping(value = "/unsubscribe/v1/{boardId}")
-    public ResponseEntity unsubscribe_v1(@PathVariable Long boardId, HttpServletRequest request) {
+    public ResponseEntity unsubscribe_v1(@PathVariable @NotNull Long boardId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
         subscriptionService.unsubscribeFromTopic(email, boardId);
@@ -56,8 +57,8 @@ public class SubscriptionRestController {
         );
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
-    public ResponseEntity handle400Exception(RuntimeException e) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handle400Exception() {
         return ResponseEntity.badRequest().body(
             Response.builder()
                     .status(FAIL.getStatus())
@@ -66,9 +67,9 @@ public class SubscriptionRestController {
         );
     }
 
-    @ExceptionHandler({NoSuchBoardException.class, NoSuchMemberException.class})
-    public ResponseEntity handle410Exception(RuntimeException e) {
-        return ResponseEntity.status(GONE).body(
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity handleIllegalArgumentException(Exception e) {
+        return ResponseEntity.badRequest().body(
             Response.builder()
                     .status(FAIL.getStatus())
                     .message(e.getMessage())
@@ -86,7 +87,17 @@ public class SubscriptionRestController {
         );
     }
 
-    @ExceptionHandler(SubscriptionException.class)
+    @ExceptionHandler(NoSuchMemberException.class)
+    public ResponseEntity handle410Exception(RuntimeException e) {
+        return ResponseEntity.status(GONE).body(
+            Response.builder()
+                    .status(FAIL.getStatus())
+                    .message(e.getMessage())
+                .build()
+        );
+    }
+
+    @ExceptionHandler({SubscriptionException.class, NoSuchBoardException.class})
     public ResponseEntity handleSubscriptionException(RuntimeException e) {
         return ResponseEntity.internalServerError().body(
             Response.builder()

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.letmeknow.auth.entity.DeviceToken;
 import com.letmeknow.auth.entity.OAuth2;
 import com.letmeknow.auth.entity.RefreshToken;
+import com.letmeknow.dto.address.AddressDto;
 import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.entity.Address;
 import com.letmeknow.entity.BaseEntity;
@@ -33,8 +34,9 @@ import java.util.stream.Collectors;
 public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
-    private long id;
+    private Long id;
 
+    @NotBlank
     private String name;
 
     @NotBlank
@@ -196,13 +198,12 @@ public class Member extends BaseEntity {
                 .id(id)
                 .name(name)
                 .email(email)
-                .city(address != null ? address.getCity() : null)
-                .street(address != null ? address.getStreet() : null)
-                .zipcode(address != null ? address.getZipcode() : null)
-                .status(status.toString())
-                .jwtIds(refreshTokens.stream().map(jwt -> jwt.getId()).collect(Collectors.toSet()))
-                .logInAttempt(logInAttempt)
-                .passwordVerificationCode(passwordVerificationCode != null ? passwordVerificationCode : null)
-                .build();
+                .address(AddressDto.builder()
+                        .city(address.getCity())
+                        .street(address.getStreet())
+                        .zipcode(address.getZipcode())
+                        .build())
+                .consentToReceivePushNotification(consentToReceivePushNotification)
+            .build();
     }
 }
