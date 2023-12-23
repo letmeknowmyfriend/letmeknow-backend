@@ -1,18 +1,13 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
     jpa:
         database: mysql
-        hibernate:
-            ddl-auto: create
-#        properties:
-#            hibernate:
-#                show_sql: true
-#                format_sql: true
-#                dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        #        properties:
+        #            hibernate:
+        #                show_sql: true
+        #                format_sql: true
+        #                dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         logging.level:
         org.hibernate.SQL: debug
         open-in-view: false
@@ -35,7 +30,7 @@ spring:
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         authorization-grant-type: authorization_code
                         scope:
-                          - account_email
+                            - account_email
                     naver:
                         client-id: ${NAVER_CLIENT_ID}
                         client-secret: ${NAVER_CLIENT_SECRET}
@@ -43,13 +38,13 @@ spring:
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         authorization-grant-type: authorization_code
                         scope:
-                          - email
+                            - email
                     google:
                         client-id: ${GOOGLE_CLIENT_ID}
                         client-secret: ${GOOGLE_CLIENT_SECRET}
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         scope:
-                          - email
+                            - email
                 provider:
                     kakao:
                         authorization-uri: https://kauth.kakao.com/oauth/authorize
@@ -81,15 +76,13 @@ jwt:
     secret: ${JWT_SECRET}
     token:
         access:
-            expiration: 300000 # 5분
-#            expiration: 86_400_000 # 1일
             header: Authorization
         refresh:
             expiration: 604800000 # 7일 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> d) * 7L(d -> w))
             header: AuthorizationRefresh
 
 server:
-    port: { SERVER_PORT }
+    port: ${SERVER_PORT}
     error:
         include-message: always
         include-binding-errors: always
@@ -124,3 +117,43 @@ domain: ${DOMAIN}
 port: ${SERVER_PORT}
 
 
+
+---
+# local
+spring:
+    profiles:
+        active: local
+    datasource:
+        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: create
+
+# JWT
+jwt:
+    token:
+        access:
+            expiration: 86_400_000 # 1일
+
+---
+# prod
+spring:
+    profiles:
+        active: prod
+    datasource:
+        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: validate
+
+# JWT
+jwt:
+    token:
+        access:
+            expiration: 300000 # 5분
