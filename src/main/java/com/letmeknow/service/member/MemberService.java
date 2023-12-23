@@ -125,7 +125,7 @@ public class MemberService {
         validator.isValidPassword(member.getEmail(), newPassword, newPasswordAgain);
 
         // 비밀번호 변경
-        member.changePassword(passwordEncoder.encode(newPassword));
+        member.changePassword(passwordEncoder.encode(newPassword.trim()));
 
         // 상태 변경
         member.unlock();
@@ -253,19 +253,6 @@ public class MemberService {
 
         // 구독
         subscriptionService.subscribeToAllTopics(deviceToken, member);
-
-        // 저장
-        memberRepository.save(member);
-    }
-
-    @Transactional
-    public void consentToNotification(String email) {
-        Member member = memberRepository.findNotDeletedByEmailWithSubscriptionAndDeviceToken(email)
-            // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
-            .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
-
-        // 알림 수신 동의
-        member.consentToReceivePushNotification();
 
         // 저장
         memberRepository.save(member);

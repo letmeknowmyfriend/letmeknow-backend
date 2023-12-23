@@ -11,6 +11,8 @@ spring:
         logging.level:
         org.hibernate.SQL: debug
         open-in-view: false
+        hibernate:
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     properties:
         hibernate:
             default_batch_fetch_size: 100
@@ -115,45 +117,3 @@ domain: ${DOMAIN}
 
 # port
 port: ${SERVER_PORT}
-
-
-
----
-# local
-spring:
-    profiles:
-        active: local
-    datasource:
-        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-
-    jpa:
-        hibernate:
-            ddl-auto: create
-
-# JWT
-jwt:
-    token:
-        access:
-            expiration: 86_400_000 # 1일
-
----
-# prod
-spring:
-    profiles:
-        active: prod
-    datasource:
-        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-
-    jpa:
-        hibernate:
-            ddl-auto: validate
-
-# JWT
-jwt:
-    token:
-        access:
-            expiration: 300000 # 5분

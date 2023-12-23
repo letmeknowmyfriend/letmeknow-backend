@@ -21,6 +21,7 @@ public enum Messages {
     OR("또는 "),
     ALREADY("이미 "),
     DID_NOT("하지 않음 "),
+    NEED_TO("해야 합니다. "),
     SUCH("해당하는 "),
     WITH("가지고 있는 "),
     FORMAT("형식 "),
@@ -36,6 +37,9 @@ public enum Messages {
     TIME("시간 "),
     PASSED("지남 "),
     CHANGE("변경 "),
+    SERVER("서버 "),
+    ERROR("오류 "),
+    OCCURRED("발생 "),
     ;
 
     private final String message;

@@ -1,0 +1,19 @@
+# local
+spring:
+    config:
+        activate:
+            on-profile: local
+    datasource:
+        url: jdbc:mysql://localhost:3306/letmeknow_test?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: create
+
+# JWT
+jwt:
+    token:
+        access:
+            expiration: 86_400_000 # 1일

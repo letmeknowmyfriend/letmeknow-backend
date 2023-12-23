@@ -103,7 +103,7 @@ public class SubscriptionService {
 
         // 회원이 구독에 동의했는지 확인한다.
         if (!member.getConsentToReceivePushNotification()) {
-            throw new IllegalArgumentException(new StringBuffer().append(MEMBER.getMessage()).append(CONSENT_TO_PUSH_NOTIFICATION.getMessage()).append(DID_NOT.getMessage()).toString());
+            throw new IllegalArgumentException(new StringBuffer().append(CONSENT_TO_PUSH_NOTIFICATION.getMessage()).append(NEED_TO.getMessage()).toString());
         }
 
         // 회원이 이미 구독한 토픽이 아니면
