@@ -53,7 +53,7 @@ public class SecurityConfig {
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
                 .authorizeHttpRequests(authorize -> authorize
 //                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
-                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico").permitAll()
+                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico", "/error/**").permitAll()
                         .antMatchers("/api/auth/**").permitAll()
                         .antMatchers("/api/subscription/**").permitAll()
                         .antMatchers("/api/notification/**").permitAll()

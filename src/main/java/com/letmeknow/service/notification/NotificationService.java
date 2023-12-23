@@ -34,17 +34,26 @@ public class NotificationService {
     private final SubscriptionRepository subscriptionRepository;
     private final MemberRepository memberRepository;
 
-    public List<NotificationDtoWithBoardViewUrlAndArticleDto> findWithNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
+    public List<NotificationDtoWithBoardViewUrlAndArticleDto> findByNoOffset(Long lastId, Long pageSize, String email) throws NoSuchMemberException {
         Long memberId = memberRepository.findNotDeletedIdByEmail(email)
             .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
         List<Notification> withNoOffset = notificationRepository.findByNoOffsetWithArticle(lastId, pageSize, memberId);
 
-        List<NotificationDtoWithBoardViewUrlAndArticleDto> collect = withNoOffset.stream()
+        return withNoOffset.stream()
             .map(Notification::toDtoWithBoardViewUrlAndArticleDto)
             .collect(Collectors.toList());
+    }
 
-        return collect;
+    public List<NotificationDtoWithBoardViewUrlAndArticleDto> findByNoOffsetWithKeyword(String keyword, Long lastId, Long pageSize, String email) throws NoSuchMemberException {
+        Long memberId = memberRepository.findNotDeletedIdByEmail(email)
+            .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
+
+        List<Notification> withNoOffset = notificationRepository.findByNoOffsetWithArticleAndKeyword(keyword, lastId, pageSize, memberId);
+
+        return withNoOffset.stream()
+            .map(Notification::toDtoWithBoardViewUrlAndArticleDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional

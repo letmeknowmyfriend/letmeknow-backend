@@ -32,6 +32,22 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
     }
 
     @Override
+    public List<Article> findByNoOffsetWithKeyword(Long boardId, String keyword, Long lastId, Long pageSize) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return queryFactory
+                .selectFrom(article)
+            .where(
+                ltId(lastId),
+                article.board.id.eq(boardId),
+                containsKeyword(keyword)
+            )
+            .orderBy(article.id.desc())
+            .limit(getPageSize(pageSize))
+            .fetch();
+    }
+
+    @Override
     public List<Article> findAllByBoardIdAndIsNoticeOrderByIdDescLimit(long boardId, long limit, Boolean isNotice) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
@@ -54,5 +70,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQueryDsl {
 
     private long getPageSize(Long pageSize) {
         return pageSize == null ? 60 : pageSize;
+    }
+
+    private BooleanExpression containsKeyword(String keyword) {
+        return keyword.equals("") ? null : article.articleName.contains(keyword);
     }
 }

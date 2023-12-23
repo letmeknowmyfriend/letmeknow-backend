@@ -25,7 +25,7 @@ public class BoardRestController {
     private final ObjectMapper objectMapper;
 
     // 게시판 리스트 조회
-    @GetMapping(value = "/v1")
+    @GetMapping(value = "/list/v1")
     public ResponseEntity list_v1(@RequestParam Long collegeId, HttpServletRequest request) throws JsonProcessingException {
         String email = request.getAttribute("email").toString();
 

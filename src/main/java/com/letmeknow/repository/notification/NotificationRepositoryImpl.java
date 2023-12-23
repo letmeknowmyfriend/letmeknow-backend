@@ -32,6 +32,24 @@ public class NotificationRepositoryImpl implements NotificationRepositoryQueryDs
     }
 
     @Override
+    public List<Notification> findByNoOffsetWithArticleAndKeyword(String keyword, Long lastId, Long pageSize, Long memberId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return queryFactory
+            .selectFrom(notification)
+            .where(
+                ltId(lastId),
+                notification.memberId.eq(memberId),
+                containsKeyword(keyword)
+            )
+            .leftJoin(notification.board).fetchJoin()
+            .leftJoin(notification.article).fetchJoin()
+            .orderBy(notification.id.desc())
+            .limit(getPageSize(pageSize))
+            .fetch();
+    }
+
+    @Override
     public void readNotification(Long notificationId, Long memberId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
@@ -63,6 +81,10 @@ public class NotificationRepositoryImpl implements NotificationRepositoryQueryDs
     }
 
     private long getPageSize(Long pageSize) {
-        return pageSize == null ? 10 : pageSize;
+        return pageSize == null ? 60 : pageSize;
+    }
+
+    private BooleanExpression containsKeyword(String keyword) {
+        return keyword.equals("") ? null : notification.article.articleName.contains(keyword);
     }
 }

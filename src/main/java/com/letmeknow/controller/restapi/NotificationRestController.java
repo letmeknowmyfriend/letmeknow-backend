@@ -38,12 +38,27 @@ public class NotificationRestController {
     public ResponseEntity list_v1(@RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize, HttpServletRequest request) throws JsonProcessingException {
         String email = (String) request.getAttribute("email");
 
-        List<NotificationDtoWithBoardViewUrlAndArticleDto> notificationDtoWithBoardViewUrlAndArticleDtos = notificationService.findWithNoOffset(lastId, pageSize, email);
+        List<NotificationDtoWithBoardViewUrlAndArticleDto> notificationDtoWithBoardViewUrlAndArticleDtos = notificationService.findByNoOffset(lastId, pageSize, email);
 
         return ResponseEntity.ok(
             Response.builder()
                 .status(SUCCESS.getStatus())
                 .data(objectMapper.writeValueAsString(notificationDtoWithBoardViewUrlAndArticleDtos))
+            .build()
+        );
+    }
+
+    // 알릶 검색
+    @GetMapping(value = "/search/v1")
+    public ResponseEntity search_v1(@RequestParam(required = false) String keyword, @RequestParam(required = false) Long lastId, @RequestParam(required = false) Long pageSize, HttpServletRequest request) throws JsonProcessingException {
+        String email = (String) request.getAttribute("email");
+
+        List<NotificationDtoWithBoardViewUrlAndArticleDto> byNoOffsetWithKeyword = notificationService.findByNoOffsetWithKeyword(keyword, lastId, pageSize, email);
+
+        return ResponseEntity.ok(
+            Response.builder()
+                .status(SUCCESS.getStatus())
+                .data(objectMapper.writeValueAsString(byNoOffsetWithKeyword))
             .build()
         );
     }
