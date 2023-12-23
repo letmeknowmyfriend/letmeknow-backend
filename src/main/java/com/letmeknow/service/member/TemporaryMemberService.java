@@ -77,12 +77,12 @@ public class TemporaryMemberService {
 
         //temporaryMember 생성
         Long temporaryMemberId = temporaryMemberRepository.save(TemporaryMember.builder()
-                        .name(memberSignUpForm.getName())
-                        .email(memberSignUpForm.getEmail())
-                        .password(passwordEncoder.encode(memberSignUpForm.getPassword()))
-                        .city(memberSignUpForm.getCity())
-                        .street(memberSignUpForm.getStreet())
-                        .zipcode(memberSignUpForm.getZipcode())
+                        .name(memberSignUpForm.getName().trim())
+                        .email(memberSignUpForm.getEmail().trim())
+                        .password(passwordEncoder.encode(memberSignUpForm.getPassword().trim()))
+                        .city(memberSignUpForm.getCity().trim())
+                        .street(memberSignUpForm.getStreet().trim())
+                        .zipcode(memberSignUpForm.getZipcode().trim())
                         .verificationCode(verificationCode)
                         .build())
                 .getId();

@@ -198,6 +198,9 @@ public class MemberService {
 
     @Transactional(rollbackFor = Exception.class)
     public void sendChangePasswordVerificationEmail(String email) throws NoSuchMemberException, UnsupportedEncodingException, MessagingException {
+        // trim()으로 공백 제거
+        email = email.trim();
+
         Member member = memberRepository.findNotDeletedByEmail(email)
                 // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));

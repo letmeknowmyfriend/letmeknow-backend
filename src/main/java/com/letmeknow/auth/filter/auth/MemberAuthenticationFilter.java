@@ -89,6 +89,10 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
         String password = Optional.ofNullable(signInAPIRequest.getPassword())
                 .orElseThrow(() -> new InvalidRequestException(new StringBuffer().append(PASSWORD.getMessage()).append(NOT_FOUND.getMessage()).toString()));
 
+        // trim()으로 공백 제거
+        email = email.trim();
+        password = password.trim();
+
         // 로그인 실패 시 활용 용도
         request.setAttribute("email", email);
 
