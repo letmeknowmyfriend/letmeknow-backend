@@ -26,6 +26,6 @@ echo ">>> JAR 배포"    >> /home/ubuntu/LetMeKnow/deploy.log
 source ~/.bashrc
 
 # profile prod
-nohup java -jar $JAR_PATH --spring.profiles.active=prod  >> /home/ubuntu/LetMeKnow/deploy.log 2>/home/ubuntu/LetMeKnow/deploy_err.log &
+nohup java -jar $JAR_PATH --spring.profiles.active=prod > /home/ubuntu/LetMeKnow/nohup.out 2>&1 &
 
 
