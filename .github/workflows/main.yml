@@ -6,8 +6,6 @@ name: LetMeKnow
 on:
   # 지정한 branch에서 push/pull_request에 해당하는 command가 수행되면 이 workflow가 동작 합니다. 
   # 여기서는 간단히 main 브런치에서 push되면서 이 workflow가 실행 되도록 하겠습니다.
-  push:
-    branches: [ main ] 
   pull_request:
     branches: [ main ]
  
