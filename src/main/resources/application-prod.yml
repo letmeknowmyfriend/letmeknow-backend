@@ -1,7 +1,7 @@
 # prod
 spring:
     config:
-        import: 'aws-parameterstore:/LetMeKnow/WAS_prod'
+        import: 'aws-parameterstore:'
         activate:
             on-profile: prod
     datasource:

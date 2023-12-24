@@ -51,7 +51,7 @@ public class TemporaryMemberService {
     private String domain;
 
     @Value("${port}")
-    private String port;
+    private Integer port;
 
     public TemporaryMemberDto findTemporaryMemberByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findByEmail(email)

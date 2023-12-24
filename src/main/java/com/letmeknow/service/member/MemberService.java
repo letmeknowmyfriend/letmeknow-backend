@@ -67,7 +67,7 @@ public class MemberService {
     private String domain;
 
     @Value("${port}")
-    private String port;
+    private Integer port;
 
     public MemberFindDto findMemberFindDtoById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
