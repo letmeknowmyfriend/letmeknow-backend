@@ -15,6 +15,9 @@ public class CorsConfig {
     @Value("${cors.allowed-origin}")
     private String allowedOrigin;
 
+    @Value("${port}")
+    private String port;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -23,7 +26,7 @@ public class CorsConfig {
         config.setAllowedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
         config.setExposedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
 
-        config.setAllowedOrigins(List.of(allowedOrigin + ":9090"));
+        config.setAllowedOrigins(List.of(allowedOrigin + ":" + port));
         config.setAllowedMethods(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
