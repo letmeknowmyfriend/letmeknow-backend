@@ -1,9 +1,7 @@
 REPOSITORY=/home/ubuntu/LetMeKnow
 
 APP_NAME=letMeKnow
-
-BUILD_JAR=$(ls /home/ubuntu/LetMeKnow/build/libs/letMeKnow-0.0.1-SNAPSHOT.jar)
-JAR_NAME=$(basename $BUILD_JAR)
+JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
 echo ">>> build 파일명: $JAR_NAME" >> /home/ubuntu/LetMeKnow/deploy.log
 
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
@@ -21,9 +19,8 @@ else
 fi
 
 echo ">>> JAR 배포"    >> /home/ubuntu/LetMeKnow/deploy.log
-
 # Java 환경변수
-source ~/.bashrc
+source REPOSITORY/scripts/.bashrc
 
 # profile prod
 nohup java -jar $JAR_PATH --spring.profiles.active=prod > /home/ubuntu/LetMeKnow/nohup.out 2>&1 &
