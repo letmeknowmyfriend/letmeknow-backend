@@ -5,9 +5,9 @@ files:
   - source: /
     destination: /home/ubuntu/LetMeKnow
     overwrite: yes
-    
+
 permissions:
-  - object: /
+  - object: /home/ubuntu/LetMeKnow
     pattern: "**"
     owner: ubuntu
     group: ubuntu
