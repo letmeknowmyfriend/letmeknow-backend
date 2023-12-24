@@ -16,7 +16,7 @@ public class FirebaseConfig {
     @Bean
     public GoogleCredentials getGoogleCredentials() throws IOException {
         return GoogleCredentials
-                .fromStream(new FileInputStream("letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json"))
+                .fromStream(new FileInputStream("./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json"))
                 .createScoped(Arrays.asList("https://www.googleapis.com/auth/cloud-platform"));
     }
 
