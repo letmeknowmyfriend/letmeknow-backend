@@ -1,10 +1,10 @@
 buildscript {
 	dependencies {
-		//queryDsl
+		// queryDsl
 		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10")
 	}
 	ext {
-		//queryDsl
+		// queryDsl
 		queryDslVersion = "5.0.0"
 	}
 }
@@ -26,7 +26,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-    querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -69,7 +68,8 @@ dependencies {
 	annotationProcessor(
 			"javax.persistence:javax.persistence-api",
 			"javax.annotation:javax.annotation-api",
-			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+//			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa"
+    )
 
 	// jsoup
 	implementation 'org.jsoup:jsoup:1.16.1'
@@ -80,8 +80,6 @@ dependencies {
     // TEST
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    annotationProcessor("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['queryDslVersion']}:jpa")
 }
 
 tasks.named('test') {
@@ -90,7 +88,6 @@ tasks.named('test') {
 
 // querydsl 추가 시작
 apply plugin: "com.ewerk.gradle.plugins.querydsl"
-
 def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
     library = "com.querydsl:querydsl-apt:${queryDslVersion}"
