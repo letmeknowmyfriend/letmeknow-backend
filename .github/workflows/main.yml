@@ -11,7 +11,7 @@ env:
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
   # 지정한 branch에서 pull_request에 해당하는 command가 수행되면 이 workflow가 동작
-  pull_request:
+  merge:
     branches: [ main ]
 
   # 이부분은 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해주는 역할을 합니다.
