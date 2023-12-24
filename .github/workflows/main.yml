@@ -67,4 +67,4 @@ jobs:
         --application-name LetMeKnow
         --deployment-config-name CodeDeployDefault.OneAtATime
         --deployment-group-name LetMeKnow
-        --s3-location bucket=letmeknow, bundleType=tgz, key=archive/LetMeKnow.tar.gz
+        --s3-location bucket=letmeknow,bundleType=tgz,key=archive/LetMeKnow.tar.gz
