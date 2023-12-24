@@ -1,6 +1,7 @@
 # local
 spring:
     config:
+        import: 'aws-parameterstore:/LetMeKnow/WAS_local'
         activate:
             on-profile: local
     datasource:

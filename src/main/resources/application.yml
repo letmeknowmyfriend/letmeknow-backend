@@ -1,9 +1,6 @@
 spring:
     application:
       name: WAS
-    config:
-        # aws ParameterStore사용을 위한 명시
-        import: 'aws-parameterstore:'
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
