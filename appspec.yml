@@ -7,13 +7,11 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /home/ubuntu/LetMeKnow
+  - object: /
+    pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: 777
-    type:
-      - file
-      - directory
+    
 
 hooks:
   AfterInstall:
