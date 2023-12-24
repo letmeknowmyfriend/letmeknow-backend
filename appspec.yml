@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/LetMeKnow
+permissions:
+  - object: /home/ubuntu/LetMeKnow
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
