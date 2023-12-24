@@ -20,7 +20,7 @@ fi
 
 echo ">>> JAR 배포"    >> /home/ubuntu/LetMeKnow/deploy.log
 # Java 환경변수
-source REPOSITORY/scripts/.bashrc
+source $REPOSITORY/scripts/.bashrc
 
 # profile prod
 nohup java -jar $JAR_PATH --spring.profiles.active=prod > /home/ubuntu/LetMeKnow/nohup.out 2>&1 &
