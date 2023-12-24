@@ -9,6 +9,7 @@ CURRENT_PID=$(pgrep -f $APP_NAME)
 
 if [ -z $CURRENT_PID ]
 then
+    echo ">>> No $APP_NAME is running"
 else
   echo ">>> kill -15 $CURRENT_PID"
   kill -15 $CURRENT_PID
