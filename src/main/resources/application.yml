@@ -1,4 +1,7 @@
 spring:
+    config:
+        # aws ParameterStore사용을 위한 명시
+        import: 'aws-parameterstore:'
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
@@ -26,24 +29,24 @@ spring:
             client:
                 registration:
                     kakao:
-                        client-id: ${KAKAO_CLIENT_ID}
-                        client-secret: ${KAKAO_CLIENT_SECRET}
+                        client-id: ${KAKAO.CLIENT.ID}
+                        client-secret: ${KAKAO.CLIENT.SECRET}
                         client-name: kakao
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         authorization-grant-type: authorization_code
                         scope:
                             - account_email
                     naver:
-                        client-id: ${NAVER_CLIENT_ID}
-                        client-secret: ${NAVER_CLIENT_SECRET}
+                        client-id: ${NAVER.CLIENT.ID}
+                        client-secret: ${NAVER.CLIENT.SECRET}
                         client-name: naver
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         authorization-grant-type: authorization_code
                         scope:
                             - email
                     google:
-                        client-id: ${GOOGLE_CLIENT_ID}
-                        client-secret: ${GOOGLE_CLIENT_SECRET}
+                        client-id: ${GOOGLE.CLIENT.ID}
+                        client-secret: ${GOOGLE.CLIENT.SECRET}
                         redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
                         scope:
                             - email
@@ -62,8 +65,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: ${EMAIL_USERNAME}
-        password: ${EMAIL_PASSWORD}
+        username: ${EMAIL.USERNAME}
+        password: ${EMAIL.PASSWORD}
         properties:
             mail:
                 smtp:
@@ -75,7 +78,7 @@ spring:
 
 # JWT
 jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT.SECRET}
     token:
         access:
             header: Authorization
@@ -84,7 +87,7 @@ jwt:
             header: AuthorizationRefresh
 
 server:
-    port: ${SERVER_PORT}
+    port: ${SERVER.PORT}
     error:
         include-message: always
         include-binding-errors: always
@@ -116,4 +119,12 @@ cors.allowed-origin: ${DOMAIN}
 domain: ${DOMAIN}
 
 # port
-port: ${SERVER_PORT}
+port: ${SERVER.PORT}
+
+aws:
+    paramstore:
+        enabled: true
+        prefix: /LetMeKnow
+        name: WAS
+        profileSeparator: _
+        failFast: true

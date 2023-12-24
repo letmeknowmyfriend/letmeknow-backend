@@ -4,13 +4,13 @@ spring:
         activate:
             on-profile: prod
     datasource:
-        url: jdbc:mysql://localhost:3306/letmeknow?useSSL=false&serverTimezone=Asia/Seoul
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
+        url: jdbc:mysql://${MY_SQL.HOST}:${MY_SQL.PORT}/${MY_SQL.DATABASE}?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB.USERNAME}
+        password: ${DB.PASSWORD}
 
     jpa:
         hibernate:
-            ddl-auto: create
+            ddl-auto: ${JPA.DDL_AUTO}
 
 # JWT
 jwt:

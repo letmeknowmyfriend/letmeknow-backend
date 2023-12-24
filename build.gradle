@@ -6,6 +6,8 @@ buildscript {
 	ext {
 		// queryDsl
 		queryDslVersion = "5.0.0"
+
+        set('springCloudVersion', "2021.0.0")
 	}
 }
 
@@ -80,6 +82,15 @@ dependencies {
     // TEST
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // AWS Parameter Store
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config:2.3.3'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
+    }
 }
 
 tasks.named('test') {
