@@ -16,9 +16,7 @@ else
   sleep 5
 fi
 
-# Java 환경변수
-source $REPOSITORY/scripts/.bashrc
-
 # profile prod
 nohup java -jar $JAR_PATH --spring.profiles.active=prod > /dev/null 2> /dev/null < /dev/null &
+echo ">>> Deploy Success!!"
 
