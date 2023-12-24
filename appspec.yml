@@ -8,13 +8,11 @@ files:
 
 permissions:
   - object: /home/ubuntu/LetMeKnow
-    pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: 755
 
 hooks:
-  ApplicationStart:
+  AfterInstall:
     - location: scripts/deploy.sh
       timeout: 60
       runas: ubuntu
