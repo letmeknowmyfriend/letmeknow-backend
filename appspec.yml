@@ -10,7 +10,10 @@ permissions:
   - object: /home/ubuntu/LetMeKnow
     owner: ubuntu
     group: ubuntu
-    mode: 755
+    mode: 777
+    type:
+      - file
+      - directory
 
 hooks:
   AfterInstall:
