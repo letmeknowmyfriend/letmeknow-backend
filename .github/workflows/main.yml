@@ -13,7 +13,7 @@ on:
   # 지정한 branch에서 pull_request에 해당하는 command가 수행되면 이 workflow가 동작
   pull_request:
     branches: [ main ]
- 
+
   # 이부분은 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해주는 역할을 합니다.
   workflow_dispatch:
 
@@ -52,18 +52,21 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
       shell: bash
-    
+
     - name: Build with Gradle
-      run: ./gradlew build -x test 
+      run: ./gradlew build -x test
       shell: bash
+
+    - name: Bring FCM key from S3 to Build Path
+      run: aws s3 cp --region $AWS_REGION s3://$S3_BUCKET_NAME/FCM/letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json ./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
 
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
       shell: bash
-    
+
     - name: Upload to S3
       run: aws s3 cp --region $AWS_REGION ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/archive/$GITHUB_SHA.zip
-      
+
     - name: deploy with AWS codeDeploy
       run: aws deploy create-deployment
         --application-name $CODEDEPLOY_NAME
