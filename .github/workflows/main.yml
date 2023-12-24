@@ -58,7 +58,7 @@ jobs:
       shell: bash
 
     - name: Bring FCM key from S3 to Build Path
-      run: aws s3 cp --region $AWS_REGION s3://$S3_BUCKET_NAME/FCM/letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json ./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
+      run: aws s3 cp --region $AWS_REGION s3://$S3_BUCKET_NAME/archive/FCM/letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json ./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
 
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
