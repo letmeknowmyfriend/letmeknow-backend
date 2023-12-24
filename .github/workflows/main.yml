@@ -3,73 +3,73 @@ name: LetMeKnow
 
 # 현재 스크립트에서 사용할 환경변수를 정의하여 사용
 env:
-  AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: letmeknow
-  CODEDEPLOY_NAME: LetMeKnow
-  CODEDEPLOY_GROUP: LetMeKnow
+    AWS_REGION: ap-northeast-2
+    S3_BUCKET_NAME: letmeknow
+    CODEDEPLOY_NAME: LetMeKnow
+    CODEDEPLOY_GROUP: LetMeKnow
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
-  # 지정한 branch에서 push에 해당하는 command가 수행되면 이 workflow가 동작
-  push:
-    branches: [ main ]
+    # 지정한 branch에서 push에 해당하는 command가 수행되면 이 workflow가 동작
+    push:
+        branches: [ main ]
 
-  # 이부분은 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해주는 역할을 합니다.
-  workflow_dispatch:
+    # 이부분은 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해주는 역할을 합니다.
+    workflow_dispatch:
 
 # 워크 플로우가 깃 레포에 대한 권한을 읽기만 가능하게 설정한다.
 permissions:
-  contents: read
+    contents: read
 
 # 워크플로우에서 할 작업 정의한다.
 jobs:
-  build:
-    # 작업 환경 = 우분투 최신 버전
-    runs-on: ubuntu-latest
+    build:
+        # 작업 환경 = 우분투 최신 버전
+        runs-on: ubuntu-latest
 
-    # 깃허브에서 제공하는 checkout 액션 사용
-    steps:
+        # 깃허브에서 제공하는 checkout 액션 사용
+        steps:
 
-    # JDK 설정
-    # temurin = Adoptium에서 제공하는 JDK
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
+            # JDK 설정
+            # temurin = Adoptium에서 제공하는 JDK
+            - name: Set up JDK 11
+              uses: actions/setup-java@v3
+              with:
+                  java-version: '11'
+                  distribution: 'temurin'
 
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: checkout release
-      uses: actions/checkout@v3
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - name: checkout release
+              uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-region: ${{ env.AWS_REGION }}
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-region: ${{ env.AWS_REGION }}
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
-      shell: bash
+            - name: Grant execute permission for gradlew
+              run: chmod +x ./gradlew
+              shell: bash
 
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test
-      shell: bash
+            - name: Build with Gradle
+              run: ./gradlew build -x test
+              shell: bash
 
-    - name: Bring FCM key from S3 to Build Path
-      run: aws s3 cp --region $AWS_REGION s3://$S3_BUCKET_NAME/archive/FCM/letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json ./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
+            - name: Bring FCM key from S3 to Build Path
+              run: aws s3 cp --region $AWS_REGION s3://$S3_BUCKET_NAME/archive/FCM/letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json ./letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
 
-    - name: Make zip file
-      run: zip -r ./$GITHUB_SHA.zip .
-      shell: bash
+            - name: Make zip file
+              run: zip -r ./$GITHUB_SHA.zip .
+              shell: bash
 
-    - name: Upload to S3
-      run: aws s3 cp --region $AWS_REGION ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/archive/$GITHUB_SHA.zip
+            - name: Upload to S3
+              run: aws s3 cp --region $AWS_REGION ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/archive/$GITHUB_SHA.zip
 
-    - name: deploy with AWS codeDeploy
-      run: aws deploy create-deployment
-        --application-name $CODEDEPLOY_NAME
-        --deployment-config-name CodeDeployDefault.OneAtATime
-        --deployment-group-name $CODEDEPLOY_GROUP
-        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=archive/$GITHUB_SHA.zip
+            - name: deploy with AWS codeDeploy
+              run: aws deploy create-deployment
+                  --application-name $CODEDEPLOY_NAME
+                  --deployment-config-name CodeDeployDefault.OneAtATime
+                  --deployment-group-name $CODEDEPLOY_GROUP
+                  --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=archive/$GITHUB_SHA.zip
