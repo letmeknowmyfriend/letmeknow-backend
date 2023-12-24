@@ -18,3 +18,7 @@ jwt:
     token:
         access:
             expiration: 300000 # 5분
+
+logging:
+    level:
+        p6spy: INFO

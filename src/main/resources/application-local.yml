@@ -13,8 +13,23 @@ spring:
         hibernate:
             ddl-auto: ${JPA.DDL_AUTO}
 
+            logging:
+                level:
+                    org:
+                        hibernate.SQL: trace
+
+
 # JWT
 jwt:
     token:
         access:
             expiration: 86_400_000 # 1일
+
+logging:
+    level:
+      p6spy: DEBUG
+
+decorator:
+    datasource:
+        p6spy:
+            enable-logging: true

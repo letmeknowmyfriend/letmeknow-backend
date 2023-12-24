@@ -8,19 +8,13 @@ spring:
         #                show_sql: true
         #                format_sql: true
         #                dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-        logging.level:
-        org.hibernate.SQL: debug
         open-in-view: false
         hibernate:
             dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     properties:
         hibernate:
             default_batch_fetch_size: 100
-    logging:
-        level:
-            org:
-                hibernate:
-                    SQL: trace
+
     security:
         oauth2:
             client:
@@ -94,18 +88,13 @@ server:
 # p6spy
 logging:
     file:
-        path: /Users/mac/Desktop/letmeknow/log
+        path: ./logs
     level:
         root: info
-        p6spy: debug
     logback:
         rollingpolicy:
             max-file-size: 50MB
             max-history: 10
-decorator:
-    datasource:
-        p6spy:
-            enable-logging: true
 # p6spy
 
 # cors

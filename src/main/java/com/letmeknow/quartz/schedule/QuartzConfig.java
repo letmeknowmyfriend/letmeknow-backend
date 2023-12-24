@@ -1,11 +1,10 @@
 package com.letmeknow.quartz.schedule;
 
 import com.letmeknow.analyser.Analyser;
+import com.letmeknow.enumstorage.SpringProfile;
 import com.letmeknow.quartz.AutoWiringSpringBeanJobFactory;
-import org.quartz.DateBuilder;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
+import lombok.RequiredArgsConstructor;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -25,11 +24,13 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Configuration
+@RequiredArgsConstructor
 public class QuartzConfig {
-    @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private PlatformTransactionManager transactionManager;
+    private final ApplicationContext applicationContext;
+    private final PlatformTransactionManager transactionManager;
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() {
@@ -79,26 +80,26 @@ public class QuartzConfig {
 
     @Bean
     public Trigger trigger() {
-        // Trigger the job to run now, and then repeat every 40 seconds
-//        return newTrigger()
-//                .withIdentity("trigger1", "group1")
-//                .forJob("job1", "group1")
-//                .build();
-        return newTrigger()
+        TriggerBuilder<Trigger> triggerTriggerBuilder = newTrigger();
+        triggerTriggerBuilder
                 .withIdentity("trigger1", "group1")
-                .forJob(jobDetail())
+                .forJob(jobDetail());
 
-//                // 매일 10시 30분부터 17시 30분까지 1시간마다 실행
-//                .startNow()
-//                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"))
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        // Local Profile은 10초 후에 1번만 실행
+        if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
+            triggerTriggerBuilder
                 .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
-                    .withSchedule(simpleSchedule()
-                        .withRepeatCount(0)) // 1번만 실행
+                .withSchedule(simpleSchedule()
+                .withRepeatCount(0)); // 1번만 실행
+        }
+        // Prod Profile은 매일 10시 30분부터 17시 30분까지 1시간마다 실행
+        else if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
+            triggerTriggerBuilder
+                .startNow()
+                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"));
+        }
 
-                .build();
+        return triggerTriggerBuilder.build();
     }
 
 //    @Bean
