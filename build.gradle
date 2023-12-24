@@ -97,6 +97,6 @@ sourceSets {
 configurations {
 	querydsl.extendsFrom compileClasspath
 }
-compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
-}
+//compileQuerydsl {
+//	options.annotationProcessorPath = configurations.querydsl
+//}
