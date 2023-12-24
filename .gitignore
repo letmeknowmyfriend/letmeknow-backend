@@ -41,3 +41,6 @@ ChaChaKeyStore.p12
 
 # Firebase
 letmeknow-bdaef-firebase-adminsdk-ogpdk-7f7f7325ab.json
+
+# logs
+logs/
