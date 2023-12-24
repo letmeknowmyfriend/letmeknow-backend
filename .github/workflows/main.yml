@@ -1,47 +1,68 @@
-# This is a basic workflow to help you get started with Actions
-
+# 워크 플로우 이름
 name: LetMeKnow
 
-# Controls when the workflow will run
+# 현재 스크립트에서 사용할 환경변수를 정의하여 사용
+env:
+  S3_BUCKET_NAME: letmeknow
+  AWS_REGION: ap-northeast-2
+
+# 워크 플로우가 언제 실행 될지를 정한다.
 on:
-  # 지정한 branch에서 push/pull_request에 해당하는 command가 수행되면 이 workflow가 동작 합니다. 
-  # 여기서는 간단히 main 브런치에서 push되면서 이 workflow가 실행 되도록 하겠습니다.
+  # 지정한 branch에서 pull_request에 해당하는 command가 수행되면 이 workflow가 동작
   pull_request:
     branches: [ main ]
  
   # 이부분은 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해주는 역할을 합니다.
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# 워크 플로우가 깃 레포에 대한 권한을 읽기만 가능하게 설정한다.
+permissions:
+  contents: read
+
+# 워크플로우에서 할 작업 정의한다.
 jobs:
-  # This workflow contains a single job called "build" 
   build:
+    # 작업 환경 = 우분투 최신 버전
     runs-on: ubuntu-latest
-    
+
+    # 깃허브에서 제공하는 checkout 액션 사용
     steps:
+
+    # JDK 설정
+    # temurin = Adoptium에서 제공하는 JDK
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: checkout release
       uses: actions/checkout@v3
 
-    # Runs a single command using the runners shell 
-    - name: Clean temp directory
-      run: |
-        rm -rf *
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+      shell: bash
+    
+    - name: Build with Gradle
+      run: ./gradlew build
+      shell: bash
+
+    - name: Make zip file
+      run: zip -r ./$GITHUB_SHA.zip .
+      shell: bash
       
-    - name: archive LetMeKnow
-      run: tar cvfz ./LetMeKnow.tar.gz *
-       
-    - name: AWS configure credentials
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-region: ap-northeast-2
-        
-    - name: upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./LetMeKnow.tar.gz s3://letmeknow/archive/
+          aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Upload to S3
+      run: aws s3 cp --region $AWS_REGION ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/archive/$GITHUB_SHA.zip
       
     - name: deploy with AWS codeDeploy
       run: aws deploy create-deployment
         --application-name LetMeKnow
         --deployment-config-name CodeDeployDefault.OneAtATime
         --deployment-group-name LetMeKnow
-        --s3-location bucket=letmeknow,bundleType=tgz,key=archive/LetMeKnow.tar.gz
+        --s3-location bucket=letmeknow, bundleType=tgz, key=archive/LetMeKnow.tar.gz
