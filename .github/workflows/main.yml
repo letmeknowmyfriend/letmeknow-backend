@@ -72,4 +72,4 @@ jobs:
         --application-name $CODEDEPLOY_NAME
         --deployment-config-name CodeDeployDefault.OneAtATime
         --deployment-group-name $CODEDEPLOY_GROUP
-        --s3-location bucket=$S3_BUCKET_NAME/archive,bundleType=zip,key=$GITHUB_SHA.zip
+        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=archive/$GITHUB_SHA.zip
