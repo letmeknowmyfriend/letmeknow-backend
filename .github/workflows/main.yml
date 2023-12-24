@@ -3,8 +3,10 @@ name: LetMeKnow
 
 # 현재 스크립트에서 사용할 환경변수를 정의하여 사용
 env:
-  S3_BUCKET_NAME: letmeknow
   AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: letmeknow
+  CODEDEPLOY_NAME: LetMeKnow
+  CODEDEPLOY_GROUP: LetMeKnow
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
@@ -64,7 +66,7 @@ jobs:
       
     - name: deploy with AWS codeDeploy
       run: aws deploy create-deployment
-        --application-name LetMeKnow
+        --application-name $CODEDEPLOY_NAME
         --deployment-config-name CodeDeployDefault.OneAtATime
-        --deployment-group-name LetMeKnow
-        --s3-location bucket=letmeknow,bundleType=tgz,key=archive/LetMeKnow.tar.gz
+        --deployment-group-name $CODEDEPLOY_GROUP
+        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
