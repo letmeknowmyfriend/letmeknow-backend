@@ -27,7 +27,9 @@ jobs:
     - name: Clean temp directory
       run: |
         rm -rf *
-        cp -r $GITHUB_WORKSPACE . 
+        mkdir -p $GITHUB_WORKSPACE/source_code
+        rm -rf $GITHUB_WORKSPACE/source_code
+        cp -r $GITHUB_WORKSPACE/* ./source_code
       
     - name: archive LetMeKnow
       run: tar cvfz ./LetMeKnow.tar.gz *
