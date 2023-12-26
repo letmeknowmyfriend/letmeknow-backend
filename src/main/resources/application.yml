@@ -97,13 +97,6 @@ logging:
             max-history: 10
 # p6spy
 
-# cors
-cors.allowed-origin: ${DOMAIN}
-# cors
-
-# domain
-domain: ${DOMAIN}
-
 # port
 port: ${SERVER.PORT}
 
