@@ -22,3 +22,10 @@ jwt:
 logging:
     level:
         p6spy: INFO
+
+# cors
+allowed-origin: ${DOMAIN}
+# cors
+
+# domain
+domain: ${DOMAIN}

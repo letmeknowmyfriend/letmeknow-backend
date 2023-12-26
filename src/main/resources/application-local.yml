@@ -33,3 +33,10 @@ decorator:
     datasource:
         p6spy:
             enable-logging: true
+
+# cors
+allowed-origin: ${DOMAIN}
+# cors
+
+# domain
+domain: ${DOMAIN}
