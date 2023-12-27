@@ -60,6 +60,7 @@ public class Notification extends BaseEntity {
         return NotificationDtoWithBoardViewUrlAndArticleDto.builder()
             .id(this.id)
             .memberId(this.memberId)
+            .boardName(this.board.getBoardName())
             .boardViewUrl(this.board.getBoardViewUrl())
             .articleDto(this.article.toDto())
             .isRead(this.isRead)

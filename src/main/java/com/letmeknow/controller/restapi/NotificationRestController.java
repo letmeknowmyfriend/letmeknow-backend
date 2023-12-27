@@ -6,8 +6,6 @@ import com.letmeknow.dto.NotificationDtoWithBoardViewUrlAndArticleDto;
 import com.letmeknow.dto.Response;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.member.NoSuchMemberException;
-import com.letmeknow.service.DeviceTokenService;
-import com.letmeknow.service.member.MemberService;
 import com.letmeknow.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
-
 import java.util.List;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
@@ -29,7 +25,6 @@ import static javax.servlet.http.HttpServletResponse.SC_GONE;
 @RequiredArgsConstructor
 public class NotificationRestController {
     private final NotificationService notificationService;
-    private final MemberService memberService;
 
     private final ObjectMapper objectMapper;
 
