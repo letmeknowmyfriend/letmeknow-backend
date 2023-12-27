@@ -92,11 +92,13 @@ public class QuartzConfig {
                 .withSchedule(simpleSchedule()
                 .withRepeatCount(0)); // 1번만 실행
         }
-        // Prod Profile은 매일 10시 30분부터 17시 30분까지 1시간마다 실행
+        // Prod Profile은 10초 후에 시작해서, 1시간마다 실행
         else if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
             triggerTriggerBuilder
-                .startNow()
-                .withSchedule(cronSchedule("0 30 10-17/1 * * ?"));
+                .startAt(DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND)) // 10초 후에 실행
+                .withSchedule(simpleSchedule()
+                .withIntervalInHours(1)
+                .repeatForever());
         }
 
         return triggerTriggerBuilder.build();
