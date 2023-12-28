@@ -28,11 +28,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Entity
+import static javax.persistence.GenerationType.IDENTITY;
+
 @Getter
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "MEMBER_ID")
     private Long id;
 

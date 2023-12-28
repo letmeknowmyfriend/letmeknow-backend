@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import static lombok.AccessLevel.*;
+
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@NoArgsConstructor(access = PROTECTED, force = true)
 public class MemberSignUpForm {
     @NotBlank
     private final String name;
