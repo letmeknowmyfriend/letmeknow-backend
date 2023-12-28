@@ -208,13 +208,19 @@ public class MemberService {
         // PasswordVerificationCode 업데이트
         member.updatePasswordVerificationCode(verificationCode);
 
+        // domain에서 http://를 제거한다.
+        String newDomain = domain.replace("http://", "");
+
+        // newDomain 앞에 https://를 붙인다.
+        newDomain = "https://" + newDomain;
+
         // 비밀번호 재설정 이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailEnum.CHANGE_PASSWORD_EMAIL_SUBJECT.getMessage())
                 .receiver(email)
                 .message(EmailEnum.CHANGE_PASSWORD_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_1.getMessage() +
-                        domain +
+                        newDomain +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_3.getMessage())
