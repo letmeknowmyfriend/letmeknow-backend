@@ -67,6 +67,7 @@ public class MemberController {
             if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
                 // domain의 http를 https로 바꾼다.
                 newDomain = domain.replace("http://", "https://");
+                newDomain += ":" + port;
             }
             // Profile이 local면, domain 끝에 포트를 붙여준다.
             else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
@@ -101,7 +102,7 @@ public class MemberController {
         }
         // 비밀번호가 유효하지 않으면
         catch (MemberSignUpValidationException e) {
-            if (e.getReason().equals(MemberCause.PASSWORD)) {
+//            if (e.getReason().equals(MemberCause.PASSWORD)) {
                 result.addError(new FieldError("memberChangePasswordForm", "newPassword", e.getMessage()));
                 result.addError(new FieldError("memberChangePasswordForm", "newPasswordAgain", e.getMessage()));
 
@@ -110,6 +111,7 @@ public class MemberController {
                 if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
                     // domain의 http를 https로 바꾼다.
                     newDomain = domain.replace("http://", "https://");
+                    newDomain += ":" + port;
                 }
                 // Profile이 local면, domain 끝에 포트를 붙여준다.
                 else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
@@ -122,7 +124,7 @@ public class MemberController {
 
                 // 잘못된 값이 들어오면, 다시 로그인 폼으로 돌아간다.
                 return "auth/member/changePasswordForm";
-            }
+//            }
         }
 
         // 모든 작업 성공 시, 완료 메시지 출력
