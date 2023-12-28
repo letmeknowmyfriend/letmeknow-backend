@@ -16,7 +16,7 @@ spring:
             logging:
                 level:
                     org:
-                        hibernate.SQL: trace
+                        hibernate.SQL: debug
 
 
 # JWT
@@ -25,6 +25,7 @@ jwt:
         access:
             expiration: 86_400_000 # 1일
 
+# SQL log
 logging:
     level:
       p6spy: DEBUG
@@ -33,6 +34,7 @@ decorator:
     datasource:
         p6spy:
             enable-logging: true
+# SQL log
 
 # cors
 allowed-origin: ${DOMAIN}
