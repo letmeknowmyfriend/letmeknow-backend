@@ -50,9 +50,6 @@ public class TemporaryMemberService {
     @Value("${domain}")
     private String domain;
 
-    @Value("${port}")
-    private String port;
-
     public TemporaryMemberDto findTemporaryMemberByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(new StringBuffer().append(SUCH).append(TEMPORARY_MEMBER).append(NOT_EXISTS).toString()))
@@ -93,7 +90,7 @@ public class TemporaryMemberService {
                 .receiver(memberSignUpForm.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain + ":" + port +
+                        domain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
@@ -119,7 +116,7 @@ public class TemporaryMemberService {
                 .receiver(temporaryMember.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain + ":" + port +
+                        domain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
@@ -134,16 +131,16 @@ public class TemporaryMemberService {
         //verificationCode 생성
         String verificationCode = codeGenerator.generateCode(20);
 
-        //temporaryMember의 verificationCode 변경
+        // temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
 
-        //이메일 발송
+        // 이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain + ":" + port +
+                        domain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())

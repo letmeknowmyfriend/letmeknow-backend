@@ -66,9 +66,6 @@ public class MemberService {
     @Value("${domain}")
     private String domain;
 
-    @Value("${port}")
-    private Integer port;
-
     public MemberFindDto findMemberFindDtoById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
                 //회원이 없으면 예외 발생
@@ -217,7 +214,7 @@ public class MemberService {
                 .receiver(email)
                 .message(EmailEnum.CHANGE_PASSWORD_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_1.getMessage() +
-                        domain + ":" + port +
+                        domain +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.CHANGE_PASSWORD_EMAIL_CONTENT_3.getMessage())
