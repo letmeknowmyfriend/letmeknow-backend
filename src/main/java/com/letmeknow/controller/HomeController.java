@@ -18,16 +18,7 @@ public class HomeController {
     private final MemberService memberService;
 
     @GetMapping("/")
-    public String home(Authentication authentication, Model model) throws NoSuchMemberException {
-        log.info("home controller");
-
-        if (authentication != null) {
-            PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
-            model.addAttribute("username", principal.getUsername());
-            MemberFindDto memberFindDtoByEmail = memberService.findMemberFindDtoByEmail(principal.getUsername());
-            model.addAttribute("memberFindDto", memberFindDtoByEmail);
-        }
-
+    public String home() throws NoSuchMemberException {
         return "home";
     }
 }
