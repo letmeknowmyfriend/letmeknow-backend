@@ -19,9 +19,16 @@ jwt:
         access:
             expiration: 300000 # 5분
 
+# SQL log
 logging:
     level:
-        p6spy: INFO
+        p6spy: DEBUG
+
+decorator:
+    datasource:
+        p6spy:
+            enable-logging: false
+# SQL log
 
 # cors
 allowed-origin: ${DOMAIN}

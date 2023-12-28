@@ -23,4 +23,5 @@ else
 fi
 
 nohup java -jar $JAR_PATH --spring.profiles.active=prod > $REPOSITORY/nohup.out 2>&1 &
-echo "> Deploy - $JAR_PATH\n" >> $REPOSITORY/deploy.log
+echo "> Deploy - $JAR_PATH" >> $REPOSITORY/deploy.log
+echo " " >> $REPOSITORY/deploy.log

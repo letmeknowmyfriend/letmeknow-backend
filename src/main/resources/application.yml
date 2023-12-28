@@ -89,8 +89,6 @@ server:
 logging:
     file:
         path: ./logs
-    level:
-        root: info
     logback:
         rollingpolicy:
             max-file-size: 50MB
