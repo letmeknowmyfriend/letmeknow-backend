@@ -84,13 +84,19 @@ public class TemporaryMemberService {
                         .build())
                 .getId();
 
+        // domain에서 http://를 제거한다.
+        String newDomain = domain.replace("http://", "");
+
+        // newDomain 앞에 https://를 붙인다.
+        newDomain = "https://" + newDomain;
+
         //이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(memberSignUpForm.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain +
+                        newDomain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
@@ -110,13 +116,19 @@ public class TemporaryMemberService {
         //temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
 
+        // domain에서 http://를 제거한다.
+        String newDomain = domain.replace("http://", "");
+
+        // newDomain 앞에 https://를 붙인다.
+        newDomain = "https://" + newDomain;
+
         //이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain +
+                        newDomain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
@@ -134,13 +146,19 @@ public class TemporaryMemberService {
         // temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
 
+        // domain에서 http://를 제거한다.
+        String newDomain = domain.replace("http://", "");
+
+        // newDomain 앞에 https://를 붙인다.
+        newDomain = "https://" + newDomain;
+
         // 이메일 발송
         emailService.sendMail(Email.builder()
                 .subject(EmailEnum.VERIFICATION_EMAIL_SUBJECT.getMessage())
                 .receiver(temporaryMember.getEmail())
                 .message(EmailEnum.VERIFICATION_EMAIL_MESSAGE.getMessage() +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_1.getMessage() +
-                        domain +
+                        newDomain +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_2.getMessage() +
                         URLEncoder.encode(verificationCode, "UTF-8") +
                         EmailEnum.VERIFICATION_EMAIL_CONTENT_3.getMessage())
