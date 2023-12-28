@@ -10,9 +10,7 @@ import com.letmeknow.message.messages.Messages;
 import com.letmeknow.service.DeviceTokenService;
 import com.letmeknow.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -27,9 +25,10 @@ import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
 import static com.letmeknow.message.messages.Messages.*;
 import static org.springframework.http.HttpStatus.GONE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/api/member", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/member", consumes = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class MemberRestController {
     private final MemberService memberService;

@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .antMatchers("/api/board/**").permitAll()
                         .antMatchers("/api/article/**").permitAll()
                         .antMatchers("/api/member/**").permitAll()
+                        .antMatchers("/api/request/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 );
