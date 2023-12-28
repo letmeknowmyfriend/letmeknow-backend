@@ -97,9 +97,6 @@ logging:
             max-history: 10
 # p6spy
 
-# port
-port: ${SERVER.PORT}
-
 aws:
     paramstore:
         enabled: true
