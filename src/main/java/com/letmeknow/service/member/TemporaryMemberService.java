@@ -4,6 +4,7 @@ import com.letmeknow.dto.member.MemberCreationDto;
 import com.letmeknow.dto.temporarymember.TemporaryMemberDto;
 import com.letmeknow.entity.member.Member;
 import com.letmeknow.entity.member.TemporaryMember;
+import com.letmeknow.enumstorage.SpringProfile;
 import com.letmeknow.enumstorage.errormessage.member.temporarymember.TemporaryMemberErrorMessage;
 import com.letmeknow.exception.member.MemberSignUpValidationException;
 import com.letmeknow.exception.member.temporarymember.NoSuchTemporaryMemberException;
@@ -50,6 +51,12 @@ public class TemporaryMemberService {
     @Value("${domain}")
     private String domain;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
+    @Value("${server.port}")
+    private String port;
+
     public TemporaryMemberDto findTemporaryMemberByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(new StringBuffer().append(SUCH).append(TEMPORARY_MEMBER).append(NOT_EXISTS).toString()))
@@ -84,11 +91,16 @@ public class TemporaryMemberService {
                         .build())
                 .getId();
 
-        // domain에서 http://를 제거한다.
-        String newDomain = domain.replace("http://", "");
-
-        // newDomain 앞에 https://를 붙인다.
-        newDomain = "https://" + newDomain;
+        // Profile이 prod면, domain의 http를 https로 바꾼다.
+        String newDomain = domain;
+        if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
+            // domain의 http를 https로 바꾼다.
+            newDomain = domain.replace("http://", "https://");
+        }
+        // Profile이 local면, domain 끝에 포트를 붙여준다.
+        else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
+            newDomain += ":" + port;
+        }
 
         //이메일 발송
         emailService.sendMail(Email.builder()
@@ -116,11 +128,16 @@ public class TemporaryMemberService {
         //temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
 
-        // domain에서 http://를 제거한다.
-        String newDomain = domain.replace("http://", "");
-
-        // newDomain 앞에 https://를 붙인다.
-        newDomain = "https://" + newDomain;
+        // Profile이 prod면, domain의 http를 https로 바꾼다.
+        String newDomain = domain;
+        if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
+            // domain의 http를 https로 바꾼다.
+            newDomain = domain.replace("http://", "https://");
+        }
+        // Profile이 local면, domain 끝에 포트를 붙여준다.
+        else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
+            newDomain += ":" + port;
+        }
 
         //이메일 발송
         emailService.sendMail(Email.builder()
@@ -146,11 +163,16 @@ public class TemporaryMemberService {
         // temporaryMember의 verificationCode 변경
         temporaryMember.updateVerificationCode(verificationCode);
 
-        // domain에서 http://를 제거한다.
-        String newDomain = domain.replace("http://", "");
-
-        // newDomain 앞에 https://를 붙인다.
-        newDomain = "https://" + newDomain;
+        // Profile이 prod면, domain의 http를 https로 바꾼다.
+        String newDomain = domain;
+        if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
+            // domain의 http를 https로 바꾼다.
+            newDomain = domain.replace("http://", "https://");
+        }
+        // Profile이 local면, domain 끝에 포트를 붙여준다.
+        else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
+            newDomain += ":" + port;
+        }
 
         // 이메일 발송
         emailService.sendMail(Email.builder()

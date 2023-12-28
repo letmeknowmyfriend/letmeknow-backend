@@ -5,15 +5,16 @@ import com.letmeknow.form.BoardRequestForm;
 import com.letmeknow.service.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import static com.letmeknow.enumstorage.response.Status.FAIL;
 import static com.letmeknow.enumstorage.response.Status.SUCCESS;
+import static com.letmeknow.message.messages.Messages.INVALID;
+import static com.letmeknow.message.messages.Messages.REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -33,5 +34,16 @@ public class RequestRestController {
                 .status(SUCCESS.getStatus())
             .build()
         );
+    }
+
+    // 필요한 인자가 없으면
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    public ResponseEntity handle400Exception(Exception e) {
+        // 400 Bad Request
+        return ResponseEntity.badRequest()
+            .body(Response.builder()
+                .status(FAIL.getStatus())
+                .message(new StringBuffer().append(REQUEST.getMessage()).append(INVALID.getMessage()).toString())
+                .build());
     }
 }

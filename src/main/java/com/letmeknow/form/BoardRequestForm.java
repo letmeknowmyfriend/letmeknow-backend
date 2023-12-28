@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -15,7 +16,7 @@ public class BoardRequestForm {
     @NotBlank
     private final String schoolName;
 
-    @NotBlank
+    @NotNull
     private final String branchName;
 
     @NotBlank

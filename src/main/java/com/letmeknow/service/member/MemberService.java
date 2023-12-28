@@ -11,6 +11,7 @@ import com.letmeknow.dto.member.MemberFindDto;
 import com.letmeknow.dto.member.MemberPasswordUpdateDto;
 import com.letmeknow.entity.member.Member;
 import com.letmeknow.entity.notification.Subscription;
+import com.letmeknow.enumstorage.SpringProfile;
 import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
 import com.letmeknow.exception.member.*;
@@ -66,6 +67,12 @@ public class MemberService {
     @Value("${domain}")
     private String domain;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
+    @Value("${server.port}")
+    private String port;
+
     public MemberFindDto findMemberFindDtoById(long memberId) throws NoSuchMemberException {
         return memberRepository.findNotDeletedById(memberId)
                 //회원이 없으면 예외 발생
@@ -108,7 +115,7 @@ public class MemberService {
                 //해당하는 비밀번호 변경 코드를 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage()));
 
-        //verificationCode로 인증
+        // verificationCode로 인증
         if (!member.getPasswordVerificationCode().equals(passwordVerificationCode)) {
             throw new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage());
         }
@@ -208,11 +215,16 @@ public class MemberService {
         // PasswordVerificationCode 업데이트
         member.updatePasswordVerificationCode(verificationCode);
 
-        // domain에서 http://를 제거한다.
-        String newDomain = domain.replace("http://", "");
-
-        // newDomain 앞에 https://를 붙인다.
-        newDomain = "https://" + newDomain;
+        // Profile이 prod면, domain의 http를 https로 바꾼다.
+        String newDomain = domain;
+        if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
+            // domain의 http를 https로 바꾼다.
+            newDomain = domain.replace("http://", "https://");
+        }
+        // Profile이 local면, domain 끝에 포트를 붙여준다.
+        else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
+            newDomain += ":" + port;
+        }
 
         // 비밀번호 재설정 이메일 발송
         emailService.sendMail(Email.builder()
