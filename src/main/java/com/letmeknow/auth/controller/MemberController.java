@@ -66,8 +66,7 @@ public class MemberController {
             String newDomain = domain;
             if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
                 // domain의 http를 https로 바꾼다.
-                newDomain = domain.replace("http://", "https://");
-                newDomain += ":" + port;
+                newDomain = domain.replace("http", "https");
             }
             // Profile이 local면, domain 끝에 포트를 붙여준다.
             else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
@@ -110,8 +109,7 @@ public class MemberController {
                 String newDomain = domain;
                 if (activeProfile.equals(SpringProfile.PROD.getProfile())) {
                     // domain의 http를 https로 바꾼다.
-                    newDomain = domain.replace("http://", "https://");
-                    newDomain += ":" + port;
+                    newDomain = domain.replace("http", "https");
                 }
                 // Profile이 local면, domain 끝에 포트를 붙여준다.
                 else if (activeProfile.equals(SpringProfile.LOCAL.getProfile())) {
