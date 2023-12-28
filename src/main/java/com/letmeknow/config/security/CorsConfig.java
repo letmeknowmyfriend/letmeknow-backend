@@ -23,7 +23,8 @@ public class CorsConfig {
         config.setAllowedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
         config.setExposedHeaders(List.of("Authorization", "AuthorizationRefresh, DeviceToken"));
 
-        config.setAllowedOrigins(List.of(allowedOrigin));
+        String httpsDomain = allowedOrigin.replace("http", "https");
+        config.setAllowedOrigins(List.of(allowedOrigin, httpsDomain));
         config.setAllowedMethods(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
