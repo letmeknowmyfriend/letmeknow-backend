@@ -136,46 +136,47 @@ public class JwtService {
 
             throw new NoSuchDeviceTokenException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(NOT_EXISTS.getMessage()).toString());
         }
+        // 일치하는 Device Token이 있으면
+        else {
+            DeviceToken deviceTokenEntity = validDeviceTokens.get(0);
 
-        // Device Token이 있을 때
-        DeviceToken deviceTokenEntity = validDeviceTokens.get(0);
+            // 유저가 보낸 Refresh Token와 다르면, 유효하지 않은 Refresh Token이므로
+            if (!deviceTokenEntity.getRefreshToken().getRefreshToken().equals(refreshToken)) {
+                // Refresh Token을 DB에서 삭제
+                deviceTokenEntity.removeRefreshToken();
+                deviceTokenRepository.save(deviceTokenEntity);
 
-        // 유저가 보낸 Refresh Token와 다르면, 유효하지 않은 Refresh Token이므로
-        if (!deviceTokenEntity.getRefreshToken().getRefreshToken().equals(refreshToken)) {
-            // Refresh Token을 DB에서 삭제
-            deviceTokenEntity.removeRefreshToken();
-            deviceTokenRepository.save(deviceTokenEntity);
+                // 예외 발생
+                throw new JWTVerificationException(new StringBuffer().append(REFRESH_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
+            }
 
-            // 예외 발생
-            throw new JWTVerificationException(new StringBuffer().append(REFRESH_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
+            // refreshToken이 유효하면
+            // access token을 발급한다.
+            String newAccessToken = JWT.create()
+                .withIssuer("LetMeKnow")
+                .withSubject("accessToken")
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .withClaim("email", email)
+                .withClaim("issuedTime", System.currentTimeMillis())
+                .sign(Algorithm.HMAC512(secret));
+
+            // refresh token을 발급한다.
+            String newRefreshToken = JWT.create()
+                .withIssuer("LetMeKnow")
+                .withSubject("refreshToken")
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .withClaim("email", email)
+                .withClaim("issuedTime", System.currentTimeMillis())
+                .sign(Algorithm.HMAC512(secret));
+
+            // 해당 refreshToken을 업데이트한다.
+            deviceTokenEntity.getRefreshToken().updateRefreshToken(newRefreshToken);
+            refreshTokenRepository.save(deviceTokenEntity.getRefreshToken());
+
+            return new String[]{newAccessToken, newRefreshToken};
         }
-
-        // refreshToken이 유효하면
-        // access token을 발급한다.
-        String newAccessToken = JWT.create()
-            .withIssuer("LetMeKnow")
-            .withSubject("accessToken")
-            .withIssuedAt(new Date(System.currentTimeMillis()))
-            .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
-            .withClaim("email", email)
-            .withClaim("issuedTime", System.currentTimeMillis())
-            .sign(Algorithm.HMAC512(secret));
-
-        // refresh token을 발급한다.
-        String newRefreshToken = JWT.create()
-            .withIssuer("LetMeKnow")
-            .withSubject("refreshToken")
-            .withIssuedAt(new Date(System.currentTimeMillis()))
-            .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-            .withClaim("email", email)
-            .withClaim("issuedTime", System.currentTimeMillis())
-            .sign(Algorithm.HMAC512(secret));
-
-        // 해당 refreshToken을 업데이트한다.
-        deviceTokenEntity.getRefreshToken().updateRefreshToken(newRefreshToken);
-        refreshTokenRepository.save(deviceTokenEntity.getRefreshToken());
-
-        return new String[] {newAccessToken, newRefreshToken};
     }
 
     // refreshToken을 삭제한다.
