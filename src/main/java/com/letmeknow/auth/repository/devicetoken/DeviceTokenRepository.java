@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Long>, DeviceTokenRepositoryQueryDsl {
     Optional<DeviceToken> findByDeviceToken(String deviceToken);
-    Optional<DeviceToken> findByDeviceTokenWithJWTs(String deviceToken);
+    Optional<DeviceToken> findByDeviceTokenWithRefreshToken(String deviceToken);
     void deleteByDeviceToken(String deviceToken);
     void deleteByMemberId(Long memberId);
 }

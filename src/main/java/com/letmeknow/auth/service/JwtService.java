@@ -3,14 +3,11 @@ package com.letmeknow.auth.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.letmeknow.auth.entity.DeviceToken;
 import com.letmeknow.auth.entity.RefreshToken;
 import com.letmeknow.auth.repository.devicetoken.DeviceTokenRepository;
 import com.letmeknow.auth.repository.refreshtoken.RefreshTokenRepository;
 import com.letmeknow.entity.member.Member;
-import com.letmeknow.entity.notification.Subscription;
 import com.letmeknow.exception.auth.jwt.NoAccessTokenException;
 import com.letmeknow.exception.auth.jwt.NoRefreshTokenException;
 import com.letmeknow.exception.auth.jwt.NoSuchDeviceTokenException;
@@ -30,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.letmeknow.auth.messages.JwtMessages.ACCESS_TOKEN;
@@ -110,73 +106,72 @@ public class JwtService {
         return new String[] {newAccessToken, newRefreshToken};
     }
 
-    @Transactional(noRollbackFor = {JWTVerificationException.class, NoSuchDeviceTokenException.class}) // JWTVerificationException 발생해도 롤백 X
+    @Transactional(noRollbackFor = {JWTVerificationException.class, NoSuchDeviceTokenException.class, NoSuchMemberException.class}) // JWTVerificationException 발생해도 롤백 X
     public String[] reissueJwts(String email, String refreshToken, String deviceToken) throws NoSuchMemberException, IllegalArgumentException, NoSuchDeviceTokenException, NoSuchRefreshTokenInDBException, JWTVerificationException {
-        Member member = memberRepository.findNotDeletedByEmailWithRefreshTokenAndSubscriptionAndDeviceToken(email)
-            .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
+        // RefreshToken과 함께 DeviceTokenEntity를 찾아
+        DeviceToken deviceTokenEntity = deviceTokenRepository.findByDeviceTokenWithRefreshToken(deviceToken)
+            // Device Token이 DB에 없으면, Device Token이 바뀐 상황
+            .orElseThrow(() -> {
+                // RefreshToken을 DB에서 삭제
+                refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
-        List<DeviceToken> validDeviceTokens = member.getDeviceTokens().stream()
-            .filter(deviceTokenEntity -> deviceTokenEntity.getDeviceToken().equals(deviceToken))
-            .collect(Collectors.toList());
+                Member member = memberRepository.findNotDeletedByEmailWithRefreshTokenAndSubscriptionAndDeviceToken(email)
+                    .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
 
-        // Device Token로 찾을 수 없으면, Device Token이 바뀐 상황
-        if (validDeviceTokens.isEmpty()) {
-            // Refresh Token으로 Device Token을 찾고
-            DeviceToken invalidDeviceTokenEntity = member.getRefreshTokens().stream()
-                .filter(refreshTokenEntity -> refreshTokenEntity.getRefreshToken().equals(refreshToken))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchRefreshTokenInDBException(new StringBuffer().append(REFRESH_TOKEN.getMessage()).append(NOT_EXISTS.getMessage()).toString()))
-                .getDeviceToken();
+                // 만료된 Device Token으로 구독한 모든 Topic을 구독 해제한다.
+                subscriptionService.unsubscribeFromAllTopics(deviceToken, member);
 
-            // 만료된 Device Token으로 구독한 모든 Topic을 구독 해제한다.
-            subscriptionService.unsubscribeFromAllTopics(invalidDeviceTokenEntity.getDeviceToken(), member);
+                throw new NoSuchDeviceTokenException(new StringBuffer().append(SUCH.getMessage()).append(DEVICE_TOKEN.getMessage()).append(NOT_EXISTS.getMessage()).toString());
+            });
 
-            // 만료된 Device Token과 그에 딸린 Refresh Token을 지운다.
-            deviceTokenRepository.delete(invalidDeviceTokenEntity);
-
-            throw new NoSuchDeviceTokenException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(NOT_EXISTS.getMessage()).toString());
-        }
         // 일치하는 Device Token이 있으면
-        else {
-            DeviceToken deviceTokenEntity = validDeviceTokens.get(0);
-
-            // 유저가 보낸 Refresh Token와 다르면, 유효하지 않은 Refresh Token이므로
-            if (!deviceTokenEntity.getRefreshToken().getRefreshToken().equals(refreshToken)) {
-                // Refresh Token을 DB에서 삭제
-                deviceTokenEntity.removeRefreshToken();
-                deviceTokenRepository.save(deviceTokenEntity);
-
-                // 예외 발생
+        // 그 RefreshToken이 들어온 RefreshToken과 일치하는지 확인
+        // 유저가 보낸 Refresh Token와 다르면, 유효하지 않은 Refresh Token이므로
+        RefreshToken refreshTokenEntity = Optional.ofNullable(deviceTokenEntity.getRefreshToken())
+            // RefreshToken이 DB에 없으면
+            .orElseThrow(() -> {
                 throw new JWTVerificationException(new StringBuffer().append(REFRESH_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
-            }
+            });
 
-            // refreshToken이 유효하면
-            // access token을 발급한다.
-            String newAccessToken = JWT.create()
-                .withIssuer("LetMeKnow")
-                .withSubject("accessToken")
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
-                .withClaim("email", email)
-                .withClaim("issuedTime", System.currentTimeMillis())
-                .sign(Algorithm.HMAC512(secret));
+        // RefreshToken이 있지만, 유저가 보낸 Refresh Token와 다르면, 이미 사용된 Refresh Token이므로
+        if (!refreshTokenEntity.getRefreshToken().equals(refreshToken)) {
+            // 해당 DeviceToken을 구독 해제
+            subscriptionService.unsubscribeFromAllTopics(deviceTokenEntity.getDeviceToken(), deviceTokenEntity.getMember());
 
-            // refresh token을 발급한다.
-            String newRefreshToken = JWT.create()
-                .withIssuer("LetMeKnow")
-                .withSubject("refreshToken")
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                .withClaim("email", email)
-                .withClaim("issuedTime", System.currentTimeMillis())
-                .sign(Algorithm.HMAC512(secret));
+            // RefreshToken을 DB에서 삭제
+            // DeviceToken도 삭제
+            deviceTokenRepository.delete(deviceTokenEntity);
 
-            // 해당 refreshToken을 업데이트한다.
-            deviceTokenEntity.getRefreshToken().updateRefreshToken(newRefreshToken);
-            refreshTokenRepository.save(deviceTokenEntity.getRefreshToken());
-
-            return new String[]{newAccessToken, newRefreshToken};
+            // 예외 발생
+            throw new JWTVerificationException(new StringBuffer().append(REFRESH_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
         }
+
+        // refreshToken이 유효하면
+        // access token을 발급한다.
+        String newAccessToken = JWT.create()
+            .withIssuer("LetMeKnow")
+            .withSubject("accessToken")
+            .withIssuedAt(new Date(System.currentTimeMillis()))
+            .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
+            .withClaim("email", email)
+            .withClaim("issuedTime", System.currentTimeMillis())
+            .sign(Algorithm.HMAC512(secret));
+
+        // refresh token을 발급한다.
+        String newRefreshToken = JWT.create()
+            .withIssuer("LetMeKnow")
+            .withSubject("refreshToken")
+            .withIssuedAt(new Date(System.currentTimeMillis()))
+            .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+            .withClaim("email", email)
+            .withClaim("issuedTime", System.currentTimeMillis())
+            .sign(Algorithm.HMAC512(secret));
+
+        // 해당 refreshToken을 업데이트한다.
+        refreshTokenEntity.updateRefreshToken(newRefreshToken);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        return new String[]{newAccessToken, newRefreshToken};
     }
 
     // refreshToken을 삭제한다.
