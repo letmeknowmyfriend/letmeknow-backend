@@ -15,7 +15,7 @@ public class DeviceTokenRepositoryImpl implements DeviceTokenRepositoryQueryDsl 
     private final EntityManager em;
 
     @Override
-    public Optional<DeviceToken> findByDeviceTokenWithJWTs(String deviceToken) {
+    public Optional<DeviceToken> findByDeviceTokenWithRefreshToken(String deviceToken) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return Optional.ofNullable(

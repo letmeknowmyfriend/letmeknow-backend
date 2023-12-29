@@ -5,5 +5,5 @@ import com.letmeknow.auth.entity.DeviceToken;
 import java.util.Optional;
 
 public interface DeviceTokenRepositoryQueryDsl {
-    Optional<DeviceToken> findByDeviceTokenWithJWTs(String deviceToken);
+    Optional<DeviceToken> findByDeviceTokenWithRefreshToken(String deviceToken);
 }
