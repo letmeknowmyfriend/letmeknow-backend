@@ -7,7 +7,9 @@ public enum SubscriptionMessages {
     SUBSCRIPTION("구독 "),
     UNSUBSCRIPTION("구독 취소 "),
     SUBSCRIBED("구독한 "),
-    BOARD_ID("게시판 ID ");
+    BOARD_ID("게시판 ID "),
+    TOPIC("토픽 ")
+    ;
 
     private final String message;
 

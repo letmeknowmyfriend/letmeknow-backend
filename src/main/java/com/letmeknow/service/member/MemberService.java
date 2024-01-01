@@ -3,7 +3,6 @@ package com.letmeknow.service.member;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.letmeknow.auth.entity.DeviceToken;
-import com.letmeknow.auth.entity.RefreshToken;
 import com.letmeknow.auth.repository.devicetoken.DeviceTokenRepository;
 import com.letmeknow.auth.repository.refreshtoken.RefreshTokenRepository;
 import com.letmeknow.auth.service.JwtService;
@@ -25,7 +24,10 @@ import com.letmeknow.service.email.EmailService;
 import com.letmeknow.util.CodeGenerator;
 import com.letmeknow.util.Validator;
 import com.letmeknow.util.email.Email;
+import java.time.LocalDateTime;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,11 +47,15 @@ import static com.letmeknow.auth.service.JwtService.REFRESH_TOKEN_HEADER;
 import static com.letmeknow.message.messages.MemberMessage.CONSENT_TO_PUSH_NOTIFICATION;
 import static com.letmeknow.message.messages.Messages.*;
 import static com.letmeknow.message.messages.NotificationMessages.DEVICE_TOKEN;
+import static com.letmeknow.message.messages.NotificationMessages.FCM;
+import static com.letmeknow.message.messages.SubscriptionMessages.TOPIC;
+import static com.letmeknow.message.messages.SubscriptionMessages.UNSUBSCRIPTION;
 import static java.time.LocalDateTime.now;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
     private final SubscriptionService subscriptionService;
     private final DeviceTokenService deviceTokenService;
@@ -111,7 +117,7 @@ public class MemberService {
     // ToDo: verificationCode 유효 기간 확인할 것!
     @Transactional
     public void changePassword(String passwordVerificationCode, String newPassword, String newPasswordAgain) throws NoSuchMemberException, VerificationInvalidException, MemberSignUpValidationException {
-        Member member = memberRepository.findNotDeletedByPasswordVerificationCode(passwordVerificationCode)
+        Member member = memberRepository.findNotDeletedByPasswordVerificationCodeWithDeviceTokenAndSubscription(passwordVerificationCode)
                 //해당하는 비밀번호 변경 코드를 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_PASSWORD_VERIFICATION_CODE.getMessage()));
 
@@ -130,6 +136,28 @@ public class MemberService {
 
         // 비밀번호 변경
         member.changePassword(passwordEncoder.encode(newPassword.trim()));
+
+        List<String> deviceTokens = member.getDeviceTokens().stream().map(DeviceToken::getDeviceToken).collect(Collectors.toList());
+
+        // 구독 해제
+        for (Subscription subscription : member.getSubscriptions()) {
+            // 구독 해제
+            try {
+                String boardId = String.valueOf(subscription.getBoard().getId());
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(deviceTokens, boardId);
+            }
+            // 구독 해제 실패해도, 계속 진행
+            catch (FirebaseMessagingException e) {
+                log.info(FCM.getMessage() + TOPIC.getMessage() + UNSUBSCRIPTION.getMessage()
+                    + FAIL.getMessage());
+            }
+        }
+
+        // 로그인된 기기의 Device Token 삭제
+        for (DeviceToken deviceToken : member.getDeviceTokens()) {
+            deviceToken.deleteDeviceToken();
+            deviceTokenRepository.delete(deviceToken);
+        }
 
         // 상태 변경
         member.unlock();
@@ -167,36 +195,6 @@ public class MemberService {
         member.updateMemberAddress(memberAddressUpdateForm.getCity(), memberAddressUpdateForm.getStreet(), memberAddressUpdateForm.getZipcode());
 
         // 저장
-        memberRepository.save(member);
-    }
-
-    @Transactional
-    public void updateMemberPassword(@Valid MemberPasswordUpdateDto memberPasswordUpdateDto, String email) throws NoSuchMemberException, PasswordIncorrectException, MemberSignUpValidationException, NewPasswordNotMatchException {
-        // 새 비밀번호와 새 비밀번호 확인이 일치하지 않으면, 예외 발생
-        if (!memberPasswordUpdateDto.getNewPassword().equals(memberPasswordUpdateDto.getNewPasswordAgain())) {
-            throw new NewPasswordNotMatchException(new StringBuffer().append(NEW_PASSWORD.getMessage()).append(NOT_EQUAL.getMessage()).toString());
-        }
-
-        // 새 비밀번호가 규칙에 맞지 않으면, 예외 발생
-        validator.isValidPassword(email, memberPasswordUpdateDto.getNewPassword(), memberPasswordUpdateDto.getNewPasswordAgain());
-
-        Member member = memberRepository.findNotDeletedByEmail(email)
-            // 해당하는 이메일을 가진 회원이 없으면, 예외 발생
-            .orElseThrow(() -> new NoSuchMemberException(new StringBuffer().append(SUCH.getMessage()).append(EMAIL.getMessage()).append(MEMBER.getMessage()).append(NOT_EXISTS.getMessage()).toString()));
-
-        // 회원의 비밀번호가 일치하지 않으면, 예외 발생
-        if (!passwordEncoder.matches(memberPasswordUpdateDto.getPassword(), member.getPassword())) {
-            throw new PasswordIncorrectException(new StringBuffer().append(INCORRECT.getMessage()).append(PASSWORD.getMessage()).toString());
-        }
-
-        // 회원의 정보 업데이트
-        member.changePassword(memberPasswordUpdateDto.getNewPassword());
-
-        // ToDo: Device Token과 Refresh Token 전부 날리기 & 잘 되는 지 확인
-        // 회원이 가지고 있는  Device Token 삭제
-        deviceTokenRepository.deleteByMemberId(member.getId());
-
-        // 회원의 정보 저장
         memberRepository.save(member);
     }
 
@@ -325,18 +323,25 @@ public class MemberService {
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(deviceTokens, boardId);
             }
             // 구독 해제 실패해도, 계속 진행
-            catch (FirebaseMessagingException e) {}
+            catch (FirebaseMessagingException e) {
+                log.info(FCM.getMessage() + TOPIC.getMessage() + UNSUBSCRIPTION.getMessage()
+                    + FAIL.getMessage());
+            }
 
             subscriptionRepository.delete(subscription);
         }
 
-        // RefreshToken 삭제
-        for (RefreshToken refreshToken : member.getRefreshTokens()) {
-            refreshTokenRepository.delete(refreshToken);
+        // Device Token 삭제
+        for (DeviceToken deviceToken : member.getDeviceTokens()) {
+            deviceToken.deleteDeviceToken();
+            deviceTokenRepository.delete(deviceToken);
         }
 
         // 회원 삭제
-        memberRepository.delete(member);
+        member.deleteMember();
+
+        // 저장
+        memberRepository.save(member);
 
         // AccessToken 삭제
         response.setHeader(JwtService.ACCESS_TOKEN_HEADER, "");

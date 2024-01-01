@@ -18,7 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.letmeknow.auth.messages.MemberMessages.EMAIL;
+import static com.letmeknow.auth.messages.MemberMessages.VERIFICATION;
 import static com.letmeknow.enumstorage.response.Status.FAIL;
+import static com.letmeknow.message.messages.Messages.PLEASE;
+import static com.letmeknow.message.messages.Messages.REQUIRED;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 @Component
@@ -32,52 +36,64 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
         String email = (String) request.getAttribute("email");
 
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
-            .status(FAIL.getStatus())
-            .message(exception.getMessage())
-            .build()
-        ));
 
         // 해당 회원이 없는 경우
         if (exception instanceof UsernameNotFoundException) {
+            response.setStatus(SC_UNAUTHORIZED);
+
             // 임시 회원을 찾아본다.
             try
             {
                 // 임시 회원이 있다면,
                 temporaryMemberService.findTemporaryMemberByEmail(email);
 
-                // 이메일 재전송 요청 페이지로 redirect
-                response.setStatus(SC_UNAUTHORIZED);
-                response.setHeader("Location", "/api/auth/member/notice/verification-email/v1?email=" + email);
+                response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                    .status(FAIL.getStatus())
+                    .message(EMAIL.getMessage() + VERIFICATION.getMessage() + REQUIRED.getMessage() + PLEASE.getMessage())
+                    .build()
+                ));
+
                 return;
             }
             // 임시회원도 없으면
             catch (NoSuchTemporaryMemberException e)
             {
-                // 회원가입 페이지로 redirect
-                response.setStatus(SC_UNAUTHORIZED);
-                response.setHeader("Location", "/api/auth/signup/v1");
+                response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                    .status(FAIL.getStatus())
+                    .message(exception.getMessage())
+                    .build()
+                ));
+
                 return;
             }
         }
         // 계정이 잠겨있는 경우
         else if (exception instanceof MemberStateException) {
-            // 잠긴 계정 알림 페이지로 redirect
             response.setStatus(SC_UNAUTHORIZED);
-            response.setHeader("Location", "/api/auth/member/notice/locked/v1?email=" + email);
+
+            response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                .status(FAIL.getStatus())
+                .message(exception.getMessage())
+                .build()
+            ));
+
             return;
         }
         // 비밀번호가 틀린 경우
         else if (exception instanceof BadCredentialsException) {
             response.setStatus(SC_UNAUTHORIZED);
+
+            response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
+                .status(FAIL.getStatus())
+                .message(exception.getMessage())
+                .build()
+            ));
+
             return;
         }
         // 요청이 유효하지 않은 경우
         else if (exception instanceof InvalidRequestException) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-
-            // UTF-8로 인코딩, body에 메시지 담아서 보내기
-            response.setCharacterEncoding("UTF-8");
 
             response.getWriter().write(objectMapper.writeValueAsString(
                 Response.builder()
@@ -85,6 +101,7 @@ public class MemberLogInFailureHandler implements AuthenticationFailureHandler {
                 .message(exception.getMessage())
                 .build()
             ));
+
             return;
         }
     }

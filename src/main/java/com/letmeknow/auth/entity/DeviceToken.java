@@ -51,6 +51,10 @@ public class DeviceToken extends BaseEntity {
         this.refreshToken = null;
     }
 
+    public void deleteDeviceToken() {
+        this.member.getDeviceTokens().remove(this);
+    }
+
     // DTO
     public DeviceTokenDto toDeviceTokenDto() {
         return DeviceTokenDto.builder()

@@ -227,11 +227,13 @@ public class TemporaryMemberService {
 
     private void isEmailUsed(String email) throws MemberSignUpValidationException {
         if (temporaryMemberRepository.findByEmail(email).isPresent()) {
-            throw new MemberSignUpValidationException(MemberCause.EMAIL, new StringBuffer().append(TEMPORARY_MEMBER.getMessage()).append(ALREADY.getMessage()).append(EXISTS.getMessage()).toString());
+            throw new MemberSignUpValidationException(MemberCause.EMAIL,
+                TEMPORARY_MEMBER.getMessage() + ALREADY.getMessage() + EXISTS.getMessage());
         }
 
         if (memberRepository.findIdByEmail(email).isPresent()) {
-            throw new MemberSignUpValidationException(MemberCause.EMAIL, new StringBuffer().append(MEMBER.getMessage()).append(ALREADY.getMessage()).append(EXISTS.getMessage()).toString());
+            throw new MemberSignUpValidationException(MemberCause.EMAIL,
+                MEMBER.getMessage() + ALREADY.getMessage() + EXISTS.getMessage());
         }
     }
 }

@@ -14,6 +14,7 @@ public interface MemberRepositoryQueryDsl {
     Optional<Member> findNotDeletedByRefreshTokenIdWithSubscriptionAndDeviceToken(long refreshTokenId);
     Optional<Member> findNotDeletedByDeviceTokenIdWithSubscription(long deviceTokenId);
     Optional<Member> findNotDeletedByPasswordVerificationCode(String passwordVerificationCode);
+    Optional<Member> findNotDeletedByPasswordVerificationCodeWithDeviceTokenAndSubscription(String passwordVerificationCode);
     Optional<Long> findIdByEmail(String email);
     Optional<Long> findNotDeletedIdByEmail(String email);
     Optional<Member> findNotDeletedByEmailAndDeviceTokenAndSubscription(String email);

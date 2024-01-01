@@ -97,6 +97,19 @@ public class MemberRestController {
         );
     }
 
+    @PostMapping(value = "/delete/v1")
+    public ResponseEntity deleteMember(HttpServletRequest request, HttpServletResponse response) {
+        String email = request.getAttribute("email").toString();
+
+        memberService.deleteMember(email, response);
+
+        return ResponseEntity.ok(
+            Response.builder()
+                .status(SUCCESS.getStatus())
+                .build()
+        );
+    }
+
 //    @PostMapping("/update/address")
 //    public ResponseEntity<String> updateMemberAddress(MemberAddressUpdateForm memberAddressUpdateForm, HttpServletRequest request) throws NoSuchMemberException {
 //        String email = request.getAttribute("email").toString();
