@@ -43,7 +43,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
 
-    private static final List<String> NO_CHECK_URL = Arrays.asList("/api/auth", "/auth/member");
+    private static final List<String> NO_CHECK_URL = Arrays.asList("/api/auth", "/auth/member", "/support");
 
     /**
      * "/auth/login"으로 시작하는 URL 요청은 logIn 검증 및 authenticate X
