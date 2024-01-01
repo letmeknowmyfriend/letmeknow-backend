@@ -144,6 +144,22 @@ public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
     }
 
     @Override
+    public Optional<Member> findNotDeletedByPasswordVerificationCodeWithDeviceTokenAndSubscription(String passwordVerificationCode) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return Optional.ofNullable(
+            queryFactory
+                .selectDistinct(member)
+                .from(member)
+                .where(member.passwordVerificationCode.eq(passwordVerificationCode)
+                    .and(member.status.ne(MemberStatus.DELETED)))
+                .leftJoin(member.deviceTokens, deviceToken1).fetchJoin()
+                .leftJoin(member.subscriptions, subscription).fetchJoin()
+                .fetchOne()
+        );
+    }
+
+    @Override
     public Optional<Long> findIdByEmail(String email) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 

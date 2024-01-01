@@ -13,6 +13,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Optional<Member> findNotDeletedByEmailWithSubscriptionAndDeviceToken(String email);
     Optional<Member> findNotDeletedByEmailWithRefreshTokenAndSubscriptionAndDeviceToken(String email);
     Optional<Member> findNotDeletedByPasswordVerificationCode(String passwordVerificationCode);
+    Optional<Member> findNotDeletedByPasswordVerificationCodeWithDeviceTokenAndSubscription(String passwordVerificationCode);
     Optional<Long> findIdByEmail(String email);
     Optional<Long> findNotDeletedIdByEmail(String email);
     Optional<Member> findNotDeletedByEmailAndDeviceTokenAndSubscription(String email);

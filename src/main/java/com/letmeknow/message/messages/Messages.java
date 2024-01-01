@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Messages {
-    EXISTS("존재 "),
+    EXISTS("존재합니다. "),
     NOT_EXISTS("존재하지 않음 "),
     NOT_FOUND("찾을 수 없음 "),
     SUCCESS("성공 "),
@@ -40,6 +40,9 @@ public enum Messages {
     SERVER("서버 "),
     ERROR("오류 "),
     OCCURRED("발생 "),
+    REQUIRED("완료 "),
+    CHECK("확인 "),
+    PLEASE("해주세요. "),
     ;
 
     private final String message;

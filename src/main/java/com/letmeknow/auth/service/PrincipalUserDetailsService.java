@@ -28,9 +28,6 @@ public class PrincipalUserDetailsService implements UserDetailsService {
                 // 없으면, UsernameNotFoundException 발생
                 .orElseThrow(() -> new UsernameNotFoundException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()));
 
-        // 로그인 시도 횟수 증가
-        member.countUpLogInAttempt();
-
         // 있으면, PrincipalUserDetails 생성
         return new PrincipalUserDetails(member);
     }
