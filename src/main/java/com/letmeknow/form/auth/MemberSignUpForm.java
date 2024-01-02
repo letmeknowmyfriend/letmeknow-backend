@@ -1,5 +1,6 @@
 package com.letmeknow.form.auth;
 
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,11 +23,11 @@ public class MemberSignUpForm {
     private final String password;
     @NotBlank
     private final String passwordAgain;
-    @NotBlank
+    @NotNull
     private final String city;
-    @NotBlank
+    @NotNull
     private final String street;
-    @NotBlank
+    @NotNull
     private final String zipcode;
 
     @Builder
