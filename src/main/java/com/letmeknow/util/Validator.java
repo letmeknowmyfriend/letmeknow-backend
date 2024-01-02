@@ -30,15 +30,6 @@ public class Validator {
 
 
     public void validateNewMember(MemberSignUpForm memberSignUpForm) throws MemberSignUpValidationException {
-        // 도시 검사
-        isValidVarchar255(memberSignUpForm.getCity());
-
-        // 거리 검사
-        isValidVarchar255(memberSignUpForm.getStreet());
-
-        // 우편번호 검사
-        isValidVarchar255(memberSignUpForm.getZipcode());
-
         // 이름 검사
         isValidName(memberSignUpForm.getName());
 
@@ -51,10 +42,6 @@ public class Validator {
 
     private void isValidVarchar255(String varchar255) throws MemberSignUpValidationException {
         if (varchar255 == null) {
-            throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(NOT_FOUND.getMessage()).toString());
-        }
-
-        if (varchar255.isBlank()) {
             throw new MemberSignUpValidationException(MemberCause.FORM, new StringBuffer().append(ADDRESS.getMessage()).append(NOT_FOUND.getMessage()).toString());
         }
 

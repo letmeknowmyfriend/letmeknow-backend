@@ -190,13 +190,12 @@ public class TemporaryMemberService {
     @Transactional
     public void verifyEmailAndTurnIntoMember(String verificationCode) throws NoSuchTemporaryMemberException {
         TemporaryMember temporaryMember = temporaryMemberRepository.findByVerificationCode(verificationCode)
-                .orElseThrow(() -> new NoSuchTemporaryMemberException(new StringBuffer()
-                    .append(SUCH.getMessage())
-                    .append(VERIFICATION_CODE.getMessage())
-                    .append(WITH.getMessage())
-                    .append(TEMPORARY_MEMBER.getMessage())
-                    .append(NOT_EXISTS.getMessage())
-                    .toString()));
+                .orElseThrow(() -> new NoSuchTemporaryMemberException(
+                    SUCH.getMessage()
+                    + VERIFICATION_CODE.getMessage()
+                    + WITH.getMessage()
+                    + TEMPORARY_MEMBER.getMessage()
+                    + NOT_EXISTS.getMessage()));
 
         // verificationCode가 일치하면
         if (verificationCode.equals(temporaryMember.getVerificationCode())) {
@@ -215,13 +214,11 @@ public class TemporaryMemberService {
         }
         else {
             throw new NoSuchTemporaryMemberException(
-                new StringBuffer()
-                    .append(SUCH.getMessage())
-                    .append(VERIFICATION_CODE.getMessage())
-                    .append(WITH.getMessage())
-                    .append(TEMPORARY_MEMBER.getMessage())
-                    .append(NOT_EXISTS.getMessage())
-                        .toString());
+                    SUCH.getMessage()
+                    + VERIFICATION_CODE.getMessage()
+                    + WITH.getMessage()
+                    + TEMPORARY_MEMBER.getMessage()
+                    + NOT_EXISTS.getMessage());
         }
     }
 

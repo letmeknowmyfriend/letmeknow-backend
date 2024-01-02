@@ -108,13 +108,6 @@ public class Member extends BaseEntity {
         this.consentToReceivePushNotification = false;
     }
 
-    @Builder
-    protected Member(String email) {
-        this.email = email;
-        this.role = MemberRole.ADMIN;
-        this.status = MemberStatus.ACTIVE;
-    }
-
     //== 비즈니스 로직 ==//
     public void changePassword(String newPassword) {
         this.password = newPassword;
