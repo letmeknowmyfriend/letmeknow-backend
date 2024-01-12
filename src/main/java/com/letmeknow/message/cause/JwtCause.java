@@ -1,7 +1,14 @@
 package com.letmeknow.message.cause;
 
-public class JwtCause {
-    public static final String JWT = "jwt";
+import lombok.Getter;
 
-    private JwtCause() {}
+@Getter
+public enum JwtCause {
+    JWT("jwt");
+
+    private final String cause;
+
+    private JwtCause(String cause) {
+        this.cause = cause;
+    }
 }

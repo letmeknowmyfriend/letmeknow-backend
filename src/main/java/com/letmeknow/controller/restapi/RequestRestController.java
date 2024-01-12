@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 import static com.letmeknow.enumstorage.response.Status.FAIL;
@@ -37,13 +38,13 @@ public class RequestRestController {
     }
 
     // 필요한 인자가 없으면
-    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({IllegalArgumentException.class, ConstraintViolationException.class})
     public ResponseEntity handle400Exception(Exception e) {
         // 400 Bad Request
         return ResponseEntity.badRequest()
             .body(Response.builder()
                 .status(FAIL.getStatus())
-                .message(new StringBuffer().append(REQUEST.getMessage()).append(INVALID.getMessage()).toString())
+                .message(REQUEST.getMessage() + INVALID.getMessage())
                 .build());
     }
 }

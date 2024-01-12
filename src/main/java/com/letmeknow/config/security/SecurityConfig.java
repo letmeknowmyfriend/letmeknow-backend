@@ -1,8 +1,8 @@
 package com.letmeknow.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letmeknow.auth.filter.auth.AuthenticationProcessFilter;
-import com.letmeknow.auth.filter.auth.MemberAuthenticationFilter;
+import com.letmeknow.auth.filter.AuthenticationProcessFilter;
+import com.letmeknow.auth.filter.MemberAuthenticationFilter;
 import com.letmeknow.auth.handler.JwtLogoutHandler;
 import com.letmeknow.auth.handler.MemberLogInFailureHandler;
 import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
@@ -10,7 +10,6 @@ import com.letmeknow.auth.provider.MemberAuthenticationProvider;
 import com.letmeknow.auth.service.PrincipalUserDetailsService;
 import com.letmeknow.enumstorage.role.MemberRole;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -22,8 +21,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-
-import javax.servlet.http.HttpServletResponse;
 
 import static org.apache.http.HttpStatus.SC_OK;
 
@@ -43,16 +40,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // CORS
         http
                 .csrf().disable()
                 .cors().configurationSource(corsConfig.corsConfigurationSource());
-//            .and()
-//                .addFilter(corsConfig.corsFilter());
 
+        // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능
         http
-                // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
                 .authorizeHttpRequests(authorize -> authorize
-//                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
                         .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico", "/error/**").permitAll()
                         .antMatchers("/api/auth/**").permitAll()
                         .antMatchers("/api/subscription/**").permitAll()
@@ -69,20 +64,20 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
+        // 세션
         http
-                //세션
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션을 사용하지 않겠다.
             .and()
                 .httpBasic() // http header에 username, password를 넣어서 전송하는 방법을
                 .disable(); // 해제
 
-        //Filter
+        // Filter
         http
             .addFilterBefore(authenticationProcessFilter, LogoutFilter.class)
             .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
 
-        //로그인
+        // 로그인
         http
                 .formLogin().disable()
 //                .loginProcessingUrl("/auth/api/signin/v1")
@@ -99,9 +94,7 @@ public class SecurityConfig {
                 .logout(logout ->
                     logout.permitAll()
                     .logoutUrl("/api/auth/signout/v1")
-                    .logoutSuccessHandler((request, response, authentication) -> {
-                        response.setStatus(SC_OK);
-                    })
+                    .logoutSuccessHandler((request, response, authentication) -> response.setStatus(SC_OK))
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .addLogoutHandler(jwtLogoutHandler)

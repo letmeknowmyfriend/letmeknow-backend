@@ -28,9 +28,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 회원을 찾고, 인증을 수행하는 클래스
+ */
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class MemberAuthenticationProvider implements AuthenticationProvider {
     private final PrincipalUserDetailsService principalUserDetailsService;
     private final MemberService memberService;

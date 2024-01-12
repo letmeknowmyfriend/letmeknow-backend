@@ -48,7 +48,7 @@ public class JwtLogoutHandler implements LogoutHandler {
             response.setStatus(HttpStatus.SC_OK);
             response.getWriter().write(objectMapper.writeValueAsString(Response.builder()
                 .status(SUCCESS.getStatus())
-                .message(new StringBuffer().append(SIGN_OUT.getMessage()).append(Messages.SUCCESS.getMessage()).toString())
+                .message(SIGN_OUT.getMessage() + Messages.SUCCESS.getMessage())
                 .build()));
         }
         // 들어오는 값이 이상할 때
