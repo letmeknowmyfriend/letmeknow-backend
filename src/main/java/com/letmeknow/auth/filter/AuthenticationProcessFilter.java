@@ -1,4 +1,4 @@
-package com.letmeknow.auth.filter.auth;
+package com.letmeknow.auth.filter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;

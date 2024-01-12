@@ -1,17 +1,15 @@
 package com.letmeknow.auth.service;
 
 import com.letmeknow.auth.userdetail.PrincipalUserDetails;
+import com.letmeknow.entity.member.Member;
+import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
+import com.letmeknow.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.letmeknow.entity.member.Member;
-import com.letmeknow.enumstorage.errormessage.member.MemberErrorMessage;
-import com.letmeknow.repository.member.MemberRepository;
-
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Service
 // Transactional 붙이지 마

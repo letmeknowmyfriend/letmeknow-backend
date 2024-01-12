@@ -1,5 +1,8 @@
 package com.letmeknow.enumstorage;
 
+import lombok.Getter;
+
+@Getter
 public enum SpringProfile {
     LOCAL("local"),
     DEV("dev"),
@@ -9,9 +12,5 @@ public enum SpringProfile {
 
     SpringProfile(String profile) {
         this.profile = profile;
-    }
-
-    public String getProfile() {
-        return profile;
     }
 }

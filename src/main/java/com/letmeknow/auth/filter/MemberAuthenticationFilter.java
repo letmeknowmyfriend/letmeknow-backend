@@ -1,9 +1,6 @@
-package com.letmeknow.auth.filter.auth;
+package com.letmeknow.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -12,8 +9,6 @@ import com.letmeknow.auth.handler.MemberLogInSuccessHandler;
 import com.letmeknow.dto.auth.SignInAPIRequest;
 import com.letmeknow.exception.auth.InvalidRequestException;
 import com.letmeknow.service.DeviceTokenService;
-import org.apache.http.entity.ContentType;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,7 +69,7 @@ public class MemberAuthenticationFilter extends AbstractAuthenticationProcessing
                         .setToken(deviceToken)
                 .build());
         } catch (FirebaseMessagingException e) {
-            throw new InvalidRequestException(new StringBuffer().append(DEVICE_TOKEN.getMessage()).append(INVALID.getMessage()).toString());
+            throw new InvalidRequestException(DEVICE_TOKEN.getMessage() + INVALID.getMessage());
         }
 
         // DeviceToken을 request의 attribute에 담는다.
